@@ -24,14 +24,42 @@ namespace CS.Edu.Core.Extensions
 
         static IEnumerable<IEnumerable<TSource>> PaginateIterator<TSource>(IEnumerable<TSource> source, int pageSize)
         {
-            int behind = 0;
             IEnumerable<TSource> left = source;
             while (left.Any())
             {
                 yield return left.Take(pageSize);
-                behind += pageSize;
-                left = source.Skip(behind);
+                left = left.Skip(pageSize);
             }
+        }
+
+        static IEnumerable<IEnumerable<TSource>> TunedPaginateIterator<TSource>(IEnumerable<TSource> source, int pageSize)
+        {
+            IEnumerable<TSource> InnerIterator(IEnumerator<TSource> e, int c)
+            {
+                //bool guard = true;
+                int count = 0;
+
+                while (count < c && e.MoveNext())
+                {                    
+                    yield return e.Current;
+                    count++;
+
+                    //if (count++ < c)
+                    //    break;
+
+                    //guard = e.MoveNext();
+                }
+
+                ///guard = count > 0 && count <= c;
+            }
+
+            using (IEnumerator<TSource> e = source.GetEnumerator())
+            {
+                while (e.MoveNext())
+                {
+                    yield return InnerIterator(e, pageSize);
+                }
+            };
         }
     }
 }

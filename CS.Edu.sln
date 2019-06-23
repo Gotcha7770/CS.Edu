@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CS.Edu.Tests", "CS.Edu.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CS.Edu.Core", "CS.Edu.Core\CS.Edu.Core.csproj", "{58A58B78-E76F-4D63-8866-AAC07618CB4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS.Edu.Benchmarks", "CS.Edu.Benchmarks\CS.Edu.Benchmarks.csproj", "{F7597303-5ED3-4299-8758-0CFFFD2C19E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS.Edu.Benchmarks", "CS.Edu.Benchmarks\CS.Edu.Benchmarks.csproj", "{B97C3703-DF3A-4299-90A1-C95972015599}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{58A58B78-E76F-4D63-8866-AAC07618CB4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58A58B78-E76F-4D63-8866-AAC07618CB4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58A58B78-E76F-4D63-8866-AAC07618CB4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7597303-5ED3-4299-8758-0CFFFD2C19E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7597303-5ED3-4299-8758-0CFFFD2C19E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7597303-5ED3-4299-8758-0CFFFD2C19E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7597303-5ED3-4299-8758-0CFFFD2C19E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B97C3703-DF3A-4299-90A1-C95972015599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97C3703-DF3A-4299-90A1-C95972015599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97C3703-DF3A-4299-90A1-C95972015599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97C3703-DF3A-4299-90A1-C95972015599}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
