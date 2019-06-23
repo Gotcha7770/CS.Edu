@@ -12,7 +12,7 @@ namespace CS.Edu.Tests.LINQTests
     public class AggregateBoolTest
     {
         [Test]
-        public void TestMethod()
+        public void EnumerableOfBoolsTest()
         {
             var func = new Func<IEnumerable<bool>, bool?>((source) =>
             {
@@ -39,6 +39,36 @@ namespace CS.Edu.Tests.LINQTests
 
             items = new bool[] { true, true, true };
             Assert.That(func(items), Is.True);
+        }
+
+        [Test]
+        public void EnumerableOfNullableBoolsTest()
+        {
+            var func = new Func<IEnumerable<bool?>, bool?>((source) =>
+            {
+                return source.Aggregate((acc, cur) =>
+                {
+                    return acc.HasValue && acc.Value == cur ? cur : null;
+                });
+            });
+
+            var items = new bool?[] { true };
+            Assert.That(func(items), Is.True);
+
+            items = new bool?[] { false };
+            Assert.That(func(items), Is.False);
+
+            items = new bool?[] { true, false, true };
+            Assert.That(func(items), Is.Null);
+
+            items = new bool?[] { false, false, false };
+            Assert.That(func(items), Is.False);
+
+            items = new bool?[] { true, true, true };
+            Assert.That(func(items), Is.True);
+
+            items = new bool?[] { true, true, null };
+            Assert.That(func(items), Is.Null);
         }
     }
 }
