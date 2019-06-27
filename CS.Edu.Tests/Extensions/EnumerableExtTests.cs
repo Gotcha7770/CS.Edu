@@ -63,5 +63,25 @@ namespace CS.Edu.Tests.Extensions
             var items = Enumerable.Range(0, 10);
             Assert.Throws<ArgumentOutOfRangeException>(() => items.Paginate(0));
         }
+
+        [Test]
+        public void TakeLastLinkedListTest()
+        {
+            var items = Enumerable.Range(0, 1000);
+            var lastTen = items.TakeLastLinkedList(10).ToArray();
+
+            Assert.That(lastTen.Length, Is.EqualTo(10));
+            Assert.That(lastTen, Is.EquivalentTo(new [] {990, 991, 992, 993, 994, 995, 996, 997, 998, 999}));
+        }
+
+        [Test]
+        public void TakeLastReverseTest()
+        {
+            var items = Enumerable.Range(0, 1000);
+            var lastTen = items.TakeLastReverse(10).ToArray();
+
+            Assert.That(lastTen.Length, Is.EqualTo(10));
+            Assert.That(lastTen, Is.EquivalentTo(new[] { 990, 991, 992, 993, 994, 995, 996, 997, 998, 999 }));
+        }
     }
 }

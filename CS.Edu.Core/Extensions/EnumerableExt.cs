@@ -31,5 +31,25 @@ namespace CS.Edu.Core.Extensions
                 left = left.Skip(pageSize);
             }
         }
+
+        public static IEnumerable<TSource> TakeLastLinkedList<TSource>(this IEnumerable<TSource> source, int count)
+        {
+            var linkedList = new LinkedList<TSource>();
+
+            foreach (var item in source)
+            {
+                linkedList.AddLast(item);
+
+                if(linkedList.Count > count)
+                    linkedList.RemoveFirst();
+            }
+
+            return linkedList;
+        }
+
+        public static IEnumerable<TSource> TakeLastReverse<TSource>(this IEnumerable<TSource> source, int count)
+        {
+            return source.Reverse().Take(count).Reverse();
+        }
     }
 }

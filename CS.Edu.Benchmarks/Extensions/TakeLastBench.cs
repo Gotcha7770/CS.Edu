@@ -1,26 +1,28 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using BenchmarkDotNet.Attributes;
 using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
     [Config(typeof(DefaultConfig))]
-    public class PaginateBench
+    public class TakeLastBench
     {
         public IEnumerable<int> items = Enumerable.Range(0, 1000);
-        public List<int> list = Enumerable.Range(0, 1000).ToList();
 
         [Benchmark]
-        public void Paginate()
+        public void TakeLastLinkedList()
         {
-            var tmp = items.Paginate(25).ToArray();
+            var tmp = items.TakeLastLinkedList(55).ToArray();
         }
 
         [Benchmark]
-        public void Split()
+        public void TakeLastReverse()
         {
-            var tmp = list.Split(25).ToArray();
+            var tmp = items.TakeLastReverse(55).ToArray();
         }
+
     }
 }
