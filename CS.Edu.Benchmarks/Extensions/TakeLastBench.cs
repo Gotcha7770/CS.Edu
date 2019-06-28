@@ -24,5 +24,10 @@ namespace CS.Edu.Benchmarks.Extensions
             var tmp = items.TakeLastReverse(55).ToArray();
         }
 
+        [Benchmark]
+        public void TakeLastCore()
+        {
+            var tmp = items.TakeLast(55).ToArray();
+        }
     }
 }
