@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using BenchmarkDotNet.Attributes;
 using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
+    [MemoryDiagnoser]
     [Config(typeof(DefaultConfig))]
     public class TakeLastBench
     {

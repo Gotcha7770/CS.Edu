@@ -5,6 +5,7 @@ using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
+    [MemoryDiagnoser]
     [Config(typeof(DefaultConfig))]
     public class PaginateBench
     {
