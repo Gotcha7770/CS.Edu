@@ -65,6 +65,26 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
+        public void TakeLastArrayTest()
+        {
+            var items = Enumerable.Range(0, 1000);
+            var lastTen = items.TakeLastArray(10).ToArray();
+
+            Assert.That(lastTen.Length, Is.EqualTo(10));
+            Assert.That(lastTen, Is.EquivalentTo(new[] { 990, 991, 992, 993, 994, 995, 996, 997, 998, 999 }));
+        }
+
+        [Test]
+        public void TakeLastListTest()
+        {
+            var items = Enumerable.Range(0, 1000);
+            var lastTen = items.TakeLastList(10).ToArray();
+
+            Assert.That(lastTen.Length, Is.EqualTo(10));
+            Assert.That(lastTen, Is.EquivalentTo(new[] { 990, 991, 992, 993, 994, 995, 996, 997, 998, 999 }));
+        }
+
+        [Test]
         public void TakeLastLinkedListTest()
         {
             var items = Enumerable.Range(0, 1000);
@@ -79,6 +99,16 @@ namespace CS.Edu.Tests.Extensions
         {
             var items = Enumerable.Range(0, 1000);
             var lastTen = items.TakeLastReverse(10).ToArray();
+
+            Assert.That(lastTen.Length, Is.EqualTo(10));
+            Assert.That(lastTen, Is.EquivalentTo(new[] { 990, 991, 992, 993, 994, 995, 996, 997, 998, 999 }));
+        }
+
+        [Test]
+        public void TakeLastSpanTest()
+        {
+            var items = Enumerable.Range(0, 1000);
+            var lastTen = items.TakeLastSpan(10).ToArray();
 
             Assert.That(lastTen.Length, Is.EqualTo(10));
             Assert.That(lastTen, Is.EquivalentTo(new[] { 990, 991, 992, 993, 994, 995, 996, 997, 998, 999 }));

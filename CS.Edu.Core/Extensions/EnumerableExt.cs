@@ -32,6 +32,22 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
+        public static IEnumerable<TSource> TakeLastArray<TSource>(this IEnumerable<TSource> source, int count)
+        {
+            var array = source.ToArray();
+            var dest = new TSource[count];
+            Array.Copy(array, array.Length - count, dest, 0, count);
+
+            return dest;
+        }
+
+        public static IEnumerable<TSource> TakeLastList<TSource>(this IEnumerable<TSource> source, int count)
+        {
+            var list = source.ToList();
+
+            return list.GetRange(list.Count - count, count);
+        }
+
         public static IEnumerable<TSource> TakeLastLinkedList<TSource>(this IEnumerable<TSource> source, int count)
         {
             var linkedList = new LinkedList<TSource>();
@@ -50,6 +66,12 @@ namespace CS.Edu.Core.Extensions
         public static IEnumerable<TSource> TakeLastReverse<TSource>(this IEnumerable<TSource> source, int count)
         {
             return source.Reverse().Take(count).Reverse();
+        }
+
+        public static IEnumerable<TSource> TakeLastSpan<TSource>(this IEnumerable<TSource> source, int count)
+        {
+            var array = source.ToArray();
+            return new Span<TSource>(array, array.Length - count, count).ToArray();
         }
     }
 }
