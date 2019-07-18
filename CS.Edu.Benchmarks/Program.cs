@@ -7,7 +7,6 @@ namespace CS.Edu.Benchmarks
     {
         static void Main(string[] args)
         {
-            //var summary = BenchmarkRunner.Run<PaginateBench>();
             _ = BenchmarkRunner.Run<TakeLastBench>();
         }
     }
