@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Running;
 using CS.Edu.Benchmarks.Extensions;
 
 namespace CS.Edu.Benchmarks
@@ -7,8 +7,7 @@ namespace CS.Edu.Benchmarks
     {
         static void Main(string[] args)
         {
-            //var summary = BenchmarkRunner.Run<PaginateBench>();
-            var summary = BenchmarkRunner.Run<TakeLastBench>();
+            _ = BenchmarkRunner.Run<TakeLastBench>();
         }
     }
 }
