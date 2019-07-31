@@ -64,7 +64,7 @@ namespace CS.Edu.Core.Extensions
             {
                 if (!yielding)
                 {
-                    if(relation(prev, element))
+                    if (relation(prev, element))
                     {
                         prev = element;
                     }
@@ -73,8 +73,10 @@ namespace CS.Edu.Core.Extensions
                         yielding = true;
                     }
                 }
-                if (yielding)
+                else
+                {
                     yield return element;
+                }
             }
         }
 
