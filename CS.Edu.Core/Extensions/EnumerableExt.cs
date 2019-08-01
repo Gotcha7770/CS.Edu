@@ -18,7 +18,7 @@ namespace CS.Edu.Core.Extensions
             while (source.Any())
             {
                 yield return source.TakeWhile(relation);
-                source = source.SkipWhile( relation);
+                source = source.SkipWhile(relation);
             }
         }
 
@@ -35,13 +35,19 @@ namespace CS.Edu.Core.Extensions
         static IEnumerable<TSource> TakeWhileIterator<TSource>(IEnumerable<TSource> source, Relation<TSource> relation)
         {
             TSource prev = source.FirstOrDefault();
-            foreach (TSource element in source.Skip(1))
+
+            if (source.Any())
             {
-                if (!relation(prev, element))
+                yield return prev;
+            }
+
+            foreach (TSource item in source.Skip(1))
+            {
+                if (!relation(prev, item))
                     break;
 
-                prev = element;
-                yield return element;
+                prev = item;
+                yield return item;
             }
         }
 
@@ -60,22 +66,23 @@ namespace CS.Edu.Core.Extensions
             TSource prev = source.FirstOrDefault();
 
             bool yielding = false;
-            foreach (TSource element in source)
+            foreach (TSource item in source.Skip(1))
             {
                 if (!yielding)
                 {
-                    if (relation(prev, element))
+                    if (relation(prev, item))
                     {
-                        prev = element;
+                        prev = item;
                     }
                     else
                     {
                         yielding = true;
+                        yield return item;
                     }
                 }
                 else
                 {
-                    yield return element;
+                    yield return item;
                 }
             }
         }
