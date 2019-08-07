@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CS.Edu.Core
 {
-    public static class PatternMathcing
+    public static class PatternMatching
     {
         public static int Add(int? x, int? y)
         {

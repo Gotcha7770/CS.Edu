@@ -10,10 +10,10 @@ namespace CS.Edu.Tests
     }
 
     [TestFixture]
-    public class Test
+    public class MoqVsNSubstituteTest
     {
        [Test]
-        public void TestMethod1()
+        public void NSubstituteSetupTest()
         {
             var main = new object();
             var sub = Substitute.For<ITestService>();
@@ -23,7 +23,7 @@ namespace CS.Edu.Tests
         }
 
         [Test]
-        public void TestMethod2()
+        public void MoqSetupTest()
         {
             var main = new object();
             var sub = new Mock<ITestService>();
