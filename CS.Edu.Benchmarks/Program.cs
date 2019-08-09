@@ -7,7 +7,8 @@ namespace CS.Edu.Benchmarks
     {
         static void Main(string[] args)
         {
-            _ = BenchmarkRunner.Run<TakeLastBench>();
+            //_ = BenchmarkRunner.Run<TakeLastBench>();
+            _ = BenchmarkRunner.Run<MatrixBench>();
         }
     }
 }
