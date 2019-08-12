@@ -43,15 +43,21 @@ namespace CS.Edu.Benchmarks
             .ToArray();
 
         [Benchmark]
-        public object GetFirstOrDeafaultOfType()
+        public object GetFirstOrDefaultOfType()
         {
             return Items.OfType<Type1>().FirstOrDefault(x => x.Value == 500);
         }
 
         [Benchmark]
-        public object GetFirstOrDeafaultWhere()
+        public object GetFirstOrDefaultWhereFieldCheck()
         {
             return Items.FirstOrDefault(x => x.Type == ClassType.Type1 && x.Value == 500) as Type1;
+        }
+
+        [Benchmark]
+        public object GetFirstOrDefaultWhereTypeCheck()
+        {
+            return Items.FirstOrDefault(x => x is Type1 && x.Value == 500) as Type1;
         }
     }
 }
