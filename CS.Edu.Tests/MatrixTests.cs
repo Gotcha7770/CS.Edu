@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Core;
+using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests
@@ -31,6 +33,6 @@ namespace CS.Edu.Tests
             Assert.That(result.Rank, Is.EqualTo(2));
             Assert.That(result.GetLength(0), Is.EqualTo(4));
             Assert.That(result.GetLength(1), Is.EqualTo(1000));
-        }        
+        }
     }
 }

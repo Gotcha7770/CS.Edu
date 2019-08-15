@@ -68,7 +68,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SkipWhile_OneElement() ///???
+        public void SkipWhile_OneElement_ReturnsEmpty()
         {
             var items = new List<int> { 1 };
             Relation<int> lessThan = (x, y) => x < y;
@@ -95,7 +95,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Split_OneElement_ReturnsEmpty()
+        public void Split_OneElement_ReturnsEmpty() //???
         {
             var items = new List<int> { 1 };
             Relation<int> lessThan = (x, y) => x < y;
@@ -113,33 +113,6 @@ namespace CS.Edu.Tests.Extensions
             Assert.That(result[1], Is.EqualTo(new int[] { 2, 3 }));
         }
 
-        struct Node
-        {
-            public Node(int? prev, int value) : this()
-            {
-                Prev = prev;
-                Value = value;
-            }
-
-            public int? Prev { get; }
-
-            public int Value { get; }
-
-            public int? Direction
-            {
-                get
-                {
-                    if (Prev.HasValue)
-                    {
-                        return Prev.Value < Value ? 0 : 1;
-                    }
-
-                    return null;
-                }
-            }
-
-        }
-
         [Test]
         public void SplitTest()
         {
@@ -151,32 +124,6 @@ namespace CS.Edu.Tests.Extensions
             };
 
             var result = items.Split(isDirectionNotChanged).Where(x => x.All(y => y != 90)).ToArray();
-        }
-
-        [Test]
-        public void SplitTest2()
-        {
-            var items = new List<Node>
-            {
-                new Node(null, 1),
-                new Node(1, 2),
-                new Node(2, 3),
-                new Node(3, 2),
-                new Node(2, 1),
-                new Node(1, 2),
-                new Node(2, 3),
-            };
-
-            Relation<Node> isDirectionNotChanged = (x, y) =>
-            {
-                return !x.Direction.HasValue || x.Direction == y.Direction;
-            };
-
-            var result = items.Split(isDirectionNotChanged).ToArray();
-            Assert.That(result.Length, Is.EqualTo(3));
-            Assert.That(result[0].Select(x => x.Value).ToArray(), Is.EqualTo(new int[] { 1, 2, 3 }));
-            Assert.That(result[1].Select(x => x.Value).ToArray(), Is.EqualTo(new int[] { 2, 1 }));
-            Assert.That(result[2].Select(x => x.Value).ToArray(), Is.EqualTo(new int[] { 2, 3 }));
         }
 
         [Test]

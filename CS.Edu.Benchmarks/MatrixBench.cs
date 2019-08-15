@@ -29,7 +29,7 @@ namespace CS.Edu.Benchmarks
         }
 
         [Benchmark]
-        public double[] For()
+        public double[] Cycle()
         {
             List<double> result = new List<double>();
 
