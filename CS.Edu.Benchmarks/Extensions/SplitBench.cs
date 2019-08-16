@@ -28,6 +28,7 @@ namespace CS.Edu.Benchmarks.Extensions
         [Benchmark]
         public IEnumerable<int>[] SplitWithCycle()
         {
+            List<int> result = new List<int>();
             int prev = items.First();
             foreach (var item in items.Skip(1))
             {
