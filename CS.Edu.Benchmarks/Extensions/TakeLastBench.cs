@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
@@ -13,39 +13,39 @@ namespace CS.Edu.Benchmarks.Extensions
         public IEnumerable<int> items = Enumerable.Range(0, 1000);
 
         [Benchmark]
-        public void TakeLastArray()
+        public int[] TakeLastArray()
         {
-            var tmp = items.TakeLastArray(55).ToArray();
+            return items.TakeLastArray(55).ToArray();
         }
 
         [Benchmark]
-        public void TakeLastList()
+        public int[] TakeLastList()
         {
-            var tmp = items.TakeLastList(55).ToArray();
+            return items.TakeLastList(55).ToArray();
         }
 
         [Benchmark]
-        public void TakeLastLinkedList()
+        public int[] TakeLastLinkedList()
         {
-            var tmp = items.TakeLastLinkedList(55).ToArray();
+            return items.TakeLastLinkedList(55).ToArray();
         }
 
         [Benchmark]
-        public void TakeLastReverse()
+        public int[] TakeLastReverse()
         {
-            var tmp = items.TakeLastReverse(55).ToArray();
+            return items.TakeLastReverse(55).ToArray();
         }
 
         [Benchmark]
-        public void TakeLastSpan()
+        public int[] TakeLastSpan()
         {
-            var tmp = items.TakeLastSpan(55).ToArray();
+            return items.TakeLastSpan(55).ToArray();
         }
 
         [Benchmark]
-        public void TakeLastCore()
+        public int[] TakeLastCore()
         {
-            var tmp = items.TakeLast(55).ToArray();
+            return items.TakeLast(55).ToArray();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Core.Extensions;
@@ -13,15 +13,21 @@ namespace CS.Edu.Benchmarks.Extensions
         public List<int> list = Enumerable.Range(0, 1000).ToList();
 
         [Benchmark]
-        public void Paginate()
+        public IEnumerable<int>[] Paginate()
         {
-            var tmp = items.Paginate(25).ToArray();
+            return items.Paginate(25).ToArray();
         }
 
         [Benchmark]
-        public void Split()
+        public IEnumerable<int>[] PaginateToArray()
         {
-            var tmp = list.Split(25).ToArray();
+            return items.Paginate(25).Select(x => x.ToArray()).ToArray();
+        }
+
+        [Benchmark]
+        public IEnumerable<int>[] Split()
+        {
+            return list.Split(25).ToArray();
         }
     }
 }
