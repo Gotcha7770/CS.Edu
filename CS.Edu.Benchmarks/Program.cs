@@ -7,7 +7,7 @@ namespace CS.Edu.Benchmarks
     {
         static void Main(string[] args)
         {
-            _ = BenchmarkRunner.Run<PaginateBench>();
+            _ = BenchmarkRunner.Run<BinarySplitBench>();
         }
     }
 }

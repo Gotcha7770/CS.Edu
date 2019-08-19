@@ -134,19 +134,6 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SplitTest()
-        {
-            var items = new List<int> { 88, 89, 90, 90, 90, 91, 92, 90, 90, 90, 89, 88, 90};
-
-            Relation<int> isDirectionNotChanged = (x, y) =>
-            {
-                return x > 90 && y > 90 || x < 90 && y < 90;
-            };
-
-            var result = items.Split(isDirectionNotChanged).Where(x => x.All(y => y != 90)).ToArray();
-        }
-
-        [Test]
         public void Paginate_Enumerable_ReturnsEnumerableOfEnumerable()
         {
             int pageSize = 20;

@@ -49,7 +49,7 @@ namespace CS.Edu.Tests
         [Test]
         public void LINQReduceTest()
         {
-            var items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1, 0, 0 }; // {{1, 3}, {0, 0, 0}, {7}, {0,0}, {9}, {0}, {1}}
+            var items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1, 0, 0 }; 
             Func<int, bool> nonZero = x => x != 0;
 
             static IEnumerable<TSource> BufferIterator<TSource>(IEnumerable<TSource> source, Func<TSource, bool> constraint) //Window
