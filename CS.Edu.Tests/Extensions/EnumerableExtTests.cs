@@ -109,14 +109,15 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Split_OneElement_ReturnsThatElement()
+        public void Split_OneElement_ReturnsOneArrayWithThatElement()
         {
             var items = new int[] { 1 };
             Relation<int> lessThan = (x, y) => x < y;
 
             var result = items.Split(lessThan).ToArray();
 
-            Assert.That(result, Is.EqualTo(new int[] { 1 }));
+            Assert.That(result.Length, Is.EqualTo(1));
+            Assert.That(result[0], Is.EqualTo(new int[] { 1 }));
         }
 
         [Test]
