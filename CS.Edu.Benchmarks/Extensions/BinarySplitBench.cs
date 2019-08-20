@@ -16,6 +16,16 @@ namespace CS.Edu.Benchmarks.Extensions
 
         public IEnumerable<int> items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 };
 
+        internal int[] AppendExeptNull(int[] array, int value)
+        {
+            return (array, value) switch
+            {
+                (null, _) => new int[] { value },
+                (int[] acc, 0) when acc.Last() == 0 => array,
+                _ => array.Append(value).ToArray()
+            };
+        }
+
         Func<int, bool> nonZero = x => x != 0;
 
         Relation<int> relation = new Relation<int>((x, y) => (x, y) switch
@@ -25,15 +35,6 @@ namespace CS.Edu.Benchmarks.Extensions
             (_, 0) => false,
             _ => true
         });
-
-        [Benchmark]
-        public int[] Split()
-        {
-            return items.Split(relation)
-                .Select(x => x.All(y => y == 0) ? Enumerable.Repeat(x.First(), 1) : x)
-                .SelectMany(x => x)
-                .ToArray();
-        }
 
         [Benchmark]
         public int[] SplitWithCycle()
@@ -59,6 +60,12 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
+        public int[] SplitWithAggregate()
+        {
+            return items.Aggregate<int, int[]>(null, (acc, cur) => AppendExeptNull(acc, cur));
+        }
+
+        [Benchmark]
         public int[] SplitWithLINQ()
         {
             static IEnumerable<TSource> SpecialIterator<TSource>(IEnumerable<TSource> source, Func<TSource, bool> constraint)
@@ -79,6 +86,15 @@ namespace CS.Edu.Benchmarks.Extensions
             }
 
             return SpecialIterator(items, nonZero).ToArray();
+        }
+
+        [Benchmark]
+        public int[] Split()
+        {
+            return items.Split(relation)
+                .Select(x => x.All(y => y == 0) ? Enumerable.Repeat(x.First(), 1) : x)
+                .SelectMany(x => x)
+                .ToArray();
         }
     }
 }

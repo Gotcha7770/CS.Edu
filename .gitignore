@@ -328,4 +328,9 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# F# Ionide extension
 .ionide/
+
+# VS Code editor misc
+.vscode/
