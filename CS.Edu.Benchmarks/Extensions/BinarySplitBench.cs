@@ -26,6 +26,16 @@ namespace CS.Edu.Benchmarks.Extensions
             };
         }
 
+        internal List<int> AppendExeptNull2(List<int> list, int value)
+        {
+            if(list == null)
+                return new List<int> { value };
+             if(list.Last() != 0 || value != 0)
+                list.Add(value);
+            
+            return list;
+        }
+
         Func<int, bool> nonZero = x => x != 0;
 
         Relation<int> relation = new Relation<int>((x, y) => (x, y) switch
@@ -63,6 +73,12 @@ namespace CS.Edu.Benchmarks.Extensions
         public int[] SplitWithAggregate()
         {
             return items.Aggregate<int, int[]>(null, (acc, cur) => AppendExeptNull(acc, cur));
+        }
+
+        [Benchmark]
+        public List<int> SplitWithAggregate2()
+        {
+            return items.Aggregate<int, List<int>>(null, (acc, cur) => AppendExeptNull2(acc, cur));
         }
 
         [Benchmark]
