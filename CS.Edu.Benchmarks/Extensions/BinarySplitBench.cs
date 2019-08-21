@@ -51,17 +51,17 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             List<int> result = new List<int>();
 
-            bool skippingZeros = false;
+            bool isZero = false;
             foreach (var item in items)
             {
                 if (item != 0)
                 {
-                    skippingZeros = false;
+                    isZero = false;
                     result.Add(item);
                 }
-                else if (!skippingZeros)
+                else if (!isZero)
                 {
-                    skippingZeros = true;
+                    isZero = true;
                     result.Add(item);
                 }
             }
