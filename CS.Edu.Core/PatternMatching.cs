@@ -1,6 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace CS.Edu.Core
 {
@@ -16,5 +15,15 @@ namespace CS.Edu.Core
                 _ => 0
             };
         }
+
+        // public static int[] ReduceZeros(int[] source)
+        // {
+        //     return (source) switch
+        //     {
+        //         { Length: 0 } => source,
+        //         { Head: 0 } => source.Head,
+        //         _ => source
+        //     };
+        // }
     }
 }

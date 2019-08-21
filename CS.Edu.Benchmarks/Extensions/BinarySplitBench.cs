@@ -28,11 +28,11 @@ namespace CS.Edu.Benchmarks.Extensions
 
         internal List<int> AppendExeptNull2(List<int> list, int value)
         {
-            if(list == null)
+            if (list == null)
                 return new List<int> { value };
-             if(list.Last() != 0 || value != 0)
+            if (list.Last() != 0 || value != 0)
                 list.Add(value);
-            
+
             return list;
         }
 
@@ -46,7 +46,7 @@ namespace CS.Edu.Benchmarks.Extensions
             _ => true
         });
 
-        [Benchmark]
+        //[Benchmark]
         public int[] SplitWithCycle()
         {
             List<int> result = new List<int>();
@@ -69,19 +69,19 @@ namespace CS.Edu.Benchmarks.Extensions
             return result.ToArray();
         }
 
-        [Benchmark]
+        //[Benchmark]
         public int[] SplitWithAggregate()
         {
             return items.Aggregate<int, int[]>(null, (acc, cur) => AppendExeptNull(acc, cur));
         }
 
-        [Benchmark]
+        //[Benchmark]
         public List<int> SplitWithAggregate2()
         {
             return items.Aggregate<int, List<int>>(null, (acc, cur) => AppendExeptNull2(acc, cur));
         }
 
-        [Benchmark]
+        //[Benchmark]
         public int[] SplitWithLINQ()
         {
             static IEnumerable<TSource> SpecialIterator<TSource>(IEnumerable<TSource> source, Func<TSource, bool> constraint)
@@ -109,6 +109,27 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             return items.Split(relation)
                 .Select(x => x.All(y => y == 0) ? Enumerable.Repeat(x.First(), 1) : x)
+                .SelectMany(x => x)
+                .ToArray();
+        }
+
+        internal IEnumerable<int> Reduce(IEnumerable<int> source)
+        {
+            int first = source.First();
+            if (first == 0)
+                yield return first;
+            else
+            {
+                foreach (var item in source)
+                    yield return item;
+            }
+        }
+
+        [Benchmark]
+        public int[] Split2()
+        {
+            return items.Split(relation)
+                .Select(x => Reduce(x))
                 .SelectMany(x => x)
                 .ToArray();
         }
