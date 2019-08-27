@@ -36,22 +36,66 @@ namespace CS.Edu.Core.Extensions
             return TakeWhileIterator(source, relation);
         }
 
+        public static IEnumerable<TSource> TakeWhile<TSource>(this IEnumerable<TSource> source, Relation<TSource, TSource, TSource> relation)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (relation == null)
+                throw new ArgumentNullException(nameof(relation));
+
+            return TakeWhileIterator(source, relation);
+        }
+
         static IEnumerable<TSource> TakeWhileIterator<TSource>(IEnumerable<TSource> source, Relation<TSource> relation)
         {
-            TSource prev = source.FirstOrDefault();
-
-            if (source.Any())
+            using (var enumerator = source.GetEnumerator())
             {
+                if (!enumerator.MoveNext())
+                    yield break;
+
+                TSource prev = enumerator.Current;
                 yield return prev;
+
+                while (enumerator.MoveNext())
+                {
+                    if (!relation(prev, enumerator.Current))
+                        break;
+
+                    prev = enumerator.Current;
+                    yield return enumerator.Current;
+                }
             }
+        }
 
-            foreach (TSource item in source.Skip(1))
+        static IEnumerable<TSource> TakeWhileIterator<TSource>(IEnumerable<TSource> source, Relation<TSource, TSource, TSource> relation)
+        {
+            using (var enumerator = source.GetEnumerator())
             {
-                if (!relation(prev, item))
-                    break;
+                TSource first;
+                TSource second;
 
-                prev = item;
-                yield return item;
+                if (!enumerator.MoveNext())
+                    yield break;
+
+                first = enumerator.Current;
+                yield return first;
+
+                if (!enumerator.MoveNext())
+                    yield break;
+
+                second = enumerator.Current;
+                yield return second;
+
+                while (enumerator.MoveNext())
+                {
+                    if (relation(first, second, enumerator.Current))
+                        yield return enumerator.Current;
+                    else
+                        yield break;
+
+                    first = second;
+                    second = enumerator.Current;
+                }
             }
         }
 
@@ -67,26 +111,32 @@ namespace CS.Edu.Core.Extensions
 
         static IEnumerable<TSource> SkipWhileIterator<TSource>(IEnumerable<TSource> source, Relation<TSource> relation)
         {
-            TSource prev = source.FirstOrDefault();
-
-            bool yielding = false;
-            foreach (TSource item in source.Skip(1))
+            using (var enumerator = source.GetEnumerator())
             {
-                if (!yielding)
+                if (!enumerator.MoveNext())
+                    yield break;
+
+                TSource prev = enumerator.Current;
+                bool yielding = false;
+
+                while (enumerator.MoveNext())
                 {
-                    if (relation(prev, item))
+                    if (!yielding)
                     {
-                        prev = item;
+                        if (relation(prev, enumerator.Current))
+                        {
+                            prev = enumerator.Current;
+                        }
+                        else
+                        {
+                            yielding = true;
+                            yield return enumerator.Current;
+                        }
                     }
                     else
                     {
-                        yielding = true;
-                        yield return item;
+                        yield return enumerator.Current;
                     }
-                }
-                else
-                {
-                    yield return item;
                 }
             }
         }
