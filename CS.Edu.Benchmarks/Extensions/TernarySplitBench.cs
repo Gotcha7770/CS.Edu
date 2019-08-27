@@ -23,7 +23,8 @@ namespace CS.Edu.Benchmarks.Extensions
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
             .SelectMany(x => x);
 
-        Relation<int, int, int> isMonotone = (x, y, z) => x < y && y < z || x > y && y > z;
+        //Relation<int, int, int> isMonotone = (x, y, z) => x < y && y < z || x > y && y > z;
+        Relation<int, int, int> isMonotone = (x, y, z) => x < y ? y < z : y > z;
 
         [Benchmark]
         public IEnumerable<int>[] Split()

@@ -15,15 +15,5 @@ namespace CS.Edu.Core
                 _ => 0
             };
         }
-
-        // public static int[] ReduceZeros(int[] source)
-        // {
-        //     return (source) switch
-        //     {
-        //         { Length: 0 } => source,
-        //         { Head: 0 } => source.Head,
-        //         _ => source
-        //     };
-        // }
     }
 }
