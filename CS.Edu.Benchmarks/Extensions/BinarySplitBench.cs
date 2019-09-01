@@ -16,26 +16,6 @@ namespace CS.Edu.Benchmarks.Extensions
 
         public IEnumerable<int> items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 };
 
-        internal int[] AppendExeptNull(int[] array, int value)
-        {
-            return (array, value) switch
-            {
-                (null, _) => new int[] { value },
-                (int[] acc, 0) when acc.Last() == 0 => array,
-                _ => array.Append(value).ToArray()
-            };
-        }
-
-        internal List<int> AppendExeptNull2(List<int> list, int value)
-        {
-            if (list == null)
-                return new List<int> { value };
-            if (list.Last() != 0 || value != 0)
-                list.Add(value);
-
-            return list;
-        }
-
         Func<int, bool> nonZero = x => x != 0;
 
         Relation<int> relation = new Relation<int>((x, y) => x == 0 ? y == 0 : y != 0);
@@ -61,18 +41,6 @@ namespace CS.Edu.Benchmarks.Extensions
             }
 
             return result.ToArray();
-        }
-
-        [Benchmark]
-        public int[] SplitWithAggregate()
-        {
-            return items.Aggregate<int, int[]>(null, (acc, cur) => AppendExeptNull(acc, cur));
-        }
-
-        [Benchmark]
-        public List<int> SplitWithAggregate2()
-        {
-            return items.Aggregate<int, List<int>>(null, (acc, cur) => AppendExeptNull2(acc, cur));
         }
 
         [Benchmark]
@@ -123,6 +91,76 @@ namespace CS.Edu.Benchmarks.Extensions
         public int[] Split2()
         {
             return items.Split(relation)
+                .Select(x => Reduce(x))
+                .SelectMany(x => x)
+                .ToArray();
+        }
+
+        public IEnumerable<IEnumerable<TSource>> SpecialSplit<TSource>(IEnumerable<TSource> source, Relation<TSource> relation)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (relation == null)
+                throw new ArgumentNullException(nameof(relation));
+
+            int countToSkip = 0;
+            while (source.Skip(countToSkip).Any())
+            {
+                yield return TakeIterator(source, countToSkip, relation);                
+
+                countToSkip += CounterIterator(source, countToSkip, relation);
+            }
+        }
+
+        static IEnumerable<TSource> TakeIterator<TSource>(IEnumerable<TSource> source, int countToSkip, Relation<TSource> relation)
+        {
+            using (var enumerator = source.GetEnumerator())
+            {
+                while (countToSkip > 0 && enumerator.MoveNext()) countToSkip--;
+                
+                if (!enumerator.MoveNext())
+                    yield break;
+
+                TSource prev = enumerator.Current;
+                yield return prev;
+
+                while (enumerator.MoveNext())
+                {
+                    if (!relation(prev, enumerator.Current))
+                        break;
+
+                    prev = enumerator.Current;
+                    yield return prev;
+                }
+            }
+        }
+
+        static int CounterIterator<TSource>(IEnumerable<TSource> source, int countToSkip, Relation<TSource> relation)
+        {            
+            using (var enumerator = source.GetEnumerator())
+            {
+                while (countToSkip > 0 && enumerator.MoveNext()) countToSkip--;
+
+                if (!enumerator.MoveNext())
+                    return 0;
+
+                int result = 1;
+                TSource prev = enumerator.Current;
+
+                while(enumerator.MoveNext() && relation(prev, enumerator.Current))
+                {
+                    result++;
+                    prev = enumerator.Current;
+                }
+
+                return result;
+            }            
+        }
+
+        [Benchmark]
+        public int[] Split3()
+        {
+            return SpecialSplit(items, relation)
                 .Select(x => Reduce(x))
                 .SelectMany(x => x)
                 .ToArray();

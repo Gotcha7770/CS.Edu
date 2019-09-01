@@ -17,6 +17,6 @@ namespace CS.Edu.Tests
             Assert.That(PatternMatching.Add(x, z), Is.EqualTo(1));
             Assert.That(PatternMatching.Add(z, y), Is.EqualTo(1));
             Assert.That(PatternMatching.Add(z, z), Is.EqualTo(0));
-        }
+        }        
     }
 }
