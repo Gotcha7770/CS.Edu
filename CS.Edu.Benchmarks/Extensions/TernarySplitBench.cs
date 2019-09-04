@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks.Extensions
@@ -23,26 +24,23 @@ namespace CS.Edu.Benchmarks.Extensions
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
             .SelectMany(x => x);
 
-        //Relation<int, int, int> isMonotone = (x, y, z) => x < y && y < z || x > y && y > z;
         Relation<int, int, int> isMonotone = (x, y, z) => x < y ? y < z : y > z;
 
         [Benchmark]
         public IEnumerable<int>[] Split()
         {
-            return Enumerable.Empty<IEnumerable<int>>().ToArray();
-            //return items.Split(isMonotone).ToArray();
+            return items.Split(isMonotone).ToArray();
         }
 
         [Benchmark]
         public IEnumerable<int>[] SplitToArray()
         {
-            return Enumerable.Empty<IEnumerable<int>>().ToArray();
-            //return items.Split(isMonotone).Select(x => x.ToArray()).ToArray();
+            return items.Split(isMonotone).Select(x => x.ToArray()).ToArray();
         }
 
         [Benchmark]
         public IEnumerable<int>[] SplitWithCycle()
-        {            
+        {
             List<IEnumerable<int>> result = new List<IEnumerable<int>>();
             List<int> accumulate = new List<int>();
 
