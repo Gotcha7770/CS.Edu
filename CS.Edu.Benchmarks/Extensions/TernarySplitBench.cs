@@ -13,57 +13,65 @@ namespace CS.Edu.Benchmarks.Extensions
         Descending
     }
 
+    public class Indexed
+    {
+        public Indexed(int index, int value)
+        {
+            Index = index;
+            Value = value;
+        }
+
+        public int Index { get; }
+
+        public int Value { get; }
+    }
+
+    public class Range
+    {
+        public Range(int start, int end)
+        {
+            Start = start;
+            End = end;
+        }
+
+        public int Start { get; }
+
+        public int End { get; }
+    }
+
     [Config(typeof(DefaultConfig))]
     public class TernarySplitBench
     {
         //Задача разделить последовательность чисел на подпоследовательности,
-        //в которых числа строго возрастают или строго убывают
+        //в которых числа строго возрастают или строго убывают, 
+        //вернуть интервал - первый и последний индекс каждой последовательности
 
-        public IEnumerable<int> items = Enumerable.Range(0, 1000)
+        public IEnumerable<Indexed> items = Enumerable.Range(0, 1000)
             .Paginate(50)
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
-            .SelectMany(x => x);
+            .SelectMany(x => x)
+            .Select((x, i) => new Indexed(i, x));
 
-        Relation<int, int, int> isMonotone = (x, y, z) => x < y ? y < z : y > z;
+        Relation<Indexed, Indexed, Indexed> isMonotone = (x, y, z) => x.Value < y.Value ? y.Value < z.Value : y.Value > z.Value;
 
         [Benchmark]
-        public IEnumerable<int>[] Split()
+        public Range[] Split()
         {
-            return items.Split(isMonotone).ToArray();
+            return items.Split(isMonotone)
+                .Select(x => new Range(x.First().Index, x.Last().Index))
+                .ToArray();
         }
 
-        [Benchmark]
-        public IEnumerable<int>[] SplitToArray()
-        {
-            return items.Split(isMonotone).Select(x => x.ToArray()).ToArray();
-        }
+        // static IEnumerable<T[]> SpecialIterator<T>(IEnumerable<T> source, Relation<T, T, T> relation)
+        // {
+
+        // }
 
         [Benchmark]
-        public IEnumerable<int>[] SplitWithCycle()
+        public Range[] SplitWithCycle()
         {
-            List<IEnumerable<int>> result = new List<IEnumerable<int>>();
-            List<int> accumulate = new List<int>();
-
-            Direction currentDirection = 0;
-            foreach (var item in items)
-            {
-                if (accumulate.Count == 1)
-                {
-                    currentDirection = accumulate.First() < item ? Direction.Ascending : Direction.Descending;
-                }
-                else if (accumulate.Count > 1)
-                {
-                    if (currentDirection == Direction.Ascending ? accumulate.Last() > item : accumulate.Last() < item)
-                    {
-                        result.Add(accumulate);
-                        accumulate = new List<int>();
-                    }
-                }
-
-                accumulate.Add(item);
-            }
-
-            return result.ToArray();
+            //return SpecialIterator(items, isMonotone).ToArray();
+            return Array.Empty<Range>();
         }
     }
 }

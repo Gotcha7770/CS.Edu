@@ -21,7 +21,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Split_OneElement_ReturnsOneArrayWithThatElement()
+        public void SplitFirstDiminsion_OneElement_ReturnsThatElement()
         {
             var items = new int[] { 1 };
             var result = items.Split(lessThan).ToArray();
@@ -31,17 +31,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SplitFirstDiminsion_OneElement_ReturnsOneArrayWithThatElement()
-        {
-            var items = new int[] { 1 };
-            var result = items.Split(lessThan).ToArray();
-
-            Assert.That(result.Length, Is.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo(new int[] { 1 }));
-        }
-
-        [Test]
-        public void SplitSecondDimension_OneElement_ReturnsOneArrayWithThatElement()
+        public void SplitSecondDimension_OneElement_ReturnsThatElement()
         {
             var items = new int[] { 1 };
             var result = items.Split(lessThan)

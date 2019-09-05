@@ -17,6 +17,7 @@ namespace CS.Edu.Core.Extensions
             return source.Where(x => !comparer.Equals(x, item));
         }
 
+        //флаг переключения режима (включать ли граничные значения)?
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T> relation)
         {
             if (source == null)
