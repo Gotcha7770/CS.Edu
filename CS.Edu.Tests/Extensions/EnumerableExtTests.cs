@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Core.Extensions;
+using CS.Edu.Core;
 
 namespace CS.Edu.Tests.Extensions
 {
@@ -32,7 +33,44 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void TakeWhile_WhilePrevLessThenNext_ReturnsFirst3Elements()
+        public void Except_Null_ThrowsArgumentNullException()
+        {
+            IEnumerable<int> empty = null;
+            Assert.Throws<ArgumentNullException>(() => empty.Except(0).ToArray()); //???
+        }
+
+        [Test]
+        public void Except_Empty_ReturnsEmpty()
+        {
+            var items = Enumerable.Empty<int>();
+            Assert.That(items.Except(0), Is.Empty);
+        }
+
+        [Test]
+        public void Except_OnlyTargetItem_ReturnsEmpty()
+        {
+            var items = Enumerable.Range(0, 1);
+            Assert.That(items.Except(0), Is.Empty);
+        }
+
+        [Test]
+        public void Except_EnumerableWithTargetItem_ReturnsWithoutTargetItem()
+        {
+            var items = Enumerable.Range(0, 3);
+            var result = items.Except(1).ToArray();
+            Assert.That(result, Is.EqualTo(new[] { 0, 2 }));
+        }
+
+        [Test]
+        public void Except_EnumerableWithoutTargetItem_ReturnsSource()
+        {
+            var items = Enumerable.Range(0, 5);
+            var result = items.Except(10).ToArray();
+            Assert.That(result, Is.EqualTo(new[] { 0, 1, 2, 3, 4 }));
+        }
+
+        [Test]
+        public void TakeWhile_PrevLessThenNext_ReturnsFirst3Elements()
         {
             var items = new int[] { 1, 2, 3, 2, 1 };
             Relation<int> lessThan = (x, y) => x < y;
@@ -65,7 +103,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SkipWhile_WhilePrevLessThenNext_SkipFirst2Elements()
+        public void SkipWhile_PrevLessThenNext_SkipFirst2Elements()
         {
             var items = new int[] { 1, 2, 3, 2, 1 };
             Relation<int> lessThan = (x, y) => x < y;
@@ -98,42 +136,6 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Split_Empty_ReturnsEmpty()
-        {
-            var items = Enumerable.Empty<int>();
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.Split(lessThan).ToArray();
-
-            Assert.That(result, Is.EqualTo(Array.Empty<int>()));
-        }
-
-        [Test]
-        public void Split_OneElement_ReturnsOneArrayWithThatElement()
-        {
-            var items = new int[] { 1 };
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.Split(lessThan).ToArray();
-
-            Assert.That(result.Length, Is.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo(new int[] { 1 }));
-        }
-
-        [Test]
-        public void Split_WhilePrevLessThenNext_Returns2Groups()
-        {
-            var items = new int[] { 1, 2, 3, 2, 3 };
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.Split(lessThan).ToArray();
-
-            Assert.That(result.Length, Is.EqualTo(2));
-            Assert.That(result[0], Is.EqualTo(new int[] { 1, 2, 3 }));
-            Assert.That(result[1], Is.EqualTo(new int[] { 2, 3 }));
-        }
-
-        [Test]
         public void Paginate_Enumerable_ReturnsEnumerableOfEnumerable()
         {
             int pageSize = 20;
@@ -157,12 +159,14 @@ namespace CS.Edu.Tests.Extensions
             Assert.That(paginated, Is.Not.Null);
             Assert.That(paginated, Is.Empty);
         }
+        
         [Test]
         public void Paginate_Null_ThrowsArgumentNullException()
         {
             IEnumerable<int> empty = null;
             Assert.Throws<ArgumentNullException>(() => empty.Paginate(2));
         }
+
         [Test]
         public void Paginate_PageSizeIs0_ThrowsArgumentOutOfRangeException()
         {
