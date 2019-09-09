@@ -1,11 +1,11 @@
+using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using BenchmarkDotNet.Attributes;
-using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
+using CS.Edu.Core;
+using System.Collections.Generic;
 
-namespace CS.Edu.Benchmarks.Extensions
+namespace CS.Edu.Tests.Temptests
 {
     public enum Direction
     {
@@ -39,34 +39,21 @@ namespace CS.Edu.Benchmarks.Extensions
         public int End { get; }
     }
 
-    [Config(typeof(DefaultConfig))]
-    public class TernarySplitBench
+    [TestFixture]
+    public class Tests
     {
-        //Задача разделить последовательность чисел на подпоследовательности,
-        //в которых числа частично упорядочены, 
-        //вернуть интервал - первый и последний индекс каждой последовательности
-        //границы интервалов включены -> [0;5] [5;10] и т. д.
+        Relation<Indexed, Indexed, Indexed> isMonotone = (x, y, z) => x.Value < y.Value ? y.Value < z.Value : y.Value > z.Value;
+
+        Relation<Indexed, Indexed, Direction> isDirectionChanged = (x, y, dir) => dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
 
         public IEnumerable<Indexed> items = Enumerable.Range(0, 1000)
             .Paginate(50)
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
             .SelectMany(x => x)
             .Select((x, i) => new Indexed(i, x));
-
-        Relation<Indexed, Indexed, Indexed> isMonotone = (x, y, z) => x.Value < y.Value ? y.Value < z.Value : y.Value > z.Value;
-
-        Relation<Indexed, Indexed, Direction> isDirectionChanged = (x, y, dir) => dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
-
-        [Benchmark]
-        public Range[] Split()
-        {
-            return items.Split(isMonotone)
-                .Select(x => new Range(x.First().Index, x.Last().Index))
-                .ToArray();
-        }
-
-        [Benchmark]
-        public Range[] SplitWithCycle()
+            
+        [Test]
+        public void Tests1()
         {
             var result = new List<Range>();
 
@@ -92,7 +79,15 @@ namespace CS.Edu.Benchmarks.Extensions
             if (min != max)
                 result.Add(new Range(min, max));
 
-            return result.ToArray();
+            var tmp = result.ToArray();
+        }
+
+        [Test]
+        public void Tests2()
+        {
+            var tmp = items.Split(isMonotone)
+                .Select(x => new Range(x.First().Index, x.Last().Index))
+                .ToArray();
         }
     }
 }

@@ -89,5 +89,31 @@ namespace CS.Edu.Tests.Extensions
             Assert.That(result[1], Is.EqualTo(new int[] { 4, 3 }));
             Assert.That(result[2], Is.EqualTo(new int[] { 4, 5 }));
         }
+
+        [Test]
+        public void SplitFirstDiminsion_WhilePrevLessThenNext_Returns3GroupsWithBordersIncluded()
+        {
+            var items = new int[] { 1, 3, 5, 4, 3, 4, 5 };
+            var result = items.Split(isMonotone, SplitOptions.IncludeBorders).ToArray();
+
+            Assert.That(result.Length, Is.EqualTo(3));
+            Assert.That(result[0], Is.EqualTo(new int[] { 1, 3, 5 }));
+            Assert.That(result[1], Is.EqualTo(new int[] { 5, 4, 3 }));
+            Assert.That(result[2], Is.EqualTo(new int[] { 3, 4, 5 }));
+        }
+
+        [Test]
+        public void SplitSecondDimension_WhilePrevLessThenNext_ReturnsTheseElementsWithBordersIncluded()
+        {
+            var items = new int[] { 1, 3, 5, 4, 3, 4, 5 };
+            var result = items.Split(isMonotone, SplitOptions.IncludeBorders)
+                .Select(x => x.ToArray())
+                .ToArray();
+
+            Assert.That(result.Length, Is.EqualTo(3));
+            Assert.That(result[0], Is.EqualTo(new int[] { 1, 3, 5 }));
+            Assert.That(result[1], Is.EqualTo(new int[] { 5, 4, 3 }));
+            Assert.That(result[2], Is.EqualTo(new int[] { 3, 4, 5 }));
+        }
     }
 }

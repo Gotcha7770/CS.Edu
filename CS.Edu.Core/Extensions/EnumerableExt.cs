@@ -4,6 +4,17 @@ using System.Linq;
 
 namespace CS.Edu.Core.Extensions
 {
+    [Flags]
+    public enum SplitOptions
+    {
+        None = 0x0,
+        /// <summary>
+        /// Если задан этот флаг, граничное значение включается и в предыдущую
+        /// и в последующую подпоследовательность
+        /// </summary>
+        IncludeBorders = 0x1
+    }
+
     public static class EnumerableExt
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> source)
@@ -17,7 +28,6 @@ namespace CS.Edu.Core.Extensions
             return source.Where(x => !comparer.Equals(x, item));
         }
 
-        //флаг переключения режима (включать ли граничные значения)?
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T> relation)
         {
             if (source == null)
@@ -25,6 +35,11 @@ namespace CS.Edu.Core.Extensions
             if (relation == null)
                 throw new ArgumentNullException(nameof(relation));
 
+            return SplitIterator(source, relation);
+        }
+
+        static IEnumerable<IEnumerable<T>> SplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
+        {
             int countToSkip = 0;
             while (source.Skip(countToSkip).Any())
             {
@@ -34,13 +49,32 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T, T, T> relation)
+        public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T, T, T> relation, SplitOptions options = SplitOptions.None)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
             if (relation == null)
                 throw new ArgumentNullException(nameof(relation));
 
+            if (options.HasFlag(SplitOptions.IncludeBorders))
+                return SplitWithBordersIterator(source, relation);
+            else
+                return SplitIterator(source, relation);
+        }
+
+        static IEnumerable<IEnumerable<T>> SplitIterator<T>(IEnumerable<T> source, Relation<T, T, T> relation)
+        {
+            int countToSkip = 0;
+            while (source.Skip(countToSkip).Any())
+            {
+                yield return TakeWhileIterator(source, countToSkip, relation);
+
+                countToSkip += CounterIterator(source, countToSkip, relation);
+            }
+        }
+
+        static IEnumerable<IEnumerable<T>> SplitWithBordersIterator<T>(IEnumerable<T> source, Relation<T, T, T> relation)
+        {
             int countToSkip = 0;
             while (source.Skip(countToSkip).Any())
             {
@@ -125,7 +159,8 @@ namespace CS.Edu.Core.Extensions
         {
             using (var enumerator = source.GetEnumerator())
             {
-                while (countToSkip > 0 && enumerator.MoveNext()) countToSkip--;
+                while (countToSkip > 0 && enumerator.MoveNext())
+                    countToSkip--;
 
                 if (!enumerator.MoveNext())
                     yield break;
@@ -148,7 +183,8 @@ namespace CS.Edu.Core.Extensions
         {
             using (var enumerator = source.GetEnumerator())
             {
-                while (countToSkip > 0 && enumerator.MoveNext()) countToSkip--;
+                while (countToSkip > 0 && enumerator.MoveNext())
+                    countToSkip--;
 
                 if (!enumerator.MoveNext())
                     yield break;
@@ -178,7 +214,8 @@ namespace CS.Edu.Core.Extensions
         {
             using (var enumerator = source.GetEnumerator())
             {
-                while (countToSkip > 0 && enumerator.MoveNext()) countToSkip--;
+                while (countToSkip > 0 && enumerator.MoveNext())
+                    countToSkip--;
 
                 if (!enumerator.MoveNext())
                     return 0;
@@ -200,7 +237,8 @@ namespace CS.Edu.Core.Extensions
         {
             using (var enumerator = source.GetEnumerator())
             {
-                while (countToSkip > 0 && enumerator.MoveNext()) countToSkip--;
+                while (countToSkip > 0 && enumerator.MoveNext())
+                    countToSkip--;
 
                 if (!enumerator.MoveNext())
                     return 0;
