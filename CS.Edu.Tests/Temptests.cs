@@ -67,7 +67,7 @@ namespace CS.Edu.Tests.Temptests
             {
                 first = second;
                 second = item;
-                max = second.Index;
+                max = second.Index;                
                 if (isDirectionChanged(first, second, currentDirection))
                 {
                     result.Add(new Range(min, max));

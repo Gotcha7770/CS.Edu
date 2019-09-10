@@ -60,7 +60,7 @@ namespace CS.Edu.Benchmarks.Extensions
         [Benchmark]
         public Range[] Split()
         {
-            return items.Split(isMonotone)
+            return items.Split(isMonotone, SplitOptions.IncludeBorders)
                 .Select(x => new Range(x.First().Index, x.Last().Index))
                 .ToArray();
         }
