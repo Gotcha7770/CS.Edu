@@ -85,7 +85,7 @@ namespace CS.Edu.Tests.Temptests
         [Test]
         public void Tests2()
         {
-            var tmp = items.Split(isMonotone)
+            var tmp = items.Split(isMonotone, SplitOptions.IncludeBorders)
                 .Select(x => new Range(x.First().Index, x.Last().Index))
                 .ToArray();
         }

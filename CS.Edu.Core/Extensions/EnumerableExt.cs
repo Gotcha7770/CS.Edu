@@ -12,6 +12,10 @@ namespace CS.Edu.Core.Extensions
         /// Если задан этот флаг, граничное значение включается и в предыдущую
         /// и в последующую подпоследовательность
         /// </summary>
+        /// <example>
+        /// (x, y, z) => x < y ? y < z : y > z
+        /// [1, 2, 3, 2, 1] -> [1, 2, 3], [3, 2, 1]
+        /// </example>
         IncludeBorders = 0x1
     }
 
@@ -80,7 +84,7 @@ namespace CS.Edu.Core.Extensions
             {
                 yield return TakeWhileIterator(source, countToSkip, relation);
 
-                countToSkip += CounterIterator(source, countToSkip, relation);
+                countToSkip += CounterWithBorderIterator(source, countToSkip, relation);
             }
         }
 
@@ -256,6 +260,43 @@ namespace CS.Edu.Core.Extensions
                     result++;
                     first = second;
                     second = enumerator.Current;
+                }
+
+                return result;
+            }
+        }
+
+        static int CounterWithBorderIterator<T>(IEnumerable<T> source, int countToSkip, Relation<T, T, T> relation)
+        {
+            using (var enumerator = source.GetEnumerator())
+            {
+                while (countToSkip > 0 && enumerator.MoveNext())
+                    countToSkip--;
+
+                if (!enumerator.MoveNext())
+                    return 0;
+
+                T first = enumerator.Current;
+
+                if (!enumerator.MoveNext())
+                    return 1;
+
+                int result = 2;
+                T second = enumerator.Current;
+
+                while (enumerator.MoveNext())
+                {
+                    if(relation(first, second, enumerator.Current))
+                    {
+                        result++;
+                        first = second;
+                        second = enumerator.Current;
+                    }
+                    else
+                    {
+                        result--;
+                        break;
+                    }
                 }
 
                 return result;
