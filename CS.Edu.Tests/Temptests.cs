@@ -42,16 +42,18 @@ namespace CS.Edu.Tests.Temptests
     [TestFixture]
     public class Tests
     {
-        Relation<Indexed, Indexed, Indexed> isMonotone = (x, y, z) => x.Value < y.Value ? y.Value < z.Value : y.Value > z.Value;
+        Relation<Indexed, Indexed, Indexed> isMonotone = (x, y, z) =>
+            x.Value < y.Value ? y.Value < z.Value : y.Value > z.Value;
 
-        Relation<Indexed, Indexed, Direction> isDirectionChanged = (x, y, dir) => dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
+        Relation<Indexed, Indexed, Direction> isDirectionChanged = (x, y, dir) =>
+            dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
 
         public IEnumerable<Indexed> items = Enumerable.Range(0, 1000)
             .Paginate(50)
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
             .SelectMany(x => x)
             .Select((x, i) => new Indexed(i, x));
-            
+
         [Test]
         public void Tests1()
         {
@@ -67,11 +69,14 @@ namespace CS.Edu.Tests.Temptests
             {
                 first = second;
                 second = item;
-                max = second.Index;                
+                max = second.Index;
                 if (isDirectionChanged(first, second, currentDirection))
                 {
                     result.Add(new Range(min, max));
-                    currentDirection = first.Value < second.Value ? Direction.Ascending : Direction.Descending;
+                    currentDirection = first.Value < second.Value 
+                        ? Direction.Ascending 
+                        : Direction.Descending;
+                        
                     min = second.Index;
                 }
             }
@@ -87,6 +92,18 @@ namespace CS.Edu.Tests.Temptests
         {
             var tmp = items.Split(isMonotone, SplitOptions.IncludeBorders)
                 .Select(x => new Range(x.First().Index, x.Last().Index))
+                .ToArray();
+        }
+
+        [Test]
+        public void Test3()
+        {
+            var items = new int[] { 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4 };
+            Relation<int> isEqual = (x, y) => x == y;
+
+            var result = items.SkipWhile(x => x == 0)
+                .Split(isEqual)
+                .Select(x => x.First())
                 .ToArray();
         }
     }

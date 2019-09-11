@@ -50,7 +50,7 @@ namespace CS.Edu.Benchmarks.Extensions
                 .SelectMany(x => x)
                 .ToArray();
         }
-        
+
         internal IEnumerable<int> Reduce(IEnumerable<int> source)
         {
             int first = source.First();
@@ -68,6 +68,15 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             return items.Split(bothAreNotZero)
                 .Select(x => Reduce(x))
+                .SelectMany(x => x)
+                .ToArray();
+        }
+
+        [Benchmark]
+        public int[] SplitWithReturn()
+        {
+            return items.Split(bothAreNotZero)
+                .Select(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
                 .SelectMany(x => x)
                 .ToArray();
         }

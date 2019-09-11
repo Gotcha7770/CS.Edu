@@ -53,7 +53,9 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T, T, T> relation, SplitOptions options = SplitOptions.None)
+        public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source,
+                                                           Relation<T, T, T> relation,
+                                                           SplitOptions options = SplitOptions.None)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -77,7 +79,8 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        static IEnumerable<IEnumerable<T>> SplitWithBordersIterator<T>(IEnumerable<T> source, Relation<T, T, T> relation)
+        static IEnumerable<IEnumerable<T>> SplitWithBordersIterator<T>(IEnumerable<T> source,
+                                                                       Relation<T, T, T> relation)
         {
             int countToSkip = 0;
             while (source.Skip(countToSkip).Any())
@@ -159,7 +162,9 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, int countToSkip, Relation<T> relation)
+        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source,
+                                                   int countToSkip,
+                                                   Relation<T> relation)
         {
             using (var enumerator = source.GetEnumerator())
             {
@@ -183,7 +188,9 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, int countToSkip, Relation<T, T, T> relation)
+        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source,
+                                                   int countToSkip,
+                                                   Relation<T, T, T> relation)
         {
             using (var enumerator = source.GetEnumerator())
             {
@@ -266,7 +273,9 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        static int CounterWithBorderIterator<T>(IEnumerable<T> source, int countToSkip, Relation<T, T, T> relation)
+        static int CounterWithBorderIterator<T>(IEnumerable<T> source,
+                                                int countToSkip,
+                                                Relation<T, T, T> relation)
         {
             using (var enumerator = source.GetEnumerator())
             {
@@ -286,7 +295,7 @@ namespace CS.Edu.Core.Extensions
 
                 while (enumerator.MoveNext())
                 {
-                    if(relation(first, second, enumerator.Current))
+                    if (relation(first, second, enumerator.Current))
                     {
                         result++;
                         first = second;
@@ -346,7 +355,8 @@ namespace CS.Edu.Core.Extensions
         }
 
         /// <summary>
-        /// Постранично разбивает входную последовательность в соответствии с заданным параметром размера страницы
+        /// Постранично разбивает входную последовательность 
+        ///в соответствии с заданным параметром размера страницы
         /// </summary>
         public static IEnumerable<IEnumerable<T>> Paginate<T>(this IEnumerable<T> source, int pageSize)
         {
