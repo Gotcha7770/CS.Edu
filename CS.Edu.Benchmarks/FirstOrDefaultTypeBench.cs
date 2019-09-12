@@ -7,57 +7,33 @@ using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks
 {
-    public enum ClassType
+    public class NumberType
     {
-        Type1,
-        Type2
+        public int Number { get; set; }
     }
 
-    public interface ITyped
+    public class StringType
     {
-        ClassType Type { get; }
-
-        int Value { get; set; }
-    }
-
-    public class Type1 : ITyped
-    {
-        public ClassType Type => ClassType.Type1;
-
-        public int Value { get; set; }
-    }
-
-    public class Type2 : ITyped
-    {
-        public ClassType Type => ClassType.Type2;
-
-        public int Value { get; set; }
-
+        public string Value { get; set; }
     }
 
     [Config(typeof(DefaultConfig))]
     public class FirstOrDefaultTypeBench
     {
-        private readonly ITyped[] Items = Enumerable.Range(0, 1000)
-            .Select(x => x.IsEven() ? (ITyped)new Type1 { Value = x } : new Type2 { Value = x })
+        private readonly object[] Items = Enumerable.Range(0, 1000)
+            .Select(x => x == 500 ? (object)new NumberType { Number = x } : new StringType { Value = x.ToString() })
             .ToArray();
 
         [Benchmark]
         public object GetFirstOrDefaultOfType()
         {
-            return Items.OfType<Type1>().FirstOrDefault(x => x.Value == 500);
-        }
-
-        [Benchmark]
-        public object GetFirstOrDefaultWhereFieldCheck()
-        {
-            return Items.FirstOrDefault(x => x.Type == ClassType.Type1 && x.Value == 500) as Type1;
+            return Items.OfType<NumberType>().FirstOrDefault();
         }
 
         [Benchmark]
         public object GetFirstOrDefaultWhereTypeCheck()
         {
-            return Items.FirstOrDefault(x => x is Type1 && x.Value == 500) as Type1;
+            return Items.FirstOrDefault(x => x is NumberType) as NumberType;
         }
     }
 }
