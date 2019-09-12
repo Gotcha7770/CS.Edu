@@ -1,3 +1,4 @@
+using System;
 using BenchmarkDotNet.Running;
 using CS.Edu.Benchmarks.Extensions;
 
@@ -7,7 +8,17 @@ namespace CS.Edu.Benchmarks
     {
         static void Main(string[] args)
         {
-            _ = BenchmarkRunner.Run<BinarySplitBench>();
+            var switcher = new BenchmarkSwitcher(new[] {
+                typeof(FirstOrDefaultTypeBench),
+                typeof(RelationBench),
+                typeof(IsEvenBench),
+                typeof(IteratorBench),
+                typeof(BinarySplitBench),
+                typeof(TernarySplitBench)
+            });
+
+            switcher.Run();
+            Console.ReadLine();
         }
     }
 }
