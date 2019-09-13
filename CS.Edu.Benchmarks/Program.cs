@@ -13,6 +13,7 @@ namespace CS.Edu.Benchmarks
                 typeof(RelationBench),
                 typeof(IsEvenBench),
                 typeof(IteratorBench),
+                typeof(PaginateBench),
                 typeof(BinarySplitBench),
                 typeof(TernarySplitBench)
             });

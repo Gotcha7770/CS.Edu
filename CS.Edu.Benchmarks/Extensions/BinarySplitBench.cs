@@ -80,5 +80,11 @@ namespace CS.Edu.Benchmarks.Extensions
                 .SelectMany(x => x)
                 .ToArray();
         }
+
+        // [Benchmark]
+        // public int[] SplitUsingInteractiveExt()
+        // {
+        //     return items.Split(bothAreNotZero).If()
+        // }
     }
 }

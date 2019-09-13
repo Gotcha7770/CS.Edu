@@ -173,5 +173,20 @@ namespace CS.Edu.Tests.Extensions
             var items = Enumerable.Range(0, 10);
             Assert.Throws<ArgumentOutOfRangeException>(() => items.Paginate(0));
         }
+
+        [Test]
+        public void Paginate_MaterializePartsOfEnumeration_ReturnsCorrectValues()
+        {
+            var items = Enumerable.Range(0, 1000);
+
+            var paginated = items.Paginate(25);
+            var first = paginated.Skip(5).First().ToArray();
+            var second = paginated.Skip(10).First().ToArray();
+            var third = paginated.Skip(1).First().First();
+
+            Assert.That(first, Is.EqualTo(Enumerable.Range(125, 25)));
+            Assert.That(second, Is.EqualTo(Enumerable.Range(250, 25)));
+            Assert.That(third, Is.EqualTo(25));
+        }
     }
 }
