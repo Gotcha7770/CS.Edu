@@ -4,6 +4,7 @@ using System.Linq;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
 using System.Collections.Generic;
+using Range = System.Range;
 
 namespace CS.Edu.Tests
 {

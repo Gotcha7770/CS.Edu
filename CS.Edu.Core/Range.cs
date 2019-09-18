@@ -1,4 +1,5 @@
 using System;
+using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core
 {
@@ -36,13 +37,20 @@ namespace CS.Edu.Core
 
         public bool Intersects(Range<T> other)
         {
-            return Minimum.CompareTo(other.Maximum) < 1 
-                && Maximum.CompareTo(other.Minimum) > -1;
+            return Minimum.CompareTo(other.Maximum) < 1
+                && other.Minimum.CompareTo(Maximum) < 1;
         }
 
         public Range<T> Intersection(Range<T> other)
         {
-            return new Range<T>();
+            if (Intersects(other))
+            {
+                T min = Operators.Max(Minimum, other.Minimum);
+                T max = Operators.Min(Maximum, other.Maximum);
+                return new Range<T>(min, max);
+            }
+
+            return Range.Empty<T>();
         }
     }
 }
