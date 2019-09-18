@@ -50,8 +50,7 @@ namespace CS.Edu.Tests.Temptests
 
         public IEnumerable<Indexed> items = Enumerable.Range(0, 1000)
             .Paginate(50)
-            .Select((x, i) => i.IsEven() ? x : x.Reverse())
-            .SelectMany(x => x)
+            .SelectMany((x, i) => i.IsEven() ? x : x.Reverse())
             .Select((x, i) => new Indexed(i, x));
 
         [Test]
