@@ -17,7 +17,7 @@ namespace CS.Edu.Benchmarks.Extensions
 
         public IEnumerable<int> items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 };
 
-        Relation<int> bothAreNotZero = new Relation<int>((x, y) => x == 0 ? y == 0 : y != 0);
+        Relation<int> bothAreZeroOrNot = new Relation<int>((x, y) => x == 0 ? y == 0 : y != 0);
 
         [Benchmark]
         public int[] SplitWithCycle()
@@ -45,46 +45,39 @@ namespace CS.Edu.Benchmarks.Extensions
         [Benchmark]
         public int[] Split()
         {
-            return items.Split(bothAreNotZero)
-                .Select(x => x.Any(y => y == 0) ? Enumerable.Repeat(x.First(), 1) : x)
-                .SelectMany(x => x)
+            return items.Split(bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
                 .ToArray();
         }
 
-        internal IEnumerable<int> Reduce(IEnumerable<int> source)
+        static IEnumerable<IEnumerable<int>> PlainSplitIterator(IEnumerable<int> source, Relation<int> relation)
         {
-            int first = source.First();
-            if (first == 0)
-                yield return first;
-            else
+            while(source.Any())
             {
-                foreach (var item in source)
-                    yield return item;
+                yield return source.TakeWhile(relation);
+                source = source.SkipWhile(relation);
             }
         }
 
         [Benchmark]
-        public int[] SplitWithReduce()
+        public int[] PlainSplit()
         {
-            return items.Split(bothAreNotZero)
-                .Select(x => Reduce(x))
-                .SelectMany(x => x)
+            return PlainSplitIterator(items, bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
                 .ToArray();
         }
 
         [Benchmark]
-        public int[] SplitWithReturn()
+        public int[] IxSplit()
         {
-            return items.Split(bothAreNotZero)
-                .Select(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
-                .SelectMany(x => x)
-                .ToArray();
+            return Array.Empty<int>();
+            //return items.Split(bothAreZeroOrNot).If()
         }
 
-        // [Benchmark]
-        // public int[] SplitUsingInteractiveExt()
-        // {
-        //     return items.Split(bothAreNotZero).If()
-        // }
+        [Benchmark]
+        public int[] RxSplit()
+        {
+            return Array.Empty<int>();
+        }
     }
 }
