@@ -42,17 +42,9 @@ namespace CS.Edu.Benchmarks.Extensions
             return result.ToArray();
         }
 
-        [Benchmark]
-        public int[] Split()
-        {
-            return items.Split(bothAreZeroOrNot)
-                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
-                .ToArray();
-        }
-
         static IEnumerable<IEnumerable<int>> PlainSplitIterator(IEnumerable<int> source, Relation<int> relation)
         {
-            while(source.Any())
+            while (source.Any())
             {
                 yield return source.TakeWhile(relation);
                 source = source.SkipWhile(relation);
@@ -66,6 +58,14 @@ namespace CS.Edu.Benchmarks.Extensions
                 .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
                 .ToArray();
         }
+
+        [Benchmark]
+        public int[] Split()
+        {
+            return items.Split(bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
+                .ToArray();
+        }        
 
         [Benchmark]
         public int[] IxSplit()
