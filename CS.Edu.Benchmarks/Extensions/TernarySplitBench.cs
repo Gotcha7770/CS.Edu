@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
+using Range = System.Range;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
