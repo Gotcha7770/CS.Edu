@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
 
@@ -11,21 +12,32 @@ namespace CS.Edu.Benchmarks.Extensions
     [Config(typeof(DefaultConfig))]
     public class BinarySplitBench
     {
-        // Задача свернуть последовательность { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 }
+        // Задача свернуть последовательность типа { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 }
         // до такой {{1, 3}, {0, 0, 0}, {7}, {0,0}, {9}, {0}, {1}} -> {1, 3, 0, 7, 0, 9, 0, 1},
         // то есть редуцировать все группы нулей до одного
 
-        public IEnumerable<int> items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 };
+        private readonly Random _random = new Random((int)DateTime.Now.Ticks);
+        private readonly Consumer _consumer = new Consumer();
+
+        public IEnumerable<int> Items;
 
         Relation<int> bothAreZeroOrNot = new Relation<int>((x, y) => x == 0 ? y == 0 : y != 0);
 
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            Items = Enumerable.Range(0, 1000)
+                .Select(x => _random.Next(0, 2) == 0 ? _random.Next(1, 10) : 0)
+                .ToArray();
+        }
+
         [Benchmark]
-        public int[] SplitWithCycle()
+        public void SplitWithCycle()
         {
             List<int> result = new List<int>();
 
             bool isZero = false;
-            foreach (var item in items)
+            foreach (var item in Items)
             {
                 if (item != 0)
                 {
@@ -39,7 +51,7 @@ namespace CS.Edu.Benchmarks.Extensions
                 }
             }
 
-            return result.ToArray();
+            result.Consume(_consumer);
         }
 
         static IEnumerable<IEnumerable<int>> PlainSplitIterator(IEnumerable<int> source, Relation<int> relation)
@@ -52,32 +64,33 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
-        public int[] PlainSplit()
+        public void PlainSplit()
         {
-            return PlainSplitIterator(items, bothAreZeroOrNot)
-                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
-                .ToArray();
+            var result = PlainSplitIterator(Items, bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
+            
+            result.Consume(_consumer);
         }
 
         [Benchmark]
-        public int[] Split()
+        public void Split()
         {
-            return items.Split(bothAreZeroOrNot)
-                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
-                .ToArray();
+            var result = Items.Split(bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
+
+            result.Consume(_consumer);
         }        
 
-        [Benchmark]
-        public int[] IxSplit()
+        //[Benchmark]
+        public void IxSplit()
         {
-            return Array.Empty<int>();
             //return items.Split(bothAreZeroOrNot).If()
         }
 
-        [Benchmark]
-        public int[] RxSplit()
+        //[Benchmark]
+        public void RxSplit()
         {
-            return Array.Empty<int>();
+
         }
     }
 }

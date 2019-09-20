@@ -5,6 +5,7 @@ using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
 using System.Collections.Generic;
 using Range = System.Range;
+using System.Diagnostics;
 
 namespace CS.Edu.Tests
 {
@@ -80,6 +81,19 @@ namespace CS.Edu.Tests
                 .Split(isEqual)
                 .Select(x => x.First())
                 .ToArray();
+        }
+
+        [Test]
+        public void Test4()
+        {
+            var items = new int[] { 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4 };
+
+            var tmp = items.Do(x => Debug.WriteLine($"first iteration {x}"))
+                .SkipWhile(x => x == 0)
+                .Do(x => Debug.WriteLine($"second iteration {x}"));
+            
+            var tmp2 = tmp.Skip(2).ToArray();
+            var tmp3 = tmp.Take(2).ToArray();
         }
     }
 }
