@@ -4,6 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
+using Range = System.Range;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
@@ -11,32 +12,6 @@ namespace CS.Edu.Benchmarks.Extensions
     {
         Ascending,
         Descending
-    }
-
-    public class Indexed
-    {
-        public Indexed(int index, int value)
-        {
-            Index = index;
-            Value = value;
-        }
-
-        public int Index { get; }
-
-        public int Value { get; }
-    }
-
-    public class Range
-    {
-        public Range(int start, int end)
-        {
-            Start = start;
-            End = end;
-        }
-
-        public int Start { get; }
-
-        public int End { get; }
     }
 
     [Config(typeof(DefaultConfig))]
@@ -47,15 +22,15 @@ namespace CS.Edu.Benchmarks.Extensions
         //вернуть интервал - первый и последний индекс каждой последовательности
         //границы интервалов включены -> [0;5] [5;10] и т. д.
 
-        public IEnumerable<Indexed> items = Enumerable.Range(0, 1000)
+        public IEnumerable<Indexed<int>> items = Enumerable.Range(0, 1000)
             .Paginate(50)
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
             .SelectMany(x => x)
-            .Select((x, i) => new Indexed(i, x));
+            .Select((x, i) => new Indexed<int>(i, x));
 
-        Relation<Indexed, Indexed, Indexed> isMonotone = (x, y, z) => x.Value < y.Value ? y.Value < z.Value : y.Value > z.Value;
+        Relation<Indexed<int>, Indexed<int>, Indexed<int>> isMonotone = (x, y, z) => x.Value <= y.Value ? y.Value <= z.Value : y.Value > z.Value;
 
-        Relation<Indexed, Indexed, Direction> isDirectionChanged = (x, y, dir) => dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
+        Relation<Indexed<int>, Indexed<int>, Direction> isDirectionChanged = (x, y, dir) => dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
 
         [Benchmark]
         public Range[] Split()
@@ -70,10 +45,10 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             var result = new List<Range>();
 
-            Indexed first = items.FirstOrDefault();
-            Indexed second = items.Skip(1).FirstOrDefault();
-            int min = first?.Index ?? 0;
-            int max = second?.Index ?? 0;
+            Indexed<int> first = items.FirstOrDefault();
+            Indexed<int> second = items.Skip(1).FirstOrDefault();
+            int min = first.Index;
+            int max = second.Index;
             Direction currentDirection = min <= max ? Direction.Ascending : Direction.Descending;
 
             foreach (var item in items.Skip(2))
@@ -83,14 +58,14 @@ namespace CS.Edu.Benchmarks.Extensions
                 max = second.Index;
                 if (isDirectionChanged(first, second, currentDirection))
                 {
-                    result.Add(new Range(min, max));
+                    result.Add(min..max);
                     currentDirection = first.Value < second.Value ? Direction.Ascending : Direction.Descending;
                     min = second.Index;
                 }
             }
 
             if (min != max)
-                result.Add(new Range(min, max));
+                result.Add(min..max);
 
             return result.ToArray();
         }

@@ -32,6 +32,18 @@ namespace CS.Edu.Core.Extensions
             return source.Where(x => !comparer.Equals(x, item));
         }
 
+        public static IEnumerable<T> If<T>(this IEnumerable<T> thenSource, Func<bool> condition, IEnumerable<T> elseSource)
+        {
+            if (condition == null)
+                throw new ArgumentNullException(nameof(condition));
+            if (thenSource == null)
+                throw new ArgumentNullException(nameof(thenSource));
+            if (elseSource == null)
+                throw new ArgumentNullException(nameof(elseSource));
+
+            return EnumerableEx.Defer(() => condition() ? thenSource : elseSource);
+        }
+
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T> relation)
         {
             if (source == null)
