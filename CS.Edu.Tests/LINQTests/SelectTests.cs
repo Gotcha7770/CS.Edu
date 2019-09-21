@@ -4,7 +4,7 @@ using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Temptests;
 using NUnit.Framework;
 
-namespace CS.Edu.Tests
+namespace CS.Edu.Tests.LINQTests
 {
     [TestFixture]
     public class SelectTests
