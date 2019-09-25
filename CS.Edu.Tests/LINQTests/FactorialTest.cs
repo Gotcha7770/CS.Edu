@@ -1,4 +1,3 @@
-using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +17,7 @@ namespace CS.Edu.Tests.LINQTests
 
         public static IEnumerable<int> FactorialIterator()
         {
-            int acc = 1;
-            for (int i = 1; ; i++)
+            for (int i = 1, acc = 1; ; i++)
             {
                 yield return acc;
                 acc *= i;
