@@ -1,4 +1,3 @@
-using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,17 +19,8 @@ namespace CS.Edu.Tests.LINQTests
 
         static IEnumerable<int> FibonacciIterator()
         {
-            int x = 1;
-            yield return x;
-
-            int y = 1;
-            yield return y;
-
-            while (true)
+            for(int x = 0, y = 1; ; y = x + y, x = y - x)
             {
-                y = x + y;
-                x = y - x;
-
                 yield return y;
             }
         }

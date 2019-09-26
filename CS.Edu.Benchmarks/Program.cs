@@ -1,6 +1,7 @@
 using System;
 using BenchmarkDotNet.Running;
 using CS.Edu.Benchmarks.Extensions;
+using CS.Edu.Benchmarks.PropertySynchronization;
 
 namespace CS.Edu.Benchmarks
 {
@@ -15,7 +16,8 @@ namespace CS.Edu.Benchmarks
                 typeof(IteratorBench),
                 typeof(PaginateBench),
                 typeof(BinarySplitBench),
-                typeof(TernarySplitBench)
+                typeof(TernarySplitBench),
+                typeof(PropertySynchronizationBench)
             });
 
             switcher.Run();
