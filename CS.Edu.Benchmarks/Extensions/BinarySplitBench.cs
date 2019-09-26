@@ -17,6 +17,7 @@ namespace CS.Edu.Benchmarks.Extensions
         // то есть редуцировать все группы нулей до одного
 
         private readonly Random _random = new Random((int)DateTime.Now.Ticks);
+        
         private readonly Consumer _consumer = new Consumer();
 
         public IEnumerable<int> Items;
