@@ -17,7 +17,8 @@ namespace CS.Edu.Benchmarks
                 typeof(PaginateBench),
                 typeof(BinarySplitBench),
                 typeof(TernarySplitBench),
-                typeof(PropertySynchronizationBench)
+                typeof(PropertySynchronizationBench),
+                typeof(ListBench)
             });
 
             switcher.Run();
