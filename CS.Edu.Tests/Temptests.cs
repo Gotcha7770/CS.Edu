@@ -24,7 +24,7 @@ namespace CS.Edu.Tests
         Relation<Indexed<int>, Indexed<int>, Direction> isDirectionChanged = (x, y, dir) =>
             dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
 
-        public IEnumerable<Indexed<int>> items = Enumerable.Range(0, 1000)
+        public IEnumerable<Indexed<int>> items = Enumerable.Range(0, 10000)
             .Paginate(50)
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
             .SelectMany(x => x)
@@ -75,18 +75,6 @@ namespace CS.Edu.Tests
         public void Test3()
         {
             var items = new int[] { 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4 };
-            Relation<int> isEqual = (x, y) => x == y;
-
-            var result = items.SkipWhile(x => x == 0)
-                .Split(isEqual)
-                .Select(x => x.First())
-                .ToArray();
-        }
-
-        [Test]
-        public void Test4()
-        {
-            var items = new int[] { 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4 };
 
             var tmp = items.Do(x => Debug.WriteLine($"first iteration {x}"))
                 .SkipWhile(x => x == 0)
@@ -94,6 +82,44 @@ namespace CS.Edu.Tests
             
             var tmp2 = tmp.Skip(2).ToArray();
             var tmp3 = tmp.Take(2).ToArray();
+        }
+
+        static IEnumerable<IEnumerable<T>> PlainSplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
+        {
+            var list = new List<T>();
+            foreach (var item in source)
+            {
+                if (list.Count == 0)
+                {
+                    list.Add(item);
+                }
+                else
+                {
+                    if (relation(list[list.Count - 1], item))
+                    {
+                        list.Add(item);
+                    }
+                    else
+                    {
+                        yield return list;
+                        list = new List<T> { item };
+                    }
+                }
+            }
+
+            if(list.Count > 0)
+                yield return list;
+        }
+
+        [Test]
+        public void Test4()
+        {
+            var items = new int[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 };
+            Relation<int> bothAreZeroOrNot = new Relation<int>((x, y) => x == 0 ? y == 0 : y != 0);
+
+            var result = PlainSplitIterator(items, bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x)
+                .ToArray();
         }
     }
 }

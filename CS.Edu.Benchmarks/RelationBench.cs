@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Attributes;
 using CS.Edu.Core;
-using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks.Extensions
 {

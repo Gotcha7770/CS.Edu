@@ -17,6 +17,7 @@ namespace CS.Edu.Benchmarks.Extensions
         // то есть редуцировать все группы нулей до одного
 
         private readonly Random _random = new Random((int)DateTime.Now.Ticks);
+
         private readonly Consumer _consumer = new Consumer();
 
         public IEnumerable<int> Items;
@@ -54,7 +55,7 @@ namespace CS.Edu.Benchmarks.Extensions
             result.Consume(_consumer);
         }
 
-        static IEnumerable<IEnumerable<int>> PlainSplitIterator(IEnumerable<int> source, Relation<int> relation)
+        static IEnumerable<IEnumerable<T>> PlainSplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
         {
             while (source.Any())
             {
@@ -68,7 +69,43 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             var result = PlainSplitIterator(Items, bothAreZeroOrNot)
                 .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
-            
+
+            result.Consume(_consumer);
+        }
+
+        static IEnumerable<IEnumerable<T>> PlainSplitIterator2<T>(IEnumerable<T> source, Relation<T> relation)
+        {
+            var list = new List<T>();
+            foreach (var item in source)
+            {
+                if (list.Count == 0)
+                {
+                    list.Add(item);
+                }
+                else
+                {
+                    if (relation(list[list.Count - 1], item))
+                    {
+                        list.Add(item);
+                    }
+                    else
+                    {
+                        yield return list;
+                        list = new List<T> { item };
+                    }
+                }
+            }
+
+            if(list.Count > 0)
+                yield return list;
+        }
+
+        [Benchmark]
+        public void PlainSplit2()
+        {
+            var result = PlainSplitIterator2(Items, bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
+
             result.Consume(_consumer);
         }
 
@@ -79,18 +116,34 @@ namespace CS.Edu.Benchmarks.Extensions
                 .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
 
             result.Consume(_consumer);
-        }        
+        }
+
+        static IEnumerable<IEnumerable<T>> IxSplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
+        {
+            yield return Enumerable.Empty<T>();
+        }
 
         //[Benchmark]
         public void IxSplit()
         {
-            //return items.Split(bothAreZeroOrNot).If()
+            var result = IxSplitIterator(Items, bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
+
+            result.Consume(_consumer);
+        }
+
+        static IEnumerable<IEnumerable<T>> RxSplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
+        {
+            yield return Enumerable.Empty<T>();
         }
 
         //[Benchmark]
         public void RxSplit()
         {
+            var result = RxSplitIterator(Items, bothAreZeroOrNot)
+                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
 
+            result.Consume(_consumer);
         }
     }
 }
