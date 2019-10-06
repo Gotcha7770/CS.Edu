@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reflection;
 using CS.Edu.Core.Interfaces;
@@ -164,38 +165,59 @@ namespace CS.Edu.Core.Helpers
 
     public class PropertySynchronizer<T> : IPropertySynchronizer<T>
     {
-        public IDisposable Sync(INotifyPropertyChanged source, INotifyPropertyChanged target, string propertyName)
+        public IDisposable Sync(INotifyPropertyChanged source,
+                                INotifyPropertyChanged target,
+                                string propertyName,
+                                SyncMode syncMode = SyncMode.TwoWay)
         {
             var sourceContext = new ReflectionSyncContext<T>(source, propertyName);
             var targetContext = new ReflectionSyncContext<T>(target, propertyName);
 
-            return Sync(sourceContext, targetContext);
+            return Sync(sourceContext, targetContext, syncMode);
         }
 
-        public IDisposable Sync(ISynchronizationContext<T> sourceContext, ISynchronizationContext<T> targetContext)
-        {
-            return sourceContext.Subscribe(targetContext);
-        }
-
-        public IDisposable Sync(INotifyPropertyChanged source, INotifyPropertyChanged[] targets, string propertyName)
+        public IDisposable Sync(ISynchronizationContext<T> sourceContext,
+                                ISynchronizationContext<T> targetContext,
+                                SyncMode syncMode = SyncMode.TwoWay)
         {
             var disposable = new CompositeDisposable();
-            var sourceContext = new ReflectionSyncContext<T>(source, propertyName);
-            foreach (var target in targets)
-            {
-                var targetContext = new ReflectionSyncContext<T>(target, propertyName);
-                disposable.Add(sourceContext.Subscribe(targetContext));
-            }
 
+            switch (syncMode)
+            {
+                case SyncMode.OneWay:
+                    disposable.Add(sourceContext.Subscribe(targetContext));
+                    break;
+                case SyncMode.TwoWay:
+                    disposable.Add(targetContext.Subscribe(sourceContext));
+                    disposable.Add(sourceContext.Subscribe(targetContext));
+                    break;
+                case SyncMode.OneWayToSource:
+                    disposable.Add(targetContext.Subscribe(sourceContext));
+                    break;
+            }
+            
             return disposable;
         }
 
-        public IDisposable Sync(ISynchronizationContext<T> sourceContext, ISynchronizationContext<T>[] targetContexts)
+        public IDisposable Sync(INotifyPropertyChanged source,
+                                IEnumerable<INotifyPropertyChanged> targets,
+                                string propertyName,
+                                SyncMode syncMode = SyncMode.TwoWay)
+        {
+            var sourceContext = new ReflectionSyncContext<T>(source, propertyName);
+            var targetContexts = targets.Select(x => new ReflectionSyncContext<T>(x, propertyName));         
+            
+            return Sync(sourceContext, targetContexts, syncMode);
+        }
+
+        public IDisposable Sync(ISynchronizationContext<T> sourceContext,
+                                IEnumerable<ISynchronizationContext<T>> targetContexts,
+                                SyncMode syncMode = SyncMode.TwoWay)
         {
             var disposable = new CompositeDisposable();
             foreach (var targetContext in targetContexts)
             {
-                disposable.Add(sourceContext.Subscribe(targetContext));
+                disposable.Add(Sync(sourceContext, targetContext, syncMode));
             }
 
             return disposable;
