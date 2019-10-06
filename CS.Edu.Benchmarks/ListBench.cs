@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
-     [MemoryDiagnoser]
+    [MemoryDiagnoser]
     [Config(typeof(DefaultConfig))]
     public class ListBench
     {
