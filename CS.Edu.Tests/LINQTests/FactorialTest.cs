@@ -28,7 +28,7 @@ namespace CS.Edu.Tests.LINQTests
         public void Test()
         {
             int fact1 = Factorial(5);
-            int fact2 = FactorialIterator().Take(6).Last();
+            int fact2 = FactorialIterator().ElementAt(5);
             int fact3 = Enumerable.Range(0, 6).Aggregate((acc, cur) => acc == 0 ? 1 : acc * cur);
 
             Assert.That(fact1, Is.EqualTo(120));

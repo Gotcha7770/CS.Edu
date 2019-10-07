@@ -10,7 +10,8 @@ namespace CS.Edu.Core
             try
             {
                 int FirstDim = source.Length;
-                int SecondDim = source.GroupBy(row => row.Length).Single().Key; // throws InvalidOperationException if source is not rectangular
+                // ↓ throws InvalidOperationException if source is not rectangular
+                int SecondDim = source.GroupBy(row => row.Length).Single().Key; 
 
                 var result = new T[FirstDim, SecondDim];
                 for (int i = 0; i < FirstDim; ++i)

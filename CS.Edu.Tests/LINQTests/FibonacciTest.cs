@@ -29,7 +29,7 @@ namespace CS.Edu.Tests.LINQTests
         public void Test()
         {
             int tenth1 = Fibonacci(10);
-            int tenth2 = FibonacciIterator().Take(10).Last();
+            int tenth2 = FibonacciIterator().ElementAt(9);
 
             Assert.That(tenth1, Is.EqualTo(55));
             Assert.That(tenth2, Is.EqualTo(55));

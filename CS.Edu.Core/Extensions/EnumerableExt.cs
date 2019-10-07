@@ -135,11 +135,13 @@ namespace CS.Edu.Core.Extensions
 
                 while (enumerator.MoveNext())
                 {
-                    if (!relation(prev, enumerator.Current))
-                        break;
-
-                    prev = enumerator.Current;
-                    yield return prev;
+                    if (relation(prev, enumerator.Current))
+                    {
+                        prev = enumerator.Current;
+                        yield return prev;
+                    }
+                    else
+                        yield break;
                 }
             }
         }
@@ -191,11 +193,13 @@ namespace CS.Edu.Core.Extensions
 
                 while (enumerator.MoveNext())
                 {
-                    if (!relation(prev, enumerator.Current))
-                        break;
-
-                    prev = enumerator.Current;
-                    yield return prev;
+                    if (relation(prev, enumerator.Current))
+                    {
+                        prev = enumerator.Current;
+                        yield return prev;
+                    }
+                    else
+                        yield break;                    
                 }
             }
         }
@@ -223,12 +227,14 @@ namespace CS.Edu.Core.Extensions
 
                 while (enumerator.MoveNext())
                 {
-                    if (!relation(first, second, enumerator.Current))
+                    if (relation(first, second, enumerator.Current))
+                    {
+                        first = second;
+                        second = enumerator.Current;
+                        yield return second;
+                    }
+                    else
                         break;
-
-                    first = second;
-                    second = enumerator.Current;
-                    yield return second;
                 }
             }
         }
