@@ -5,7 +5,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
-     [MemoryDiagnoser]
+    [MemoryDiagnoser]
     [Config(typeof(DefaultConfig))]
     public class ListBench
     {
@@ -24,6 +24,12 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
+        public List<int> ListWith1000_000_Elements()
+        {
+            return Enumerable.Range(0, 1000_000).ToList();
+        }
+
+        [Benchmark]
         public int ListConsuming()
         {
             return list.Sum();
@@ -34,6 +40,13 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             return ToLinkedList(Enumerable.Range(0, 1000));
         }
+
+        [Benchmark]
+        public LinkedList<int> LinkedListWith1000_000_Elements()
+        {
+            return ToLinkedList(Enumerable.Range(0, 1000_000));
+        }
+
 
         [Benchmark]
         public int LinkedListConsuming()
