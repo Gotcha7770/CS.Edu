@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace CS.Edu.Core
+namespace CS.Edu.Core.Math
 {
     public static class Matrix
     {
