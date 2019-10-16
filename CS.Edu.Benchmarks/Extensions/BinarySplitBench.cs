@@ -96,7 +96,7 @@ namespace CS.Edu.Benchmarks.Extensions
                 }
             }
 
-            if(list.Count > 0)
+            if (list.Count > 0)
                 yield return list;
         }
 

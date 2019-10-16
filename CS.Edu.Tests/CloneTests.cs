@@ -37,7 +37,7 @@ namespace CS.Edu.Tests
         {
             Person other = (Person)this.MemberwiseClone();
             other.IdInfo = new IdInfo(IdInfo.IdNumber);
-            other.Name = String.Copy(Name);
+            other.Name = Name;
             return other;
         }
 
