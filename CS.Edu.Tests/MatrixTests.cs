@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using CS.Edu.Core;
-using CS.Edu.Core.Extensions;
+using CS.Edu.Core.Math;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests
