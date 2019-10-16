@@ -17,12 +17,19 @@ namespace CS.Edu.Core.Extensions
 
         public static IEnumerable<long> Factorize(this long number)
         {
-            //if number == 0
             number = System.Math.Abs(number);
 
+            return (number) switch
+            {
+                0 => Enumerable.Empty<long>(),
+                1 => EnumerableEx.Return(1L),
+                _ => FactorizeIterator(number)
+            };  
+        }
+
+        static IEnumerable<long> FactorizeIterator(long number)
+        {
             yield return 1;
-            if (number == 1)
-                yield break;
 
             long constraint = (long)System.Math.Sqrt(number);
             long dividend = number;
@@ -43,12 +50,12 @@ namespace CS.Edu.Core.Extensions
         {
             number = System.Math.Abs(number);
 
-            if (number == 2)
-                return true;
-            else
-                return number > 1
-                       && !number.IsEven()
-                       && !number.Factorize().Skip(2).Any();
+            return number switch
+            {
+                0 | 1 => false,
+                2 => true,
+                _ => !(number.IsEven() || number.Factorize().Skip(2).Any())
+            };            
         }
     }
 }
