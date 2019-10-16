@@ -44,7 +44,7 @@ namespace CS.Edu.Core.Extensions
 
             if (dividend > 1)
                 yield return dividend;
-        }        
+        }
 
         public static bool IsPrime(this long number)
         {
