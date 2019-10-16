@@ -37,18 +37,16 @@ namespace CS.Edu.Core.Extensions
 
             if (dividend > 1)
                 yield return dividend;
-        }        
+        }
 
         public static bool IsPrime(this long number)
         {
             number = System.Math.Abs(number);
 
-            if (number == 2)
-                return true;
-            else
-                return number > 1
-                       && !number.IsEven()
-                       && !number.Factorize().Skip(2).Any();
+            if (number.IsEven())
+                return number == 2;
+
+            return number > 1 && !number.Factorize().Skip(2).Any();
         }
     }
 }
