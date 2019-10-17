@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using CS.Edu.Core.Extensions;
 using System.Linq;
+using System;
 
 namespace CS.Edu.Tests.Extensions
 {
@@ -21,7 +22,7 @@ namespace CS.Edu.Tests.Extensions
             return input.IsEven();
         }
 
-        //[TestCase(0, ExpectedResult = new[] { 0 })]
+        [TestCase(0, ExpectedResult = new long[0])]
         [TestCase(1, ExpectedResult = new[] { 1 })]
         [TestCase(2, ExpectedResult = new[] { 1, 2 })]
         [TestCase(3, ExpectedResult = new[] { 1, 3 })]
