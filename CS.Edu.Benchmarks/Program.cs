@@ -19,7 +19,8 @@ namespace CS.Edu.Benchmarks
                 typeof(TernarySplitBench),
                 typeof(PropertySynchronizationBench),
                 typeof(ListBench),
-                typeof(FactorialBench)
+                typeof(FactorialBench),
+                typeof(FibonacciBench)
             });
 
             switcher.Run();
