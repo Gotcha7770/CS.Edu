@@ -5,31 +5,44 @@ using System.Linq;
 
 namespace CS.Edu.Core
 {
-    public interface IRepository
+    interface IContext {}
+
+    interface IRepository
     {
         IEnumerable<int> All();
     }
 
-    public interface IWorker
+    interface IWorker
     {
         void Work();
     }
 
-    public class Repository : IRepository
+    class Repository : IRepository
     {
+        private readonly IContext _context;
+
+        public Repository(IContext context)
+        {
+            _context = context;
+        }
+        
         public IEnumerable<int> All()
         {
             return Enumerable.Range(0, 1000);
         }
     }
 
-    public class Worker : IWorker
+    class Worker : IWorker
     {
         private readonly IRepository _repository;
 
-        public Worker() : this(new Repository()) { }
+        internal Worker()
+        { 
+            var context = new Context();
+            _repository = new Repository(context);
+        }
 
-        public Worker(IRepository repository)
+        internal Worker(IRepository repository)
         {
             _repository = repository;
         }
@@ -43,7 +56,7 @@ namespace CS.Edu.Core
         }
     }
 
-    public class CompositionWithoutDI
+    class CompositionWithoutDI
     {
         public void Main()
         {
@@ -52,17 +65,18 @@ namespace CS.Edu.Core
         }
     }
 
-    public class CompositionWithDI
+    class CompositionWithDI
     {
-        public void Main()
+        void Main()
         {
-            IRepository repository = new Repository();
+            IContext context = new Context();
+            IRepository repository = new Repository(context);
             IWorker worker = new Worker(repository);
             worker.Work();
         }
     }
 
-    public class Context
+    class Context : IContext
     {
         public Options Options { get; } = new Options();
 
@@ -72,7 +86,7 @@ namespace CS.Edu.Core
         }
     }
 
-    public class Options
+    class Options
     {
         public DirectoryInfo GetDirectory()
         {
@@ -80,19 +94,18 @@ namespace CS.Edu.Core
         }
     }
 
-    public class DisclosureOfStructure
+    class DisclosureOfStructure
     {
         public void Main()
         {
             Context context = new Context();
             Options options = context.Options;
             DirectoryInfo directory = options.GetDirectory();
-
             string path = directory.Root.Name;
         }
     }
 
-    public class HidingStructure
+    class HidingStructure
     {
         public void Main()
         {

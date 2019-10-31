@@ -25,9 +25,21 @@ namespace CS.Edu.Benchmarks
         }
 
         [Benchmark]
+        public SomeType[] GetFirstOrDefaultOfTypeMultiple()
+        {
+            return Enumerable.Repeat(Items.OfType<SomeType>().FirstOrDefault(), 100).ToArray();
+        }
+
+        [Benchmark]
         public object GetFirstOrDefaultWhereTypeCheck()
         {
             return Items.FirstOrDefault(x => x is SomeType) as SomeType;
+        }
+
+        [Benchmark]
+        public SomeType[] GetFirstOrDefaultWhereTypeCheckMultiple()
+        {
+            return Enumerable.Repeat(Items.FirstOrDefault(x => x is SomeType) as SomeType, 100).ToArray();
         }
     }
 }

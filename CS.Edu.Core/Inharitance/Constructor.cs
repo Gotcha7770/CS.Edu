@@ -2,26 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 
 namespace CS.Edu.Core.Inharitance
 {
-    public class Base
-    {
-        public Base() { }
+    interface IBase { }
 
-        public Base(int value) { }
-    }
+    class Base : IBase { }
 
-    public class Derrived : Base
-    {
-        public Derrived() { }
+    struct BaseStruct : IBase { }
 
-        public Derrived(int value) : base(value)
-        {
-
-        }
-    }
+    class Derrived : Base { }
 
     interface IContainer<out T>
     {
@@ -43,14 +35,14 @@ namespace CS.Edu.Core.Inharitance
         public Test()
         {
             _items = new Collection<Derrived>();
-
+            
             _array = new Derrived[10];
             _array[0] = new Derrived();
 
             _container = new TestContainer<Derrived>();
 
             //_list = new List<Derrived>(); //ERROR
-            _list = new List<Base>();
+            //IBase[] items = EnumerableEx.Return(new BaseStruct()).ToArray(); //ERROR
         }
     }
 }
