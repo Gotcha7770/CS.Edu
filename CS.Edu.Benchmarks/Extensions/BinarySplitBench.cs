@@ -75,29 +75,31 @@ namespace CS.Edu.Benchmarks.Extensions
 
         static IEnumerable<IEnumerable<T>> PlainSplitIterator2<T>(IEnumerable<T> source, Relation<T> relation)
         {
-            var list = new List<T>();
-            foreach (var item in source)
-            {
-                if (list.Count == 0)
+            List<T> acc;
+            using (var enumerator = source.GetEnumerator())
                 {
-                    list.Add(item);
-                }
-                else
-                {
-                    if (relation(list[list.Count - 1], item))
-                    {
-                        list.Add(item);
-                    }
-                    else
-                    {
-                        yield return list;
-                        list = new List<T> { item };
-                    }
-                }
-            }
+                    if (!enumerator.MoveNext())
+                        yield break;
 
-            if (list.Count > 0)
-                yield return list;
+                    acc = new List<T> { enumerator.Current};
+
+                    while (enumerator.MoveNext())
+                    {
+                        T item = enumerator.Current;
+                        if (relation(acc.Last(), item))
+                        {
+                            acc.Add(item);
+                        }
+                        else 
+                        {
+                            yield return acc;
+                            acc = new List<T> { item };
+                        }
+                    }
+                }
+
+            if (acc.Count > 0)
+                yield return acc;
         }
 
         [Benchmark]
