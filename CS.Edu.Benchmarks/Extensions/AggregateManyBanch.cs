@@ -46,23 +46,13 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             int min = int.MaxValue;
 
-            int max = source.Scan((_, curr) => {min = Math.Min(curr, min); return curr;})
-                .Aggregate((acc, curr) => acc = Math.Max(curr, acc));
-
-            return (min, max);
-        }
-
-        static (int min, int max) GetMinMax3(IEnumerable<int> source)
-        {
-            int min = int.MaxValue;
-
             int max = source.Do((x) => min = Math.Min(x, min))
                 .Aggregate((acc, curr) => acc = Math.Max(curr, acc));
 
             return (min, max);
         }
 
-        static (int min, int max) GetMinMax4(IEnumerable<int> source)
+        static (int min, int max) GetMinMax3(IEnumerable<int> source)
         {
             return source.Aggregate((min: int.MaxValue, max: int.MinValue), (acc, curr) => (Math.Min(curr, acc.min), Math.Max(curr, acc.max)));
         }
@@ -86,21 +76,15 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
-        public (int min, int max) ScanBench()
+        public (int min, int max) DoBench()
         {
             return GetMinMax2(_items);
         }
 
         [Benchmark]
-        public (int min, int max) DoBench()
-        {
-            return GetMinMax3(_items);
-        }
-
-        [Benchmark]
         public (int min, int max) AggregateBench()
         {
-            return GetMinMax4(_items);
+            return GetMinMax3(_items);
         }
     }
 }
