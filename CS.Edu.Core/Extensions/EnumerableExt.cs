@@ -28,8 +28,7 @@ namespace CS.Edu.Core.Extensions
 
         public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item)
         {
-            var comparer = EqualityComparer<T>.Default;
-            return source.Where(x => !comparer.Equals(x, item));
+            return source.Except(EnumerableEx.Return(item));
         }
 
         public static IEnumerable<T> If<T>(this IEnumerable<T> thenSource, Func<bool> condition, IEnumerable<T> elseSource)
