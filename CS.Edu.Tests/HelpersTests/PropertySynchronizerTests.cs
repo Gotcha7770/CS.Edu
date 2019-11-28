@@ -35,37 +35,36 @@ namespace CS.Edu.Tests.HelpersTests
     public class PropertySynchronizerTests
     {
         string _propertyName = nameof(TestClass.Value);
+        IPropertySynchronizer<string> _synchronizer = new PropertySynchronizer<string>();
 
         [Test]
-        public void ReflectionSyncTest_TargetValueBecomesEqualToSourceValue()
+        public void ReflectionSyncTest_TargetValueBecomesEqualToSource()
         {
             var source = new TestClass();
-            var target = new TestClass { Value = "initialValue" };
-            IPropertySynchronizer<string> synchronizer = new PropertySynchronizer<string>();
+            var target = new TestClass { Value = "initialValue" };            
 
-            synchronizer.Sync(source, target, _propertyName);
+            _synchronizer.Sync(source, target, _propertyName);
             source.Value = "newValue";
 
             Assert.That(target.Value, Is.EqualTo(source.Value));
         }
 
         [Test]
-        public void DelegateSyncTest_TargetValueBecomesEqualToSourceValue()
+        public void DelegateSyncTest_TargetValueBecomesEqualToSource()
         {
             var source = new TestClass();
             var sourceContext = new DelegateSyncContext<TestClass, string>(source, _propertyName);
             var target = new TestClass { Value = "initialValue" };
             var targetContext = new DelegateSyncContext<TestClass, string>(target, _propertyName);
-            IPropertySynchronizer<string> synchronizer = new PropertySynchronizer<string>();
-
-            synchronizer.Sync(sourceContext, targetContext);
+            
+            _synchronizer.Sync(sourceContext, targetContext);
             source.Value = "newValue";
 
             Assert.That(target.Value, Is.EqualTo(source.Value));
         }
 
         [Test]
-        public void DirectPropertySyncTest_TargetValueBecomesEqualToSourceValue()
+        public void DirectPropertySyncTest_TargetValueBecomesEqualToSource()
         {
             var source = new TestClass();
             var sourceContext = new DirectPropertySyncContext<TestClass, string>(source,
@@ -77,9 +76,8 @@ namespace CS.Edu.Tests.HelpersTests
                                                                                  _propertyName,
                                                                                  (c) => c.Value,
                                                                                  (c, v) => c.Value = v);
-            IPropertySynchronizer<string> synchronizer = new PropertySynchronizer<string>();
-
-            synchronizer.Sync(sourceContext, targetContext);
+            
+            _synchronizer.Sync(sourceContext, targetContext);
             source.Value = "newValue";
 
             Assert.That(target.Value, Is.EqualTo(source.Value));
@@ -90,9 +88,8 @@ namespace CS.Edu.Tests.HelpersTests
         {
             var source = new TestClass();
             var target = new TestClass { Value = "initialValue" };
-            IPropertySynchronizer<string> synchronizer = new PropertySynchronizer<string>();
-
-            using (synchronizer.Sync(source, target, nameof(TestClass.Value)))
+            
+            using (_synchronizer.Sync(source, target, nameof(TestClass.Value)))
             {
                 source.Value = "syncValue";
             }
@@ -100,6 +97,36 @@ namespace CS.Edu.Tests.HelpersTests
             source.Value = "desyncValue";
 
             Assert.That(target.Value, Is.EqualTo("syncValue"));
+        }
+
+        [Test]
+        public void OneWaySyncTest_TargetValueBecomesEqualToSourceButNotViceVersa()
+        {
+            var source = new TestClass();
+            var target = new TestClass { Value = "initialValue" };
+
+            _synchronizer.Sync(source, target, _propertyName, SyncMode.OneWay);
+
+            source.Value = "syncValue";
+            Assert.That(target.Value, Is.EqualTo("syncValue"));
+
+            target.Value = "newTargetValue";
+            Assert.That(source.Value, Is.EqualTo("syncValue"));          
+        }
+
+        [Test]
+        public void OneWayToSourceSyncTest_SourceValueBecomesEqualToTargetButNotViceVersa()
+        {
+            var source = new TestClass();
+            var target = new TestClass { Value = "initialValue" };
+
+            _synchronizer.Sync(source, target, _propertyName, SyncMode.OneWayToSource);
+
+            source.Value = "syncValue";
+            Assert.That(target.Value, Is.EqualTo("initialValue"));
+
+            target.Value = "newTargetValue";
+            Assert.That(source.Value, Is.EqualTo("newTargetValue"));          
         }
     }
 }
