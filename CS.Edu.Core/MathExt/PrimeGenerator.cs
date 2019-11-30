@@ -1,4 +1,4 @@
-namespace CS.Edu.Core.Math
+namespace CS.Edu.Core.MathExt
 {
     public static class PrimesGenerator
     {

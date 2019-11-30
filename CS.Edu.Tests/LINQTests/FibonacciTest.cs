@@ -1,6 +1,5 @@
-using CS.Edu.Core.Math;
+using CS.Edu.Core.MathExt;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CS.Edu.Tests.LINQTests

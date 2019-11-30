@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using CS.Edu.Core.Math;
+using CS.Edu.Core.MathExt;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CS.Edu.Core.Math
+namespace CS.Edu.Core.MathExt
 {
     public static class Fibonacci
     { 

@@ -1,4 +1,4 @@
-using CS.Edu.Core.Math;
+using CS.Edu.Core.MathExt;
 using NUnit.Framework;
 using System.Linq;
 

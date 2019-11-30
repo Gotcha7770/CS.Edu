@@ -1,5 +1,5 @@
 using BenchmarkDotNet.Attributes;
-using CS.Edu.Core.Math;
+using CS.Edu.Core.MathExt;
 using System.Linq;
 
 namespace CS.Edu.Benchmarks.Extensions
