@@ -3,7 +3,7 @@ using System.Linq;
 using CS.Edu.Core.MathExt;
 using NUnit.Framework;
 
-namespace CS.Edu.Tests
+namespace CS.Edu.Tests.MathExt
 {
     [TestFixture]
     public class MatrixTests
@@ -20,7 +20,7 @@ namespace CS.Edu.Tests
         }
 
         [Test]
-        public void ConvertTo2D_Rectangular_returns2D()
+        public void ConvertTo2D_Jagged_returns2D()
         {
             double[][] mtrx = Enumerable.Range(0, 4)
                 .Select(c => Enumerable.Range(0, 1000).Select(r => r * Math.Pow(10, c)).ToArray())
