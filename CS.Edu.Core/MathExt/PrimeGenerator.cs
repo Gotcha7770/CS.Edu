@@ -1,53 +1,38 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core.MathExt
 {
     public static class PrimesGenerator
     {
         public static IEnumerable<long> GetPrimes()
-        {            
-            return new PrimesIterator();
-        }
-    }
-
-    class PrimesIterator : IEnumerable<long>
-    {
-        public IEnumerator<long> GetEnumerator()
         {
-            return new PrimesEnumerator();
+            return PrimesIterator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        private static IEnumerable<long> PrimesIterator()
         {
-            return new PrimesEnumerator();
+            yield return 2;
+            yield return 3;
+
+            long current = 5;
+            int step = 0;
+            var factors = new List<long> { 2, 3 };
+
+            while (current < long.MaxValue)
+            {
+                if (factors.All(x => current % x != 0))
+                {
+                    factors.Add((int)current);
+                    yield return current;
+                }
+
+                current += step.IsEven() ? 2 : 4;
+                ++step;
+            }
         }
-    }
-
-    class PrimesEnumerator : IEnumerator<long>
-    {
-        private long _current = 2;
-        private HashSet<long> _factors = new HashSet<long>();
-
-        public long Current => _current;
-
-        object IEnumerator.Current => _current;
-
-        public void Dispose()
-        {
-            
-        }
-
-        public bool MoveNext()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Reset()
-        {
-            _current = 2;
-            _factors.Clear();
-        }
-    }
+    }    
 }
