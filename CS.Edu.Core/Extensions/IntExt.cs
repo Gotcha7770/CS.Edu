@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CS.Edu.Core.Extensions
@@ -17,7 +18,7 @@ namespace CS.Edu.Core.Extensions
 
         public static IEnumerable<long> Factorize(this long number)
         {
-            number = System.Math.Abs(number);
+            number = Math.Abs(number);
 
             return (number) switch
             {
@@ -31,7 +32,7 @@ namespace CS.Edu.Core.Extensions
         {
             yield return 1;
 
-            long constraint = (long)System.Math.Sqrt(number);
+            long constraint = (long)Math.Sqrt(number);
             long dividend = number;
             for (int i = 2; i <= constraint; i++)
             {
@@ -48,7 +49,7 @@ namespace CS.Edu.Core.Extensions
 
         public static bool IsPrime(this long number)
         {
-            number = System.Math.Abs(number);
+            number = Math.Abs(number);
 
             return number switch
             {
