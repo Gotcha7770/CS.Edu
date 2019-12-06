@@ -58,12 +58,45 @@ namespace CS.Edu.Benchmarks.Extensions
             return Enumerable.Repeat(items.Buffer(25).Last(), 25)
                 .Select(x => x.ToArray())
                 .ToArray();
-        }
+        }        
 
         [Benchmark]
         public void BufferConsume()
         {
             items.Buffer(25).Consume(_consumer);
+        }
+
+        private static IEnumerable<IEnumerable<T>> Batch<T>(IEnumerable<T> source, int size)
+        {
+            return source.Select((x, i) => (Item:x, Index:i))
+                .GroupBy(x => x.Index / size)
+                .Select(g => g.Select(x => x.Item));
+        }
+
+        [Benchmark]
+        public IEnumerable<int>[] Batch()
+        {
+            return Batch(items, 25).ToArray();
+        }
+
+        [Benchmark]
+        public int[][] BatchToArray()
+        {
+            return Batch(items, 25).Select(x => x.ToArray()).ToArray();
+        }
+
+        [Benchmark]
+        public int[][] LastBatch()
+        {
+            return Enumerable.Repeat(Batch(items, 25).Last(), 25)
+                .Select(x => x.ToArray())
+                .ToArray();
+        }
+
+        [Benchmark]
+        public void BatchConsume()
+        {
+            Batch(items, 25).Consume(_consumer);
         }
     }
 }

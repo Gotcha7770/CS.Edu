@@ -23,8 +23,8 @@ namespace CS.Edu.Benchmarks.Extensions
         public int FibonacciLINQBench()
         {
             return Enumerable.Range(0, int.MaxValue)
-                                   .Scan((X: 0, Y: 1), (acc, curr) => (acc.Y, acc.X + acc.Y))
-                                   .ElementAt(34).X;
+                .Scan((X: 0, Y: 1), (acc, curr) => (acc.Y, acc.X + acc.Y))
+                .ElementAt(34).X;
         }
     }
 }
