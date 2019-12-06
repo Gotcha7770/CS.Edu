@@ -1,10 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Tests.Extensions
 {
@@ -12,11 +8,19 @@ namespace CS.Edu.Tests.Extensions
     public class FuncExtTests
     {
         [Test]
-        public void TestMethod()
+        public void ApplyPartial()
         {
-            // TODO: Add your test code here
-            var answer = 42;
-            Assert.That(answer, Is.EqualTo(42), "Some useful error message");
+            Func<int, int, int> func = (a, b) => a + b;
+            var partial = func.ApplyPartial(12);
+        }
+
+        [Test]
+        public void Curry()
+        {
+            Func<int, int, int, int[]> func = (a, b, c) => new[] { a, b, c };
+            var curried = func.Curry();
+
+            //curried.ApplyPartial(12)
         }
     }
 }

@@ -33,14 +33,7 @@ namespace CS.Edu.Core.Extensions
 
         public static IEnumerable<T> If<T>(this IEnumerable<T> thenSource, Func<bool> condition, IEnumerable<T> elseSource)
         {
-            if (condition == null)
-                throw new ArgumentNullException(nameof(condition));
-            if (thenSource == null)
-                throw new ArgumentNullException(nameof(thenSource));
-            if (elseSource == null)
-                throw new ArgumentNullException(nameof(elseSource));
-
-            return EnumerableEx.Defer(() => condition() ? thenSource : elseSource);
+            return EnumerableEx.If(condition, thenSource, elseSource);
         }
 
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T> relation)

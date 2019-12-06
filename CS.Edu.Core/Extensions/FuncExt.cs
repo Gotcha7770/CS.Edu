@@ -14,6 +14,11 @@ namespace CS.Edu.Core.Extensions
             return (x) => function(arg, x);
         }
 
+        public static Action<T2> ApplyPartial<T1, T2>(this Action<T1, T2> action, T1 arg)
+        {
+            return (x) => action(arg, x);
+        }
+
         public static Func<T1, Func<T2, Func<T3, TResult>>> Curry<T1, T2, T3, TResult>(this Func<T1, T2, T3, TResult> function)
         {
             return a => b => c => function(a, b, c);
