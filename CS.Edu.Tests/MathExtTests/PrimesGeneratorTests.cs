@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Core.MathExt;
 using NUnit.Framework;
 
@@ -40,6 +41,27 @@ namespace CS.Edu.Tests.MathExt
         public long GetNthPrime(int n)
         {
             return PrimesGenerator.GetPrimes().ElementAt(n);
+        }
+
+        [TestCase(0, ExpectedResult = 2)]
+        [TestCase(1, ExpectedResult = 3)]
+        [TestCase(2, ExpectedResult = 5)]
+        [TestCase(3, ExpectedResult = 7)]
+        [TestCase(4, ExpectedResult = 11)]
+        [TestCase(5, ExpectedResult = 13)]
+        [TestCase(6, ExpectedResult = 17)]
+        [TestCase(7, ExpectedResult = 19)]
+        [TestCase(28, ExpectedResult = 109)]
+        [TestCase(49, ExpectedResult = 229)]
+        [TestCase(70, ExpectedResult = 353)]
+        [TestCase(91, ExpectedResult = 479)]
+        [TestCase(112, ExpectedResult = 617)]
+        public long PrimesQueryTest(int n)
+        {
+            return EnumerableEx.Generate(3L, x => x < long.MaxValue, x => x +=2, x => x)                
+                .Where(x => x.IsPrime())
+                .Prepend(2)
+                .ElementAt(n);
         }
     }
 }

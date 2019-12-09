@@ -22,8 +22,9 @@ namespace CS.Edu.Benchmarks.Extensions
         [Benchmark]
         public void ConsumeCustomPrimesQuery()
         {
-            EnumerableEx.Generate(2L, x => x < long.MaxValue, x => ++x, x => x)
-                .Where(x => x.IsPrime())
+            EnumerableEx.Generate(3L, x => x < long.MaxValue, x => x +=2, x => x)                
+                .Where(x => x.IsPrime())                
+                .Prepend(2)
                 .Take(1000)
                 .Consume(_consumer);
         }
