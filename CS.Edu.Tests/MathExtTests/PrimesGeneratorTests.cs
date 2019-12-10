@@ -58,7 +58,7 @@ namespace CS.Edu.Tests.MathExt
         [TestCase(112, ExpectedResult = 617)]
         public long PrimesQueryTest(int n)
         {
-            return EnumerableEx.Generate(3L, x => x < long.MaxValue, x => x +=2, x => x)                
+            return EnumerableEx.Generate(3L, x => x < long.MaxValue, x => x +=2, x => x)
                 .Where(x => x.IsPrime())
                 .Prepend(2)
                 .ElementAt(n);
