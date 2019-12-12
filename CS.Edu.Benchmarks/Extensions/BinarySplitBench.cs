@@ -77,26 +77,26 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             List<T> acc;
             using (var enumerator = source.GetEnumerator())
+            {
+                if (!enumerator.MoveNext())
+                    yield break;
+
+                acc = new List<T> { enumerator.Current };
+
+                while (enumerator.MoveNext())
                 {
-                    if (!enumerator.MoveNext())
-                        yield break;
-
-                    acc = new List<T> { enumerator.Current};
-
-                    while (enumerator.MoveNext())
+                    T item = enumerator.Current;
+                    if (relation(acc.Last(), item))
                     {
-                        T item = enumerator.Current;
-                        if (relation(acc.Last(), item))
-                        {
-                            acc.Add(item);
-                        }
-                        else 
-                        {
-                            yield return acc;
-                            acc = new List<T> { item };
-                        }
+                        acc.Add(item);
+                    }
+                    else
+                    {
+                        yield return acc;
+                        acc = new List<T> { item };
                     }
                 }
+            }
 
             if (acc.Count > 0)
                 yield return acc;
