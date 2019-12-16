@@ -20,7 +20,7 @@ namespace CS.Edu.Tests.Extensions
             Func<int, int, int, int[]> func = (a, b, c) => new[] { a, b, c };
             var curried = func.Curry();
 
-            //curried.ApplyPartial(12)
+            int[] result = curried(12)(13)(14);
         }
     }
 }
