@@ -7,14 +7,6 @@ namespace CS.Edu.Core.Extensions
 {
     public static class CollectionExt
     {
-        public static bool TryGetItem<T>(this ICollection<T> source,
-                                         Predicate<T> predicate, 
-                                         out T result)
-        {
-            result = source.FirstOrDefault(x => predicate(x));
-            return result != null;
-        }
-
         public static void AddOrUpdate<T>(this ICollection<T> source,
                                           T item,
                                           Action<T, T> updateValue,
