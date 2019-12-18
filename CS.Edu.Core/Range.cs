@@ -25,6 +25,16 @@ namespace CS.Edu.Core
 
         public T Maximum { get; }
 
+        public static bool operator== (Range<T> one, Range<T> other) 
+        {
+            return Equals(one, other);
+        }
+
+        public static bool operator!= (Range<T> one, Range<T> other) 
+        {
+            return !Equals(one, other);
+        }
+
         public bool Contains(T value)
         {
             return false;
@@ -56,14 +66,14 @@ namespace CS.Edu.Core
 
         public override bool Equals(object obj)
         {
-            return obj is Range<T> && (ReferenceEquals(this, obj) || Equals(obj));
+            return obj is Range<T> other && (ReferenceEquals(this, other) || Equals(other));
         }
 
         public bool Equals(Range<T> other)
         {
             return Equals(Minimum, other.Minimum)
                     && Equals(Maximum, other.Maximum);
-        }
+        }        
 
         public override int GetHashCode()
         {
