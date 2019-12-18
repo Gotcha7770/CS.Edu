@@ -59,46 +59,26 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void InvalidateCollection()
         {
+            var targetId = Guid.NewGuid();
             var source = new List<TestClass>()
             {
-                new TestClass(new Range<int>(0, 10)),
+                new TestClass(targetId, new Range<int>(0, 10)),
                 new TestClass(new Range<int>(10, 20)),
-                new TestClass(new Range<int>(20, 30)),
-                new TestClass(new Range<int>(30, 40)),
-                new TestClass(new Range<int>(40, 50))
+                new TestClass(new Range<int>(20, 30))
             };
 
-            var newData = new []
+            var newData = new TestClass(new Range<int>(0, 12));
+
+            Merge<TestClass> mergeFunc = (x, y) =>
             {
-                new TestClass(new Range<int>(0, 12)),
-                new TestClass(new Range<int>(12, 22)),
-                new TestClass(new Range<int>(22, 30)),
-                new TestClass(new Range<int>(30, 40))
+                x.Range = y.Range;
+                return x;
             };
 
-            var standard = new[]
-            {
-                new TestClass(source[0].Id, new Range<int>(0, 12)),
-                new TestClass(newData[1].Id, new Range<int>(12, 22)),
-                new TestClass(newData[2].Id, new Range<int>(22, 30)),
-                new TestClass(source[3].Id, new Range<int>(30, 40)),
-                new TestClass(source[4].Id, new Range<int>(40, 50)),
-            };
+            source.AddOrUpdate(newData, mergeFunc, new TestComparer());
 
-            foreach (TestClass item in newData)
-            {
-                Merge<TestClass> mergeFunc = (x, y) =>
-                {
-                    x.Range = y.Range;
-                    return x;
-                };
-
-                source.AddOrUpdate(item, mergeFunc, new TestComparer());
-            }
-
-            var result = source.OrderBy(x => x.Range.Minimum);
-
-            Assert.That(result, Is.EqualTo(standard));
+            Assert.That(source[0].Id, Is.EqualTo(targetId));
+            Assert.That(source[0].Range, Is.EqualTo(newData.Range));
         }
     }
 }
