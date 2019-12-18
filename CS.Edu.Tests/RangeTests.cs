@@ -5,8 +5,31 @@ using NUnit.Framework;
 namespace CS.Edu.Tests
 {
     [TestFixture]
-    class RangeTests
+    public class RangeTests
     {
+        [TestCaseSource(typeof(EqualsTestsDataSource), "TestCases")]
+        public bool EqualsTest(Range<int> one, Range<int> other)
+        {
+            return Equals(one, other);
+        }
+
+        internal class EqualsTestsDataSource
+        {
+            public static IEnumerable TestCases
+            {
+                get
+                {
+                    yield return new TestCaseData(new Range<int>(0, 10), null).Returns(false);
+                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(0, 9)).Returns(false);
+                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(1, 10)).Returns(false);
+                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(1, 9)).Returns(false);
+                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(0, 10)).Returns(true);
+                    var range = new Range<int>(0, 10);
+                    yield return new TestCaseData(range, range).Returns(true);
+                }
+            }
+        }
+
         [TestCaseSource(typeof(ContainsTestsDataSource), "TestCases")]
         public bool ContainsTests(Range<int> other)
         {

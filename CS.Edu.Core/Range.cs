@@ -66,14 +66,13 @@ namespace CS.Edu.Core
 
         public override bool Equals(object obj)
         {
-            return obj is Range<T> other && (ReferenceEquals(this, other) || Equals(other));
+            return Equals(obj as Range<T>);
         }
 
         public bool Equals(Range<T> other)
         {
-            return Equals(Minimum, other.Minimum)
-                    && Equals(Maximum, other.Maximum);
-        }        
+            return other != null && (ReferenceEquals(this, other) || IsEqual(other));
+        }
 
         public override int GetHashCode()
         {
@@ -82,6 +81,12 @@ namespace CS.Edu.Core
             hash = (hash * 13) + Maximum.GetHashCode();
 
             return hash;
+        }
+
+        private bool IsEqual(Range<T> other)
+        {
+            return Equals(Minimum, other.Minimum)
+                    && Equals(Maximum, other.Maximum);
         }
     }
 }
