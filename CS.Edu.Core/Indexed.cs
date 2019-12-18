@@ -14,16 +14,16 @@ namespace CS.Edu.Core
 
         public T Value { get; }
 
-        public bool Equals(Indexed<T> other)
-        {
-            return Index == other.Index 
-                && Value.Equals(Value);
-        }
-
         public override bool Equals(object obj)
         {
             return obj is Indexed<T> other && (ReferenceEquals(this, other) || Equals(other));
         }
+
+        public bool Equals(Indexed<T> other)
+        {
+            return Index == other.Index 
+                && Value.Equals(Value);
+        }        
 
         public override int GetHashCode()
         {
