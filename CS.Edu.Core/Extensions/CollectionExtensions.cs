@@ -1,40 +1,42 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CS.Edu.Core.Extensions
 {
     public static class CollectionExt
     {
-        public static void AddOrUpdate<T>(this ICollection<T> source,
+        public static void AddOrUpdate<T>(this IList<T> list,
                                           T item,
-                                          Action<T, T> updateValue,
+                                          Merge<T> mergeFunc,
                                           IEqualityComparer<T> comparer = null)
         {
+            if (list.IsReadOnly)
+                throw new InvalidOperationException();
+
             if (comparer == null)
                 comparer = EqualityComparer<T>.Default;
 
-            if (source is IList<T> list)
+            int index = list.IndexOf(item, comparer);
+            if(index >= 0)
             {
-                list.AddOrUpdate(item, updateValue, comparer);
-                return;
+                T updated = mergeFunc(list[index], item);
+                list[index] = updated;
             }
-
-            T oldItem = source.FirstOrDefault(x => comparer.Equals(x, item));
-            if(oldItem != null)
-            {            
-                updateValue(item, oldItem);
+            else
+            {
+                list.Add(item);
             }
         }
 
-        public static void AddOrUpdate<T>(this IList<T> collection,
-                                          T item,
-                                          Func<T, T> updateValueFactory,
-                                          IEqualityComparer<T> comparer = null)
+        public static int IndexOf<T>(this IList<T> list, T item, IEqualityComparer<T> comparer)
         {
-            if (comparer == null)
-                comparer = EqualityComparer<T>.Default;
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (comparer.Equals(list[i], item))
+                    return i;
+            }
+
+            return -1;
         }
     }
 }
