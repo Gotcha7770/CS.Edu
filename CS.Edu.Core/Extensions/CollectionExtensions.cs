@@ -5,13 +5,27 @@ namespace CS.Edu.Core.Extensions
 {
     public static class CollectionExt
     {
+        public static void InvalidateCollection<T>(this IList<T> list, 
+                                                   ICollection<T> newItems,
+                                                   Merge<T> mergeFunc,
+                                                   IEqualityComparer<T> comparer = null)
+        {
+
+        }
+
         public static void AddOrUpdate<T>(this IList<T> list,
                                           T item,
                                           Merge<T> mergeFunc,
                                           IEqualityComparer<T> comparer = null)
         {
+            if(list == null)
+                throw new ArgumentNullException(nameof(list));
+
             if (list.IsReadOnly)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("list must be writeable!");
+
+            if(mergeFunc == null)
+                throw new ArgumentNullException(nameof(mergeFunc));
 
             if (comparer == null)
                 comparer = EqualityComparer<T>.Default;

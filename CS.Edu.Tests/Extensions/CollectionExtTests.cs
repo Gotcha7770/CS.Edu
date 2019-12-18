@@ -57,7 +57,25 @@ namespace CS.Edu.Tests.Extensions
     public class CollectionExtTests
     {
         [Test]
-        public void InvalidateCollection()
+        public void InvalidateCollection_SourceIsNull()
+        {
+            List<TestClass> source = null;
+            var newData = new TestClass(new Range<int>(0, 12));
+
+            Assert.Throws<ArgumentNullException>(() => source.AddOrUpdate(newData, (x,y) => x));
+        }
+
+        [Test]
+        public void InvalidateCollection_SourceIsArray()
+        {
+            TestClass[] source = Array.Empty<TestClass>();
+            var newData = new TestClass(new Range<int>(0, 12));
+
+            Assert.Throws<InvalidOperationException>(() => source.AddOrUpdate(newData, (x,y) => x));
+        }
+
+        [Test]
+        public void InvalidateCollection_SourceContainsItem_ItemUpdated()
         {
             var targetId = Guid.NewGuid();
             var source = new List<TestClass>()
@@ -79,6 +97,21 @@ namespace CS.Edu.Tests.Extensions
 
             Assert.That(source[0].Id, Is.EqualTo(targetId));
             Assert.That(source[0].Range, Is.EqualTo(newData.Range));
+        }
+
+        [Test]
+        public void InvalidateCollection_SourceDoesNotContainsItem_ItemAdded()
+        {
+            var source = new List<TestClass>()
+            {
+                new TestClass(new Range<int>(0, 10)),
+            };
+
+            var newData = new TestClass(new Range<int>(1, 12));
+
+            source.AddOrUpdate(newData, (x,y) => x, new TestComparer());
+
+            Assert.That(source[1], Is.EqualTo(newData));
         }
     }
 }
