@@ -96,7 +96,7 @@ namespace CS.Edu.Tests.Extensions
                 source.AddOrUpdate(item, mergeFunc, new TestComparer());
             }
 
-            var result = source.OrderBy(x => x.Range.Minimum).ToArray();
+            var result = source.OrderBy(x => x.Range.Minimum);
 
             Assert.That(result, Is.EqualTo(standard));
         }
