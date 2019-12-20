@@ -44,7 +44,7 @@ namespace CS.Edu.Tests.Extensions
     {
         public bool Equals(TestClass one, TestClass other)
         {
-            return one.Range.Minimum == other.Range.Minimum;
+            return GetHashCode(one) == GetHashCode(other);
         }
 
         public int GetHashCode(TestClass obj)
@@ -57,7 +57,48 @@ namespace CS.Edu.Tests.Extensions
     public class CollectionExtTests
     {
         [Test]
-        public void InvalidateCollection_SourceIsNull()
+        public void InvalidateCollection()
+        {
+            var source = new List<TestClass>()
+            {
+                new TestClass(new Range<int>(0, 10)),
+                new TestClass(new Range<int>(10, 20)),
+                new TestClass(new Range<int>(20, 30)),
+                new TestClass(new Range<int>(30, 40)),
+                new TestClass(new Range<int>(40, 50))
+            };
+
+            var newData = new []
+            {
+                new TestClass(new Range<int>(0, 12)),
+                new TestClass(new Range<int>(12, 22)),
+                new TestClass(new Range<int>(22, 30)),
+                new TestClass(new Range<int>(30, 40))
+            };
+
+            var standard = new []
+            {
+                new TestClass(source[0].Id, new Range<int>(0, 12)),
+                newData[1],
+                newData[2],
+                source[3]
+            };
+
+            Merge<TestClass> mergeFunc = (x, y) =>
+            {
+                x.Range = y.Range;
+                return x;
+            };
+
+            source.Invalidate(newData, mergeFunc, new TestComparer());
+
+            var result = source.OrderBy(x => x.Range.Minimum).ToArray();
+
+            Assert.That(result, Is.EqualTo(standard));
+        }
+
+        [Test]
+        public void AddOrUpdate_SourceIsNull()
         {
             List<TestClass> source = null;
             var newData = new TestClass(new Range<int>(0, 12));
@@ -66,7 +107,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void InvalidateCollection_SourceIsArray()
+        public void AddOrUpdate_SourceIsArray()
         {
             TestClass[] source = Array.Empty<TestClass>();
             var newData = new TestClass(new Range<int>(0, 12));
@@ -75,7 +116,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void InvalidateCollection_SourceContainsItem_ItemUpdated()
+        public void AddOrUpdate_SourceContainsItem_ItemUpdated()
         {
             var targetId = Guid.NewGuid();
             var source = new List<TestClass>()
@@ -100,7 +141,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void InvalidateCollection_SourceDoesNotContainsItem_ItemAdded()
+        public void AddOrUpdate_SourceDoesNotContainsItem_ItemAdded()
         {
             var source = new List<TestClass>()
             {
