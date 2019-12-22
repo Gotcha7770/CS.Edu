@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace CS.Edu.Core
+namespace CS.Edu.Tests
 {
     class Container 
     {

@@ -10,7 +10,7 @@ namespace CS.Edu.Benchmarks.Extensions
     [Config(typeof(DefaultConfig))]
     public class PaginateBench
     {
-        public IEnumerable<int> items = Enumerable.Range(0, 1000);
+        public IEnumerable<int> items = Enumerable.Range(0, 1000000);
 
         private readonly Consumer _consumer = new Consumer();
 

@@ -1,14 +1,15 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core
 {
     public static class Range
     {
-        public static Range<T> Empty<T>() where T : IComparable => Range<T>.Empty;
+        public static Range<T> Empty<T>() where T : IComparable, IEquatable<T> => Range<T>.Empty;
     }
 
-    public class Range<T> where T : IComparable
+    public class Range<T> : IEquatable<Range<T>> where T : IComparable, IEquatable<T>
     {
         internal static Range<T> Empty => new Range<T>();
 
@@ -23,6 +24,16 @@ namespace CS.Edu.Core
         public T Minimum { get; }
 
         public T Maximum { get; }
+
+        public static bool operator== (Range<T> one, Range<T> other) 
+        {
+            return Equals(one, other);
+        }
+
+        public static bool operator!= (Range<T> one, Range<T> other) 
+        {
+            return !Equals(one, other);
+        }
 
         public bool Contains(T value)
         {
@@ -51,6 +62,31 @@ namespace CS.Edu.Core
             }
 
             return Range.Empty<T>();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Range<T>);
+        }
+
+        public bool Equals(Range<T> other)
+        {
+            return other != null && (ReferenceEquals(this, other) || IsEqual(other));
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 21;
+            hash = (hash * 13) + Minimum.GetHashCode();
+            hash = (hash * 13) + Maximum.GetHashCode();
+
+            return hash;
+        }
+
+        private bool IsEqual(Range<T> other)
+        {
+            return Equals(Minimum, other.Minimum)
+                    && Equals(Maximum, other.Maximum);
         }
     }
 }

@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace CS.Edu.Tests
 {
-     [TestFixture]
+    [TestFixture]
     class PredicateEqualityTests
     {
         [Test]
