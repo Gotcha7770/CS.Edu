@@ -23,29 +23,27 @@ namespace CS.Edu.Tests
         {
             for (int i = 0; i <= 100; i++)
             {
-                string output = string.Empty;
+                string output = null;
                 if (i % 3 == 0) output += "Fizz";
                 if (i % 5 == 0) output += "Buzz";
 
-                var result = string.IsNullOrEmpty(output) ? i.ToString() : output;
-
-                Console.WriteLine(result);
+                Console.WriteLine(output ?? i.ToString());
             }
         }
 
         [Test]
         public void FizzBuzz2()
         {
-            Func<int, string> selector = (x) => x switch
+            Func<int, string> selector = (x) => (x % 3, x % 5) switch
             {
-                int a when a % 15 == 0 => "FizzBuzz",
-                int a when a % 5 == 0 => "Buzz",
-                int a when a % 3 == 0 => "Fizz",
+                (0, 0) => "FizzBuzz",
+                (0, _) => "Buzz",
+                (_, 0) => "Fizz",
                 _ => x.ToString()
             };
 
             Enumerable.Range(1, 100)
-                .Select(x => selector(x))
+                .Select(selector)
                 .Do(x => Console.WriteLine(x))
                 .ToList();
         }
@@ -77,8 +75,6 @@ namespace CS.Edu.Tests
                 (x => x % 3 == 0, "Fizz"),
                 (x => x % 5 == 0, "Buzz"),
             };
-
-            Func<int, int, bool> isMatch = (i, comb) => i % comb == 0;
 
             Enumerable.Range(1, 100)
                 .Select(x => combinations.Where(c => c.p(x)).Select(x => x.s).DefaultIfEmpty(x.ToString()))
