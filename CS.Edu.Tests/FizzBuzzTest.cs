@@ -1,11 +1,10 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests
 {
-
     [TestFixture]
     public class FizzBuzzTest
     {
@@ -19,65 +18,101 @@ namespace CS.Edu.Tests
             Assert.That(numbers, Is.All.Matches<int>(x => x % 15 == 0));
         }
 
-        //JS Example
-        // for (let n = 1; n <= 100; n++) {
-        //     let output = '';
-        //     if (n % 3 === 0) output += 'Fizz';
-        //     if (n % 5 === 0) output += 'Buzz';
-        //     console.log(output || n);
-        // }
-
         [Test]
         public void FizzBuzz1()
         {
             for (int i = 0; i <= 100; i++)
             {
                 string output = string.Empty;
-                if(i % 3 == 0) output += "Fizz";                
-                if(i % 5 == 0) output += "Buzz";
+                if (i % 3 == 0) output += "Fizz";
+                if (i % 5 == 0) output += "Buzz";
 
                 var result = string.IsNullOrEmpty(output) ? i.ToString() : output;
 
-                Console.WriteLine(output);
+                Console.WriteLine(result);
             }
         }
 
         [Test]
         public void FizzBuzz2()
         {
-            string Selector(int n)
+            Func<int, string> selector = (x) => x switch
             {
-                return n switch
-                {
-                    int x when x % 15 == 0 => "FizzBuzz",
-                    int x when x % 5 == 0 => "Buzz",
-                    int x when x % 3 == 0 => "Fizz",
-                    _ => n.ToString()
-                };
-            }
+                int a when a % 15 == 0 => "FizzBuzz",
+                int a when a % 5 == 0 => "Buzz",
+                int a when a % 3 == 0 => "Fizz",
+                _ => x.ToString()
+            };
 
-            Enumerable.Range(1, 101)
-                .Select(x => Selector(x))
-                .ForEach(x => Console.WriteLine(x));
+            Enumerable.Range(1, 100)
+                .Select(x => selector(x))
+                .Do(x => Console.WriteLine(x))
+                .ToList();
         }
 
         [Test]
         public void FizzBuzz3()
         {
-            //x => Check(3) ? Check(5) : ToString
+            Enumerable.Range(1, 100)
+                .Select(x => x % 15 == 0 ? "FizzBuzz"
+                    : x % 3 == 0 ? "Fizz" : x % 5 == 0 ? "Buzz" : x.ToString())
+                .Do(x => Console.WriteLine(x))
+                .ToList();
         }
 
         [Test]
-        public void FizzBuzz()
+        public void FizzBuzz4()
         {
-
-            // var result = Enumerable.Range(1, 101)
-            //     .Select(i => (i, s: i % 3 == 0 ?  "Fizz" : ""))
-            //     .Select(x => (x.i, s: x.s += (x.i % 5 == 0 ?  "Buzz" : "")))
-            //     .Select(x => string.IsNullOrEmpty(x.s) ? x.i.ToString() : x.s)
-            //     .ToList();
-
-            Assert.True(true);
+            Enumerable.Range(1, 100)
+            .Select(x => $"{(x % 3 * x % 5 == 0 ? 0 : x):#;}{x % 3:;;Fizz}{x % 5:;;Buzz}")
+                .Do(x => Console.WriteLine(x))
+                .ToList();
         }
+
+        [Test]
+        public void FizzBuzz5()
+        {
+            var combinations = new List<(Predicate<int> p, string s)>
+            {
+                (x => x % 3 == 0, "Fizz"),
+                (x => x % 5 == 0, "Buzz"),
+            };
+
+            Func<int, int, bool> isMatch = (i, comb) => i % comb == 0;
+
+            Enumerable.Range(1, 100)
+                .Select(x => combinations.Where(c => c.p(x)).Select(x => x.s).DefaultIfEmpty(x.ToString()))
+                .Select(x => string.Join("", x))
+                .Do(x => Console.WriteLine(x))
+                .ToList();
+        }
+
+        [Test]
+        public void FizzBuzz6()
+        {
+            for (int i = 1; i <= 100; i++)
+            {
+                if (i % 3 == 0)
+                    Console.Write("Fizz");
+                if (i % 5 == 0)
+                    Console.Write("Buzz");
+                if (!(i % 3 == 0 || i % 5 == 0))
+                    Console.Write(i);
+
+                Console.Write(Environment.NewLine);
+            }
+        }
+
+        [Test]
+        public void FizzBuzz7()
+        {
+            string[] fizzBuzzCycle = "FizzBuzz,{0},{0},Fizz,{0},Buzz,Fizz,{0},{0},Fizz,Buzz,{0},Fizz,{0},{0}"
+                .Split(',');
+
+            for (int i = 1; i <= 100; i++)
+                Console.WriteLine(fizzBuzzCycle[i % fizzBuzzCycle.Length], i);
+        }
+
+        //x => Check(3) ? Check(5) : ToString
     }
 }
