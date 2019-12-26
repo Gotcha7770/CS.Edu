@@ -8,7 +8,7 @@ namespace CS.Edu.Core.Extensions
 
         public GenericType(Type type)
         {
-            if(!_type.IsGenericType || !_type.IsGenericTypeDefinition)
+            if(!(type.IsGenericType || type.IsGenericTypeDefinition))
                 throw new InvalidOperationException("The definition needs to be a GenericType or GenericTypeDefinition");
 
             _type = type;
@@ -16,9 +16,9 @@ namespace CS.Edu.Core.Extensions
             GenericParameterTypes = _type.GetGenericArguments();
         }
 
-        private Type GenericTypeDefinition { get; }
+        public Type GenericTypeDefinition { get; }
         
-        private Type[] GenericParameterTypes { get; }
+        public Type[] GenericParameterTypes { get; }
 
         public static explicit operator GenericType(Type type) => new GenericType(type);
     }

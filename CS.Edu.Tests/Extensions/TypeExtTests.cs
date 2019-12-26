@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
@@ -35,10 +36,36 @@ namespace CS.Edu.Tests
         }
 
         [Test]
-        public void TestMethod2()
+        public void GenericTypeConstructionTest_NotGenericType_ThrowsException()
         {
-            var cast1 = new TestClass() as BaseGeneric<TestType>;
-            var cast2 = new TestClass() as BaseGeneric<TBase>;
+            Assert.Throws<InvalidOperationException>(() => new GenericType(typeof(int)));
+        }
+
+        [Test]
+        public void GenericTypeConstructionTest()
+        {
+            var type = new GenericType(typeof(IEnumerable<int>));
+
+            Assert.That(type.GenericTypeDefinition, Is.EqualTo(typeof(IEnumerable<>)));
+            Assert.That(type.GenericParameterTypes, Is.EqualTo(new[] { typeof(int) }));
+        }
+
+        [Test]
+        public void GenericTypeConstructionTest_2Parameters()
+        {
+            var type = new GenericType(typeof(IDictionary<int, Array>));
+
+            Assert.That(type.GenericTypeDefinition, Is.EqualTo(typeof(IDictionary<,>)));
+            Assert.That(type.GenericParameterTypes, Is.EqualTo(new[] { typeof(int), typeof(Array) }));
+        }
+
+        [Test]
+        public void ExplicitCastTest()
+        {
+            var type = (GenericType)typeof(IEnumerable<int>);
+
+            Assert.That(type.GenericTypeDefinition, Is.EqualTo(typeof(IEnumerable<>)));
+            Assert.That(type.GenericParameterTypes, Is.EqualTo(new[] { typeof(int) }));
         }
     }
 }
