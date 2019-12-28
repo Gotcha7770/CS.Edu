@@ -12,6 +12,8 @@ namespace CS.Edu.Tests.Extensions
         {
             Func<int, int, int> func = (a, b) => a + b;
             var partial = func.ApplyPartial(12);
+
+            int result = partial(12);
         }
 
         [Test]
