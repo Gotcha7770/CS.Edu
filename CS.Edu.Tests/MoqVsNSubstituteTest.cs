@@ -6,7 +6,7 @@ namespace CS.Edu.Tests
 {
     public interface ITestService
     {
-        public object Process(object main, params object[] additional);
+        object Process(object main, params object[] additional);
     }
 
     [TestFixture]
