@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Core.MathExt;
 using NUnit.Framework;
 
@@ -28,6 +31,16 @@ namespace CS.Edu.Tests.MathExt
         {
             int[] result = Number.Digits(123, 10);
             Assert.That(result, Is.EqualTo(new[] { 3, 2, 1 }));
+        }
+
+        [Test]
+        public void ReductionTest()
+        {
+            var array = new[] { 3, 2, 1 };
+
+            long number = array.Select((x,i) => x * 10.Power(i)).Sum();
+
+            Assert.That(number, Is.EqualTo(123));
         }
     }
 }

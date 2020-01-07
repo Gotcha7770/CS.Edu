@@ -6,6 +6,11 @@ namespace CS.Edu.Core.Extensions
 {
     public static class IntExt
     {
+        public static long Power(this int x, int y)
+        {
+            return (long)Math.Pow((double)x, (double)y);
+        }
+
         public static bool IsEven(this int number)
         {
             return (number & 1) == 0;
