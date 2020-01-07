@@ -41,7 +41,7 @@ namespace CS.Edu.Tests.HelpersTests
         public void ReflectionSyncTest_TargetValueBecomesEqualToSource()
         {
             var source = new TestClass();
-            var target = new TestClass { Value = "initialValue" };            
+            var target = new TestClass { Value = "initialValue" };
 
             _synchronizer.Sync(source, target, _propertyName);
             source.Value = "newValue";
@@ -56,7 +56,7 @@ namespace CS.Edu.Tests.HelpersTests
             var sourceContext = new DelegateSyncContext<TestClass, string>(source, _propertyName);
             var target = new TestClass { Value = "initialValue" };
             var targetContext = new DelegateSyncContext<TestClass, string>(target, _propertyName);
-            
+
             _synchronizer.Sync(sourceContext, targetContext);
             source.Value = "newValue";
 
@@ -76,7 +76,7 @@ namespace CS.Edu.Tests.HelpersTests
                                                                                  _propertyName,
                                                                                  (c) => c.Value,
                                                                                  (c, v) => c.Value = v);
-            
+
             _synchronizer.Sync(sourceContext, targetContext);
             source.Value = "newValue";
 
@@ -88,7 +88,7 @@ namespace CS.Edu.Tests.HelpersTests
         {
             var source = new TestClass();
             var target = new TestClass { Value = "initialValue" };
-            
+
             using (_synchronizer.Sync(source, target, nameof(TestClass.Value)))
             {
                 source.Value = "syncValue";
@@ -111,7 +111,7 @@ namespace CS.Edu.Tests.HelpersTests
             Assert.That(target.Value, Is.EqualTo("syncValue"));
 
             target.Value = "newTargetValue";
-            Assert.That(source.Value, Is.EqualTo("syncValue"));          
+            Assert.That(source.Value, Is.EqualTo("syncValue"));
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace CS.Edu.Tests.HelpersTests
             Assert.That(target.Value, Is.EqualTo("initialValue"));
 
             target.Value = "newTargetValue";
-            Assert.That(source.Value, Is.EqualTo("newTargetValue"));          
+            Assert.That(source.Value, Is.EqualTo("newTargetValue"));
         }
     }
 }

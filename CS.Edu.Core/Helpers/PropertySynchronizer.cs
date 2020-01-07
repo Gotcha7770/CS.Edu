@@ -1,22 +1,24 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 using System.Reflection;
 using CS.Edu.Core.Interfaces;
 
 namespace CS.Edu.Core.Helpers
 {
-    public interface ISynchronizationContext<T> : IObservable<T>, IObserver<T>
+    public interface ISynchronizationContext<T> : ISubject<T>
     {
         INotifyPropertyChanged Source { get; }
     }
 
     public abstract class PropertySyncContextBase<T> : ISynchronizationContext<T>
     {
-        protected readonly Dictionary<IObserver<T>, PropertyChangedEventHandler> Observers
-            = new Dictionary<IObserver<T>, PropertyChangedEventHandler>();
+        protected ConcurrentDictionary<IObserver<T>, PropertyChangedEventHandler> Observers { get; }
+            = new ConcurrentDictionary<IObserver<T>, PropertyChangedEventHandler>();
 
         public virtual void Dispose()
         {
@@ -47,17 +49,20 @@ namespace CS.Edu.Core.Helpers
 
         public virtual IDisposable Subscribe(IObserver<T> observer)
         {
-            if (Observers.ContainsKey(observer))
-                return Disposable.Empty; //???
-
-            PropertyChangedEventHandler handler = (s, e) =>
+            var factory = new Lazy<PropertyChangedEventHandler>(() =>
             {
-                if (e.PropertyName == PropertyName)
-                    observer.OnNext(GetValue());
-            };
+                PropertyChangedEventHandler handler = (s, e) =>
+                {
+                    if (e.PropertyName == PropertyName)
+                        observer.OnNext(GetValue());
+                };
 
-            Source.PropertyChanged += handler;
-            Observers[observer] = handler;
+                Source.PropertyChanged += handler;
+
+                return handler;
+            });
+
+            PropertyChangedEventHandler handler = Observers.GetOrAdd(observer, _ => factory.Value);
 
             return Disposable.Create(() => Source.PropertyChanged -= handler);
         }
@@ -180,23 +185,19 @@ namespace CS.Edu.Core.Helpers
                                 ISynchronizationContext<T> targetContext,
                                 SyncMode syncMode = SyncMode.TwoWay)
         {
-            var disposable = new CompositeDisposable();
-
             switch (syncMode)
             {
                 case SyncMode.OneWay:
-                    disposable.Add(sourceContext.Subscribe(targetContext));
-                    break;
-                case SyncMode.TwoWay:
-                    disposable.Add(targetContext.Subscribe(sourceContext));
-                    disposable.Add(sourceContext.Subscribe(targetContext));
-                    break;
+                    return sourceContext.Subscribe(targetContext);
                 case SyncMode.OneWayToSource:
-                    disposable.Add(targetContext.Subscribe(sourceContext));
-                    break;
+                    return targetContext.Subscribe(sourceContext);
+                default:
+                    return new CompositeDisposable
+                    {
+                        targetContext.Subscribe(sourceContext),
+                        sourceContext.Subscribe(targetContext)
+                    };
             }
-            
-            return disposable;
         }
 
         public IDisposable Sync(INotifyPropertyChanged source,
@@ -205,8 +206,8 @@ namespace CS.Edu.Core.Helpers
                                 SyncMode syncMode = SyncMode.TwoWay)
         {
             var sourceContext = new ReflectionSyncContext<T>(source, propertyName);
-            var targetContexts = targets.Select(x => new ReflectionSyncContext<T>(x, propertyName));         
-            
+            var targetContexts = targets.Select(x => new ReflectionSyncContext<T>(x, propertyName));
+
             return Sync(sourceContext, targetContexts, syncMode);
         }
 
@@ -214,13 +215,7 @@ namespace CS.Edu.Core.Helpers
                                 IEnumerable<ISynchronizationContext<T>> targetContexts,
                                 SyncMode syncMode = SyncMode.TwoWay)
         {
-            var disposable = new CompositeDisposable();
-            foreach (var targetContext in targetContexts)
-            {
-                disposable.Add(Sync(sourceContext, targetContext, syncMode));
-            }
-
-            return disposable;
+            return new CompositeDisposable(targetContexts.Select(x => Sync(sourceContext, x, syncMode)));
         }
     }
 }
