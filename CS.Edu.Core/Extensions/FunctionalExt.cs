@@ -2,7 +2,7 @@ using System;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static class FuncExt
+    public static class FunctionalExt
     {
         public static Func<A, C> Compose<A, B, C>(this Func<A, B> f, Func<B, C> g)
         {

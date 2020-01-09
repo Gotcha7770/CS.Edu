@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +8,7 @@ namespace CS.Edu.Core.Extensions
     {
         public static long Power(this int x, int y)
         {
-            return (long)Math.Pow((double)x, (double)y);
+            return (long)Math.Pow(x, y);
         }
 
         public static bool IsEven(this int number)
