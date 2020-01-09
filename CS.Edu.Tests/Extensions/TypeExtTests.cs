@@ -26,13 +26,45 @@ namespace CS.Edu.Tests
         {
             Type openBaseType = typeof(BaseGeneric<>);
             Type baseType = typeof(BaseGeneric<TBase>);
-            Type testTypeGeneric = typeof(BaseGeneric<TestType>);
+            Type testTypeGeneric = typeof(BaseGeneric<TestType>);            
             Type testType = typeof(TestClass);
+            GenericType genericType = (GenericType)baseType;
 
-            //object obj = new TestClass();
+            Assert.IsFalse(testType.IsSubclassOf(testTypeGeneric));            
+            Assert.IsTrue(testType.IsSubclassOfGeneric(openBaseType));
+            Assert.IsTrue(testType.IsSubclassOf(genericType));
+        }
 
-            Assert.IsTrue(testType.IsSubclassOf(testTypeGeneric));
-            Assert.IsTrue(testType.IsSubclassOfExt(openBaseType));
+        [Test]
+        public void CanConvertFrom_Null_ReturnsFalse()
+        {
+            bool result = GenericType.CanConvertFrom(null);
+
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void CanConvertFrom_NotGenericType_ReturnsFalse()
+        {
+            bool result = GenericType.CanConvertFrom(typeof(int));
+
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void CanConvertFrom_OpenGenericType_ReturnsTrue()
+        {
+            bool result = GenericType.CanConvertFrom(typeof(BaseGeneric<>));
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void CanConvertFrom_GenericType_ReturnsTrue()
+        {
+            bool result = GenericType.CanConvertFrom(typeof(BaseGeneric<TBase>));
+
+            Assert.That(result, Is.True);
         }
 
         [Test]
