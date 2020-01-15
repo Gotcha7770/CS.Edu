@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using CS.Edu.Core.Comparers;
 using CS.Edu.Core.Interfaces;
 using NUnit.Framework;
 
@@ -46,8 +47,9 @@ namespace CS.Edu.Tests
         [Test]
         public void IsSeqTypeMonoid()
         {
-            Assert.True(MonoidLaws.HasIdentity<SeqType<int>, IEnumerable<int>>(Enumerable.Range(0, 2)));
-            Assert.True(MonoidLaws.IsAssociative<SeqType<int>, IEnumerable<int>>(new[] { 1, 2 }, new[] { 3 }, new[] { 4, 5 }));
+            var comparer = EnumerableEqualityComparer<int>.Instance;
+            Assert.True(MonoidLaws.HasIdentity<SeqType<int>, IEnumerable<int>>(Enumerable.Range(0, 2), comparer));
+            Assert.True(MonoidLaws.IsAssociative<SeqType<int>, IEnumerable<int>>(new[] { 1, 2 }, new[] { 3 }, new[] { 4, 5 }, comparer));
         }
     }
 }
