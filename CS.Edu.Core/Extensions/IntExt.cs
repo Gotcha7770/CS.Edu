@@ -9,7 +9,7 @@ namespace CS.Edu.Core.Extensions
         public static long Power(this int x, int y)
         {
             return (long)Math.Pow(x, y);
-        }
+        }        
 
         public static bool IsEven(this int number)
         {
@@ -30,7 +30,7 @@ namespace CS.Edu.Core.Extensions
                 0 => Enumerable.Empty<long>(),
                 1 => EnumerableEx.Return(1L),
                 _ => FactorizeIterator(number)
-            };  
+            };
         }
 
         static IEnumerable<long> FactorizeIterator(long number)
@@ -61,7 +61,7 @@ namespace CS.Edu.Core.Extensions
                 0 | 1 => false,
                 2 => true,
                 _ => !(number.IsEven() || number.Factorize().Skip(2).Any())
-            };            
+            };
         }
     }
 }

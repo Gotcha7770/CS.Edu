@@ -7,19 +7,34 @@ namespace CS.Edu.Core.Extensions
     {
         public static IEnumerable<long> Range(long start, long count, int step = 1)
         {
-            ulong max = (ulong)start + (ulong)count - 1;
-            if (count < 0 || max > long.MaxValue) throw new ArgumentOutOfRangeException("count");
+            long max = start + count;
+            if (count < 0 || max < 0)
+                throw new ArgumentOutOfRangeException("count");
 
-            return RangeIterator(start, count, step);
+            return (step) switch
+            {
+                1 => SimpleRangeIterator(start, count),
+                _ => RangeIterator(start, count, step)
+            };
+        }
+
+        static IEnumerable<long> SimpleRangeIterator(long start, long count)
+        {
+            for (long i = 0; i < count; i++)
+            {
+                yield return start++;
+            }
         }
 
         static IEnumerable<long> RangeIterator(long start, long count, int step)
         {
-            while(count >= 0 && start > 0)
+            long max = start + step * count;
+            if (max < 0)
+                throw new InvalidOperationException("count and step parameters produce value out of range");
+
+            for (long i = 0; i < count; i++)
             {
                 yield return start;
-
-                count--;
                 start += step;
             }
         }
