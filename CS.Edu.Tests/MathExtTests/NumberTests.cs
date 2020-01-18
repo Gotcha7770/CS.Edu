@@ -38,9 +38,18 @@ namespace CS.Edu.Tests.MathExt
         {
             var array = new[] { 3, 2, 1 };
 
-            long number = array.Select((x,i) => x * 10.Power(i)).Sum();
+            long number = array.Select((x, i) => x * 10.Power(i)).Sum();
 
             Assert.That(number, Is.EqualTo(123));
+        }
+
+        [Test]
+        public void PowerOfTwoTests()
+        {
+            long standard = (long)Math.Pow(2, 32);
+            long result = Number.PowerOfTwo(32);
+
+            Assert.That(result, Is.EqualTo(standard));
         }
     }
 }
