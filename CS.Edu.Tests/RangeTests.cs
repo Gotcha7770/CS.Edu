@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using CS.Edu.Core;
 using NUnit.Framework;
@@ -19,23 +20,38 @@ namespace CS.Edu.Tests
             {
                 get
                 {
-                    yield return new TestCaseData(new Range<int>(0, 10), null).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(0, 9)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(1, 10)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(1, 9)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 10), new Range<int>(0, 10)).Returns(true);
-                    var range = new Range<int>(0, 10);
+                    var range = new Range<int>(5, 9);
+
+                    yield return new TestCaseData(range, null).Returns(false);
+                    yield return new TestCaseData(range, Range<int>.Default).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(4, 9)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(6, 9)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(5, 8)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(5, 10)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(4, 10)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(6, 8)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(5, 9)).Returns(true);
                     yield return new TestCaseData(range, range).Returns(true);
                 }
             }
         }
 
-        [TestCaseSource(typeof(ContainsTestsDataSource), "TestCases")]
-        public bool ContainsTests(Range<int> other)
+        [TestCase(4, ExpectedResult = false)]
+        [TestCase(5, ExpectedResult = true)]
+        [TestCase(7, ExpectedResult = true)]
+        [TestCase(9, ExpectedResult = true)]
+        [TestCase(10, ExpectedResult = false)]
+        public bool ContainsValueTests(int value)
         {
-            var range = new Range<int>(10, 100);
+            var range = new Range<int>(5, 9);
 
-            return range.Contains(other);
+            return range.Contains(value);
+        }
+
+        [TestCaseSource(typeof(ContainsTestsDataSource), "TestCases")]
+        public bool ContainsRangeTests(Range<int> one, Range<int> other)
+        {
+            return one.Contains(other);
         }
 
         internal class ContainsTestsDataSource
@@ -44,28 +60,34 @@ namespace CS.Edu.Tests
             {
                 get
                 {
-                    yield return new TestCaseData(new Range<int>(10, 100)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(10, 99)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(11, 100)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(11, 99)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(0, 9)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 10)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 11)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 100)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(0, 101)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(10, 101)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(11, 101)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(100, 101)).Returns(false);
+                    var range = new Range<int>(5, 9);
+
+                    yield return new TestCaseData(range, new Range<int>(5, 9)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(5, 8)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(6, 9)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(6, 8)).Returns(true);
+
+                    yield return new TestCaseData(range, new Range<int>(0, 4)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(0, 5)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(0, 6)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(0, 8)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(0, 9)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(0, 10)).Returns(false);
+
+                    yield return new TestCaseData(range, new Range<int>(4, 11)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(5, 11)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(6, 11)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(8, 11)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(9, 11)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(10, 11)).Returns(false);
                 }
             }
         }
 
         [TestCaseSource(typeof(IntersectsTestsDataSource), "TestCases")]
-        public bool IntersectsTests(Range<int> other)
+        public bool IntersectsTests(Range<int> one, Range<int> other)
         {
-            var range = new Range<int>(10, 100);
-
-            return range.Intersects(other);
+            return one.Intersects(other);
         }
 
         internal class IntersectsTestsDataSource
@@ -74,29 +96,40 @@ namespace CS.Edu.Tests
             {
                 get
                 {
-                    yield return new TestCaseData(new Range<int>(0, 10)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(0, 11)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(0, 100)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(0, 101)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(10, 99)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(10, 100)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(10, 101)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(11, 99)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(11, 100)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(11, 101)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(100, 101)).Returns(true);
-                    yield return new TestCaseData(new Range<int>(0, 9)).Returns(false);
-                    yield return new TestCaseData(new Range<int>(101, 110)).Returns(false);
+                    var range = new Range<int>(5, 9);
+
+                    yield return new TestCaseData(range, new Range<int>(0, 5)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(0, 6)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(0, 8)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(0, 9)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(0, 10)).Returns(true);
+
+                    yield return new TestCaseData(range, new Range<int>(4, 8)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(4, 9)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(4, 10)).Returns(true);
+
+                    yield return new TestCaseData(range, new Range<int>(5, 8)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(5, 9)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(5, 10)).Returns(true);
+
+                    yield return new TestCaseData(range, new Range<int>(6, 8)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(6, 9)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(6, 10)).Returns(true);
+
+                    yield return new TestCaseData(range, new Range<int>(8, 9)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(8, 10)).Returns(true);
+                    yield return new TestCaseData(range, new Range<int>(9, 10)).Returns(true);
+
+                    yield return new TestCaseData(range, new Range<int>(0, 4)).Returns(false);
+                    yield return new TestCaseData(range, new Range<int>(10, 15)).Returns(false);
                 }
             }
         }
 
         [TestCaseSource(typeof(IntersectionTestsDataSource), "TestCases")]
-        public Range<int> IntersectionTests(Range<int> other)
+        public Range<int> IntersectionTests(Range<int> one, Range<int> other)
         {
-            var range = new Range<int>(10, 100);
-
-            return range.Intersection(other);
+            return one.Intersection(other);
         }
 
         internal class IntersectionTestsDataSource
@@ -105,7 +138,81 @@ namespace CS.Edu.Tests
             {
                 get
                 {
-                    yield return new TestCaseData(new Range<int>(0, 9)).Returns(Range.Empty<int>());
+                    var range = new Range<int>(5, 9);
+
+                    yield return new TestCaseData(range, new Range<int>(0, 5)).Returns(new Range<int>(5, 5));
+                    yield return new TestCaseData(range, new Range<int>(0, 6)).Returns(new Range<int>(5, 6));
+                    yield return new TestCaseData(range, new Range<int>(0, 8)).Returns(new Range<int>(5, 8));
+                    yield return new TestCaseData(range, new Range<int>(0, 9)).Returns(new Range<int>(5, 9));
+                    yield return new TestCaseData(range, new Range<int>(0, 10)).Returns(new Range<int>(5, 9));
+
+                    yield return new TestCaseData(range, new Range<int>(4, 8)).Returns(new Range<int>(5, 8));
+                    yield return new TestCaseData(range, new Range<int>(4, 9)).Returns(new Range<int>(5, 9));
+                    yield return new TestCaseData(range, new Range<int>(4, 10)).Returns(new Range<int>(5, 9));
+
+                    yield return new TestCaseData(range, new Range<int>(5, 8)).Returns(new Range<int>(5, 8));
+                    yield return new TestCaseData(range, new Range<int>(5, 9)).Returns(new Range<int>(5, 9));
+                    yield return new TestCaseData(range, new Range<int>(5, 10)).Returns(new Range<int>(5, 9));
+
+                    yield return new TestCaseData(range, new Range<int>(6, 8)).Returns(new Range<int>(6, 8));
+                    yield return new TestCaseData(range, new Range<int>(6, 9)).Returns(new Range<int>(6, 9));
+                    yield return new TestCaseData(range, new Range<int>(6, 10)).Returns(new Range<int>(6, 9));
+
+                    yield return new TestCaseData(range, new Range<int>(8, 9)).Returns(new Range<int>(8, 9));
+                    yield return new TestCaseData(range, new Range<int>(8, 10)).Returns(new Range<int>(8, 9));
+                    yield return new TestCaseData(range, new Range<int>(9, 10)).Returns(new Range<int>(9, 9));
+
+                    yield return new TestCaseData(range, new Range<int>(0, 4)).Returns(Range<int>.Default);
+                    yield return new TestCaseData(range, new Range<int>(10, 15)).Returns(Range<int>.Default);
+                }
+            }
+        }
+
+        [TestCaseSource(typeof(SubstructionTestsDataSource), "TestCases")]
+        public Range<int>[] SubstructionTests(Range<int> one, Range<int> other)
+        {
+            return one.Substruct(other);
+        }
+
+        internal class SubstructionTestsDataSource
+        {
+            public static IEnumerable TestCases
+            {
+                get
+                {
+                    var range = new Range<int>(5, 9);
+
+                    yield return new TestCaseData(range, new Range<int>(0, 4))
+                        .Returns(new[] { new Range<int>(5, 9) });
+                    yield return new TestCaseData(range, new Range<int>(0, 5))
+                        .Returns(new[] { new Range<int>(5, 9) });
+                    yield return new TestCaseData(range, new Range<int>(0, 6))
+                        .Returns(new[] { new Range<int>(6, 9) });
+                    yield return new TestCaseData(range, new Range<int>(0, 8))
+                        .Returns(new[] { new Range<int>(8, 9) });
+                    yield return new TestCaseData(range, new Range<int>(0, 9))
+                        .Returns(new[] { new Range<int>(9, 9) });
+
+                    yield return new TestCaseData(range, new Range<int>(0, 10))
+                        .Returns(Array.Empty<int>());
+                    yield return new TestCaseData(range, new Range<int>(5, 9))
+                        .Returns(Array.Empty<int>());
+
+                    yield return new TestCaseData(range, new Range<int>(6, 8))
+                        .Returns(new[] { new Range<int>(5, 6), new Range<int>(8, 9) });
+                    yield return new TestCaseData(range, new Range<int>(7, 7))
+                        .Returns(new[] { new Range<int>(5, 7), new Range<int>(7, 9) });
+
+                    yield return new TestCaseData(range, new Range<int>(5, 10))
+                        .Returns(new[] { new Range<int>(5, 5) });
+                    yield return new TestCaseData(range, new Range<int>(6, 10))
+                        .Returns(new[] { new Range<int>(5, 6) });
+                    yield return new TestCaseData(range, new Range<int>(8, 10))
+                        .Returns(new[] { new Range<int>(5, 8) });
+                    yield return new TestCaseData(range, new Range<int>(9, 10))
+                        .Returns(new[] { new Range<int>(5, 9) });
+                    yield return new TestCaseData(range, new Range<int>(10, 11))
+                        .Returns(new[] { new Range<int>(5, 9) });
                 }
             }
         }

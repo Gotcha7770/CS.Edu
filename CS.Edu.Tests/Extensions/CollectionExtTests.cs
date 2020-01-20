@@ -49,7 +49,7 @@ namespace CS.Edu.Tests.Extensions
 
         public int GetHashCode(TestClass obj)
         {
-            return obj.Range.Minimum;
+            return obj.Range.Min;
         }
     }
 
@@ -92,7 +92,7 @@ namespace CS.Edu.Tests.Extensions
 
             source.Invalidate(newData, mergeFunc, new TestComparer());
 
-            var result = source.OrderBy(x => x.Range.Minimum).ToArray();
+            var result = source.OrderBy(x => x.Range.Min).ToArray();
 
             Assert.That(result, Is.EqualTo(standard));
         }

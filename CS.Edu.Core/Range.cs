@@ -1,92 +1,115 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core
 {
-    public static class Range
+    public struct Range<T> : IEquatable<Range<T>> where T : IComparable, IEquatable<T>
     {
-        public static Range<T> Empty<T>() where T : IComparable, IEquatable<T> => Range<T>.Empty;
-    }
+        public static Range<T> Default { get; } = new Range<T>();
 
-    public class Range<T> : IEquatable<Range<T>> where T : IComparable, IEquatable<T>
-    {
-        internal static Range<T> Empty => new Range<T>();
-
-        public Range() : this(default(T), default(T)) { }
 
         public Range(T minimum, T maximum)
         {
-            Minimum = minimum;
-            Maximum = maximum;
+            //if minimum > maximum???
+            Min = minimum;
+            Max = maximum;
         }
 
-        public T Minimum { get; }
+        public T Min { get; }
 
-        public T Maximum { get; }
+        public T Max { get; }
 
-        public static bool operator== (Range<T> one, Range<T> other) 
+        public bool IsDefault => Equals(Default);
+
+        public bool IsEmpty => Min.CompareTo(Max) == 0;
+
+
+        public static bool operator ==(Range<T> one, Range<T> other)
         {
             return Equals(one, other);
         }
 
-        public static bool operator!= (Range<T> one, Range<T> other) 
+        public static bool operator !=(Range<T> one, Range<T> other)
         {
             return !Equals(one, other);
         }
 
         public bool Contains(T value)
         {
-            return false;
+            return Min.CompareTo(value) < 1
+                && Max.CompareTo(value) > -1;
         }
 
         public bool Contains(Range<T> other)
         {
-            return Minimum.CompareTo(other.Minimum) < 1
-                && Maximum.CompareTo(other.Maximum) > -1;
+            return Min.CompareTo(other.Min) < 1
+                && Max.CompareTo(other.Max) > -1;
         }
 
         public bool Intersects(Range<T> other)
         {
-            return Minimum.CompareTo(other.Maximum) < 1
-                && other.Minimum.CompareTo(Maximum) < 1;
+            return Min.CompareTo(other.Max) < 1
+                && other.Min.CompareTo(Max) < 1;
         }
 
         public Range<T> Intersection(Range<T> other)
         {
             if (Intersects(other))
             {
-                T min = Operators.Max(Minimum, other.Minimum);
-                T max = Operators.Min(Maximum, other.Maximum);
+                T min = Operators.Max(Min, other.Min);
+                T max = Operators.Min(Max, other.Max);
                 return new Range<T>(min, max);
             }
 
-            return Range.Empty<T>();
+            return Default;
+        }
+
+        public Range<T>[] Substruct(Range<T> other)
+        {
+            bool left = Contains(other.Min);
+            bool right = Contains(other.Max);
+
+            return (left, right) switch
+            {
+                (true, true) => Equals(other) ? Array.Empty<Range<T>>() : SubstructFromCenter(other),
+                (true, false) => new[] { new Range<T>(Min, other.Min) },
+                (false, true) => new[] { new Range<T>(other.Max, Max) },
+                _ => other.Contains(this) ? Array.Empty<Range<T>>() : new [] { this }
+            };
+        }
+
+        private Range<T>[] SubstructFromCenter(Range<T> other)
+        {
+            return new[]
+            {
+                new Range<T>(Min, other.Min),
+                new Range<T>(other.Max, Max)
+            };
+        }
+
+        private Range<T> UpperBound(T x, T y)
+        {
+            return new Range<T>(Operators.Min<T>(x, y), y);
         }
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Range<T>);
+            return obj is Range<T> other && (ReferenceEquals(this, other) || Equals(other));
         }
 
         public bool Equals(Range<T> other)
         {
-            return other != null && (ReferenceEquals(this, other) || IsEqual(other));
+            return Equals(Min, other.Min)
+                    && Equals(Max, other.Max);
         }
 
         public override int GetHashCode()
         {
             int hash = 21;
-            hash = (hash * 13) + Minimum.GetHashCode();
-            hash = (hash * 13) + Maximum.GetHashCode();
+            hash = (hash * 13) + Min.GetHashCode();
+            hash = (hash * 13) + Max.GetHashCode();
 
             return hash;
-        }
-
-        private bool IsEqual(Range<T> other)
-        {
-            return Equals(Minimum, other.Minimum)
-                    && Equals(Maximum, other.Maximum);
         }
     }
 }
