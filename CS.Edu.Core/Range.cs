@@ -7,7 +7,6 @@ namespace CS.Edu.Core
     {
         public static Range<T> Default { get; } = new Range<T>();
 
-
         public Range(T minimum, T maximum)
         {
             //if minimum > maximum???
@@ -22,7 +21,6 @@ namespace CS.Edu.Core
         public bool IsDefault => Equals(Default);
 
         public bool IsEmpty => Min.CompareTo(Max) == 0;
-
 
         public static bool operator ==(Range<T> one, Range<T> other)
         {
@@ -74,7 +72,7 @@ namespace CS.Edu.Core
                 (true, true) => Equals(other) ? Array.Empty<Range<T>>() : SubstructFromCenter(other),
                 (true, false) => new[] { new Range<T>(Min, other.Min) },
                 (false, true) => new[] { new Range<T>(other.Max, Max) },
-                _ => other.Contains(this) ? Array.Empty<Range<T>>() : new [] { this }
+                _ => other.Contains(this) ? Array.Empty<Range<T>>() : new[] { this }
             };
         }
 
