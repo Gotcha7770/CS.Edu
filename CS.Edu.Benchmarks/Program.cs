@@ -23,7 +23,8 @@ namespace CS.Edu.Benchmarks
                 typeof(FibonacciBench),
                 typeof(ToArrayVsToListBench),
                 typeof(AggregateManyBench),
-                typeof(PowerOfTwoBench)
+                typeof(PowerOfTwoBench),
+                typeof(RangeDiffBench),
             });
 
             switcher.Run();
