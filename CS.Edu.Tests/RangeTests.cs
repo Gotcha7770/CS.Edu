@@ -173,34 +173,7 @@ namespace CS.Edu.Tests
         [TestCaseSource(typeof(SubstructionTestsDataSource), "TestCases")]
         public Range<int>[] SubstructionTests(Range<int> one, Range<int> other)
         {
-            return one.Substruct(other);
-        }
-
-        [TestCaseSource(typeof(SubstructionTestsDataSource), "TestCases")]
-        public Range<int>[] SubstructionTest2(Range<int> one, Range<int> other)
-        {
-            Func<Range<int>, Range<int>, Range<int>[]> func = (x, y) => 
-            {
-                var tmp1 = Operators.Min<int>(x.Min, y.Min);
-                var tmp2 = Operators.Min<int>(x.Min, y.Max);
-                var tmp3 = Operators.Min<int>(x.Max, y.Min);
-                var tmp4 = Operators.Min<int>(x.Max, y.Max);
-                
-                var tmp5 = Operators.Max<int>(x.Min, y.Min);
-                var tmp6 = Operators.Max<int>(x.Min, y.Max);
-                var tmp7 = Operators.Max<int>(x.Max, y.Min);
-                var tmp8 = Operators.Max<int>(x.Max, y.Max);
-
-                var result = new [] 
-                {
-                    new Range<int>(tmp1, tmp3),
-                    new Range<int>(tmp6, tmp8)                    
-                };
-
-                return result;
-            };
-
-            return func(one, other).Where(x => !x.IsEmpty).ToArray();
+            return one.Substruct(other).ToArray();
         }
 
         internal class SubstructionTestsDataSource
@@ -244,6 +217,15 @@ namespace CS.Edu.Tests
                         .Returns(new[] { new Range<int>(5, 9) });
                 }
             }
+        }
+
+        [Test]
+        public void SymmetricDifferenceTest()
+        {
+            var one = new Range<int>(0, 6);
+            var other = new Range<int>(4, 10);
+
+            var result = Range<int>.SymmetricDifference(one, other).ToArray();
         }
     }
 }

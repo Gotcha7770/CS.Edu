@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core
@@ -32,6 +34,11 @@ namespace CS.Edu.Core
             return !Equals(one, other);
         }
 
+        public static IEnumerable<Range<T>> SymmetricDifference(Range<T> one, Range<T> other)
+        {
+            return one.Substruct(other).Concat(other.Substruct(one));
+        }
+
         public bool Contains(T value)
         {
             return Min.CompareTo(value) < 1
@@ -62,32 +69,22 @@ namespace CS.Edu.Core
             return Default;
         }
 
-        public Range<T>[] Substruct(Range<T> other)
+        public IEnumerable<Range<T>> Substruct(Range<T> other)
         {
-            bool left = Contains(other.Min);
-            bool right = Contains(other.Max);
+            return DiffIterator(this, other).Where(x => !x.IsEmpty);
+        }        
 
-            return (left, right) switch
-            {
-                (true, true) => Equals(other) ? Array.Empty<Range<T>>() : SubstructFromCenter(other),
-                (true, false) => new[] { new Range<T>(Min, other.Min) },
-                (false, true) => new[] { new Range<T>(other.Max, Max) },
-                _ => other.Contains(this) ? Array.Empty<Range<T>>() : new[] { this }
-            };
-        }
-
-        private Range<T>[] SubstructFromCenter(Range<T> other)
+        private static IEnumerable<Range<T>> DiffIterator(Range<T> minuend, Range<T> subtrahend)
         {
-            return new[]
-            {
-                new Range<T>(Min, other.Min),
-                new Range<T>(other.Max, Max)
-            };
-        }
+            var _1 = Operators.Min<T>(minuend.Min, subtrahend.Min);
+            var _2 = Operators.Min<T>(minuend.Max, subtrahend.Min);
 
-        private Range<T> UpperBound(T x, T y)
-        {
-            return new Range<T>(Operators.Min<T>(x, y), y);
+            yield return new Range<T>(_1, _2);
+
+            var _3 = Operators.Max<T>(minuend.Min, subtrahend.Max);
+            var _4 = Operators.Max<T>(minuend.Max, subtrahend.Max);
+
+            yield return new Range<T>(_3, _4);
         }
 
         public override bool Equals(object obj)
