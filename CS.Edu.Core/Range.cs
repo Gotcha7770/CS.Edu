@@ -76,11 +76,15 @@ namespace CS.Edu.Core
 
         private static IEnumerable<Range<T>> DiffIterator(Range<T> minuend, Range<T> subtrahend)
         {
+            //if s.Min < m.Min ⇒ s.Min < m.Max → [s.Min;s.Min] → ∅
+            //if m.Max < s.Min ⇒ m.Min < s.Min ⇒ !∀[s.Min;m.Max]
             var _1 = Operators.Min<T>(minuend.Min, subtrahend.Min);
             var _2 = Operators.Min<T>(minuend.Max, subtrahend.Min);
 
             yield return new Range<T>(_1, _2);
 
+            //if s.Max > m.Max ⇒ s.Max > m.Min → [s.Max;s.Max] → ∅
+            //if m.Min > s.Max ⇒ m.Max > s.Max ⇒ !∀[m.Min;s.Max]
             var _3 = Operators.Max<T>(minuend.Min, subtrahend.Max);
             var _4 = Operators.Max<T>(minuend.Max, subtrahend.Max);
 
