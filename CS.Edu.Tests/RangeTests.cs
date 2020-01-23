@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Linq;
 using CS.Edu.Core;
-using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests

@@ -71,5 +71,5 @@ namespace CS.Edu.Core.Extensions
 
             return -1;
         }
-    }
+    }    
 }

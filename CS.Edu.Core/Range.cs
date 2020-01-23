@@ -34,6 +34,21 @@ namespace CS.Edu.Core
             return !Equals(one, other);
         }
 
+        public static Range<T> operator &(Range<T> one, Range<T> other)
+        {
+            return one.Intersection(other);
+        }
+
+        public static IEnumerable<Range<T>> operator ^(Range<T> one, Range<T> other)
+        {
+            return SymmetricDifference(one, other);
+        }
+
+        public static IEnumerable<Range<T>> operator -(Range<T> one, Range<T> other)
+        {
+            return one.Substruct(other);
+        }
+
         public static IEnumerable<Range<T>> SymmetricDifference(Range<T> one, Range<T> other)
         {
             return one.Substruct(other).Concat(other.Substruct(one));
