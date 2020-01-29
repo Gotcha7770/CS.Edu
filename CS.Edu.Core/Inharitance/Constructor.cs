@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace CS.Edu.Core.Inharitance
 {
@@ -25,14 +21,14 @@ namespace CS.Edu.Core.Inharitance
         public T Value { get; }
     }
 
-    public class Test
+    class Test
     {
         IEnumerable<Base> _items;
         Base[] _array;
         IContainer<Base> _container;
         List<Base> _list;
 
-        public Test()
+        Test()
         {
             _items = new Collection<Derrived>();
             
