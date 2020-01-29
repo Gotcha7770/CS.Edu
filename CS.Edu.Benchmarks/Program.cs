@@ -25,6 +25,7 @@ namespace CS.Edu.Benchmarks
                 typeof(AggregateManyBench),
                 typeof(PowerOfTwoBench),
                 typeof(RangeDiffBench),
+                typeof(InvalidateCollectionBench),
             });
 
             switcher.Run();

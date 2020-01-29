@@ -33,6 +33,35 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
+        public static void Invalidate2<TKey, TValue>(this IList<TValue> source,
+                                                     ICollection<TValue> update,
+                                                     Merge<TValue> mergeFunc,
+                                                     Func<TValue, TKey> keySelector = null)
+        {
+            Dictionary<TKey, TValue> patch = update.ToDictionary(keySelector);
+
+            for (int i = source.Count - 1; i >= 0; i--)
+            {
+                TValue item = source[i];
+                TKey key = keySelector(item);
+
+                if(patch.TryGetValue(key, out TValue value))
+                {
+                    source[i] = mergeFunc(item, value);
+                    patch.Remove(key);
+                }
+                else
+                {
+                    source.RemoveAt(i);
+                }
+            }
+
+            foreach (var item in patch.Values)
+            {
+                source.Add(item);
+            }
+        }
+
         public static void AddOrUpdate<T>(this IList<T> list,
                                           T item,
                                           Merge<T> mergeFunc,
@@ -71,5 +100,5 @@ namespace CS.Edu.Core.Extensions
 
             return -1;
         }
-    }    
+    }
 }

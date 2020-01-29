@@ -90,7 +90,8 @@ namespace CS.Edu.Tests.Extensions
                 return x;
             };
 
-            source.Invalidate(newData, mergeFunc, new TestComparer());
+            //source.Invalidate(newData, mergeFunc, new TestComparer());
+            source.Invalidate2(newData, mergeFunc, (x) => x.Range.Min);
 
             var result = source.OrderBy(x => x.Range.Min).ToArray();
 
