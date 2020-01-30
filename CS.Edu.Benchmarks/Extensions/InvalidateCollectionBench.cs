@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using CS.Edu.Core;
@@ -37,13 +38,28 @@ namespace CS.Edu.Benchmarks.Extensions
         public void InvalidateCollection1()
         {
             _source.Invalidate(_update, _mergeFunc, _comparer);
-            //_source.Consume(_consumer);
+            _source.Consume(_consumer);
         }
 
         [Benchmark]
         public void InvalidateCollection2()
         {
             _source.Invalidate2(_update, _mergeFunc, _keySelector);
+            _source.Consume(_consumer);
+        }
+
+        [Benchmark]
+        public void Merge()
+        {
+            var result = _source.Merge(_update, _mergeFunc, _keySelector).ToList();
+            _source.Consume(_consumer);
+        }
+
+        [Benchmark]
+        public void Merge2()
+        {
+            var result = _source.Merge2(_update, _mergeFunc, _keySelector).ToList();
+            _source.Consume(_consumer);
         }
     }
 

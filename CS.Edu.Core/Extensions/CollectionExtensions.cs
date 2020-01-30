@@ -36,7 +36,7 @@ namespace CS.Edu.Core.Extensions
         public static void Invalidate2<TKey, TValue>(this IList<TValue> source,
                                                      ICollection<TValue> update,
                                                      Merge<TValue> mergeFunc,
-                                                     Func<TValue, TKey> keySelector = null)
+                                                     Func<TValue, TKey> keySelector)
         {
             Dictionary<TKey, TValue> patch = update.ToDictionary(keySelector);
 
@@ -45,7 +45,7 @@ namespace CS.Edu.Core.Extensions
                 TValue item = source[i];
                 TKey key = keySelector(item);
 
-                if(patch.TryGetValue(key, out TValue value))
+                if (patch.TryGetValue(key, out TValue value))
                 {
                     source[i] = mergeFunc(item, value);
                     patch.Remove(key);
@@ -59,6 +59,44 @@ namespace CS.Edu.Core.Extensions
             foreach (var item in patch.Values)
             {
                 source.Add(item);
+            }
+        }
+
+        public static IEnumerable<TValue> Merge<TKey, TValue>(this ICollection<TValue> source,
+                                                              ICollection<TValue> patch,
+                                                              Merge<TValue> mergeFunc,
+                                                              Func<TValue, TKey> keySelector)
+        {
+            Func<TValue, IEnumerable<TValue>, TValue> resultSelector = (x, y) =>
+            {
+                return y switch
+                {
+                    _ when y.IsNullOrEmpty() => x,
+                    _ => mergeFunc(y.First(), x)
+                };
+            };
+
+            return patch.GroupJoin(source, keySelector, keySelector, resultSelector);
+        }
+
+        public static IEnumerable<TValue> Merge2<TKey, TValue>(this ICollection<TValue> source,
+                                                              ICollection<TValue> patch,
+                                                              Merge<TValue> mergeFunc,
+                                                              Func<TValue, TKey> keySelector)
+        {
+            var dic = source.ToDictionary(x => keySelector(x));
+
+            foreach (var p in patch)
+            {
+                TKey key = keySelector(p);
+                if(dic.TryGetValue(key, out var value))
+                {
+                    yield return mergeFunc(value, p);
+                }
+                else
+                {
+                    yield return p;
+                }
             }
         }
 

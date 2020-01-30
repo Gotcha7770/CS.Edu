@@ -68,7 +68,7 @@ namespace CS.Edu.Tests.Extensions
                 new TestClass(new Range<int>(40, 50))
             };
 
-            var newData = new []
+            var patch = new []
             {
                 new TestClass(new Range<int>(0, 12)),
                 new TestClass(new Range<int>(12, 22)),
@@ -79,8 +79,8 @@ namespace CS.Edu.Tests.Extensions
             var standard = new []
             {
                 new TestClass(source[0].Id, new Range<int>(0, 12)),
-                newData[1],
-                newData[2],
+                patch[1],
+                patch[2],
                 source[3]
             };
 
@@ -90,10 +90,13 @@ namespace CS.Edu.Tests.Extensions
                 return x;
             };
 
-            //source.Invalidate(newData, mergeFunc, new TestComparer());
-            source.Invalidate2(newData, mergeFunc, (x) => x.Range.Min);
+            //source.Invalidate(patch, mergeFunc, new TestComparer());
+            //source.Invalidate2(patch, mergeFunc, x => x.Range.Min);
 
-            var result = source.OrderBy(x => x.Range.Min).ToArray();
+            //var result = source.OrderBy(x => x.Range.Min).ToArray();
+            var result = source.Merge2(patch, mergeFunc, x => x.Range.Min)
+                .OrderBy(x => x.Range.Min)
+                .ToArray();
 
             Assert.That(result, Is.EqualTo(standard));
         }
@@ -102,18 +105,18 @@ namespace CS.Edu.Tests.Extensions
         public void AddOrUpdate_SourceIsNull()
         {
             List<TestClass> source = null;
-            var newData = new TestClass(new Range<int>(0, 12));
+            var patch = new TestClass(new Range<int>(0, 12));
 
-            Assert.Throws<ArgumentNullException>(() => source.AddOrUpdate(newData, (x,y) => x));
+            Assert.Throws<ArgumentNullException>(() => source.AddOrUpdate(patch, (x,y) => x));
         }
 
         [Test]
         public void AddOrUpdate_SourceIsArray()
         {
             TestClass[] source = Array.Empty<TestClass>();
-            var newData = new TestClass(new Range<int>(0, 12));
+            var patch = new TestClass(new Range<int>(0, 12));
 
-            Assert.Throws<InvalidOperationException>(() => source.AddOrUpdate(newData, (x,y) => x));
+            Assert.Throws<InvalidOperationException>(() => source.AddOrUpdate(patch, (x,y) => x));
         }
 
         [Test]
@@ -127,7 +130,7 @@ namespace CS.Edu.Tests.Extensions
                 new TestClass(new Range<int>(20, 30))
             };
 
-            var newData = new TestClass(new Range<int>(0, 12));
+            var patch = new TestClass(new Range<int>(0, 12));
 
             Merge<TestClass> mergeFunc = (x, y) =>
             {
@@ -135,10 +138,10 @@ namespace CS.Edu.Tests.Extensions
                 return x;
             };
 
-            source.AddOrUpdate(newData, mergeFunc, new TestComparer());
+            source.AddOrUpdate(patch, mergeFunc, new TestComparer());
 
             Assert.That(source[0].Id, Is.EqualTo(targetId));
-            Assert.That(source[0].Range, Is.EqualTo(newData.Range));
+            Assert.That(source[0].Range, Is.EqualTo(patch.Range));
         }
 
         [Test]
@@ -149,11 +152,11 @@ namespace CS.Edu.Tests.Extensions
                 new TestClass(new Range<int>(0, 10)),
             };
 
-            var newData = new TestClass(new Range<int>(1, 12));
+            var patch = new TestClass(new Range<int>(1, 12));
 
-            source.AddOrUpdate(newData, (x,y) => x, new TestComparer());
+            source.AddOrUpdate(patch, (x,y) => x, new TestComparer());
 
-            Assert.That(source[1], Is.EqualTo(newData));
+            Assert.That(source[1], Is.EqualTo(patch));
         }
     }
 }
