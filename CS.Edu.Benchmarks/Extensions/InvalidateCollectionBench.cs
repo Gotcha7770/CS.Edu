@@ -52,14 +52,14 @@ namespace CS.Edu.Benchmarks.Extensions
         public void Merge()
         {
             var result = _source.Merge(_update, _mergeFunc, _keySelector).ToList();
-            _source.Consume(_consumer);
+            result.Consume(_consumer);
         }
 
         [Benchmark]
         public void Merge2()
         {
             var result = _source.Merge2(_update, _mergeFunc, _keySelector).ToList();
-            _source.Consume(_consumer);
+            result.Consume(_consumer);
         }
     }
 
