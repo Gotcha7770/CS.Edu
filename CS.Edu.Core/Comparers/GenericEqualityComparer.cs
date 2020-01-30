@@ -1,0 +1,36 @@
+using System;
+using System.Collections.Generic;
+
+namespace CS.Edu.Core.Comparers
+{
+    public class GenericEqualityComparer<TKey, TValue> : IEqualityComparer<TValue>
+    {
+        private Func<TValue, TValue, bool> _equalsFunction;
+        private Func<TValue, int> _hashCodeFunction;
+ 
+        public GenericEqualityComparer(Func<TValue, TKey> keySelector)
+        {
+            if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
+        
+            _equalsFunction = new Func<TValue, TValue, bool>((x, y) => 
+            {
+                TKey one = keySelector(x);
+                TKey other = keySelector(y);
+
+                return Equals(one, other);
+            });
+
+            _hashCodeFunction = new Func<TValue, int>((x) => keySelector(x).GetHashCode());
+        }
+
+        public bool Equals(TValue x, TValue y)
+        {
+            return _equalsFunction(x,y);
+        }
+
+        public int GetHashCode(TValue obj)
+        {
+            return _hashCodeFunction(obj);
+        }
+    }
+}
