@@ -10,6 +10,19 @@ namespace CS.Edu.Core
 
         // the None value
         public static None None => default;
+
+        public static Option<R> Map<T, R>(this None _, Func<T, R> f) => None;
+
+        public static Option<R> Map<T, R>(this Some<T> some, Func<T, R> f) => Some(f(some.Value));
+
+        public static Option<R> Map<T, R>(this Option<T> optT, Func<T, R> f)
+        {
+            return optT.Match(() => None, x => Some(f(x)));
+        }
+           
+
+        public static Option<R> Select<T, R>(this Option<T> one, Func<T, R> func)
+         => one.Map(func);
     }
 
     public struct Option<T> : IEquatable<None>, IEquatable<Option<T>>
