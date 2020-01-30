@@ -21,7 +21,7 @@ namespace CS.Edu.Benchmarks.Extensions
             (40, new DateTime(2016, 11, 1))
         };
 
-        (int, DateTime)[] _update = new []
+        (int, DateTime)[] _update = new[]
         {
             (0, new DateTime(2012, 2, 2)),
             (12, new DateTime(2013, 3, 3)),
@@ -29,22 +29,22 @@ namespace CS.Edu.Benchmarks.Extensions
             (30, new DateTime(2015, 5, 2))
         };
 
+        Dictionary<int, (int, DateTime)> _dic;
+
         readonly Merge<(int, DateTime)> _mergeFunc = (x, y) => (x.Item1, y.Item2);
-        readonly IEqualityComparer<(int, DateTime)> _comparer = new TestComparer();
         readonly Func<(int, DateTime), int> _keySelector = (x) => x.Item1;
         readonly Consumer _consumer = new Consumer();
 
-        [Benchmark]
-        public void InvalidateCollection1()
+        [GlobalSetup]
+        public void GlobalSetup()
         {
-            _source.Invalidate(_update, _mergeFunc, _comparer);
-            _source.Consume(_consumer);
+            _dic = _update.ToDictionary(_keySelector);
         }
 
         [Benchmark]
-        public void InvalidateCollection2()
+        public void InvalidateCollection()
         {
-            _source.Invalidate2(_update, _mergeFunc, _keySelector);
+            _source.Invalidate(_update, _mergeFunc, _keySelector);
             _source.Consume(_consumer);
         }
 
@@ -56,23 +56,17 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
-        public void Merge2()
+        public void MergeWithoutMaterialzie()
         {
-            var result = _source.Merge2(_update, _mergeFunc, _keySelector).ToList();
+            var result = _source.Merge(_update, _mergeFunc, _keySelector);
             result.Consume(_consumer);
         }
-    }
 
-    class TestComparer : IEqualityComparer<(int, DateTime)>
-    {
-        public bool Equals((int, DateTime) one, (int, DateTime) other)
+        [Benchmark]
+        public void MergeOnDictionaryWithoutMaterialzie()
         {
-            return GetHashCode(one) == GetHashCode(other);
-        }
-
-        public int GetHashCode((int, DateTime) obj)
-        {
-            return obj.Item1;
+            var result = _dic.Merge(_update, _mergeFunc, _keySelector);
+            result.Consume(_consumer);
         }
     }
 }
