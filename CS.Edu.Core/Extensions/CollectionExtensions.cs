@@ -6,70 +6,55 @@ namespace CS.Edu.Core.Extensions
 {
     public static class CollectionExt
     {
-        public static void Invalidate<T>(this IList<T> list,
-                                         ICollection<T> newItems,
-                                         Merge<T> mergeFunc,
-                                         IEqualityComparer<T> comparer = null)
+        public static void Invalidate<TKey, TValue>(this IList<TValue> source,
+                                                    IEnumerable<TValue> patch,
+                                                    Merge<TValue> mergeFunc,
+                                                    Func<TValue, TKey> keySelector)
         {
-            comparer = comparer ?? EqualityComparer<T>.Default;
+            Dictionary<TKey, TValue> dic = patch.ToDictionary(keySelector);
 
-            Dictionary<int, T> missed = list.ToDictionary(x => comparer.GetHashCode(x));
-
-            foreach (var item in newItems)
+            for (int i = source.Count - 1; i >= 0; i--)
             {
-                list.AddOrUpdate(item, mergeFunc, comparer);
-                var key = comparer.GetHashCode(item);
-                missed.Remove(key);
-            }
+                TValue item = source[i];
+                TKey key = keySelector(item);
 
-            for (int i = list.Count - 1; i >= 0; i--)
-            {
-                var item = list[i];
-                var key = comparer.GetHashCode(item);
-                if (missed.ContainsKey(key))
+                if (dic.TryGetValue(key, out TValue value))
                 {
-                    list.RemoveAt(i);
+                    source[i] = mergeFunc(item, value);
+                    dic.Remove(key);
+                }
+                else
+                {
+                    source.RemoveAt(i);
                 }
             }
-        }
 
-        public static void AddOrUpdate<T>(this IList<T> list,
-                                          T item,
-                                          Merge<T> mergeFunc,
-                                          IEqualityComparer<T> comparer = null)
-        {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
-
-            if (list.IsReadOnly)
-                throw new InvalidOperationException("list must be writeable!");
-
-            if (mergeFunc == null)
-                throw new ArgumentNullException(nameof(mergeFunc));
-
-            comparer = comparer ?? EqualityComparer<T>.Default;
-
-            int index = list.IndexOf(item, comparer);
-            if (index >= 0)
+            foreach (var item in dic.Values)
             {
-                T updated = mergeFunc(list[index], item);
-                list[index] = updated;
-            }
-            else
-            {
-                list.Add(item);
+                source.Add(item);
             }
         }
 
-        public static int IndexOf<T>(this IList<T> list, T item, IEqualityComparer<T> comparer)
+        public static IEnumerable<TValue> Merge<TKey, TValue>(this IEnumerable<TValue> source,
+                                                              IEnumerable<TValue> patch,
+                                                              Merge<TValue> mergeFunc,
+                                                              Func<TValue, TKey> keySelector)
         {
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (comparer.Equals(list[i], item))
-                    return i;
-            }
+            return source.ToDictionary(keySelector)
+                .Merge(patch, mergeFunc, keySelector);
+        }
 
-            return -1;
+        public static IEnumerable<TValue> Merge<TKey, TValue>(this IDictionary<TKey, TValue> source,
+                                                              IEnumerable<TValue> patch,
+                                                              Merge<TValue> mergeFunc,
+                                                              Func<TValue, TKey> keySelector)
+        {
+            foreach (var p in patch)
+            {
+                yield return source.TryGetValue(keySelector(p), out var value)
+                    ? mergeFunc(value, p)
+                    : p;
+            }
         }
     }
 }

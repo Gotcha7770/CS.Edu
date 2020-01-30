@@ -5,7 +5,7 @@ using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core
 {
-    public struct Range<T> : IEquatable<Range<T>> where T : IComparable, IEquatable<T>
+    public struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>, IEquatable<T>
     {
         public static Range<T> Default { get; } = new Range<T>();
 
@@ -32,6 +32,21 @@ namespace CS.Edu.Core
         public static bool operator !=(Range<T> one, Range<T> other)
         {
             return !Equals(one, other);
+        }
+
+        public static Range<T> operator &(Range<T> one, Range<T> other)
+        {
+            return one.Intersection(other);
+        }
+
+        public static IEnumerable<Range<T>> operator ^(Range<T> one, Range<T> other)
+        {
+            return SymmetricDifference(one, other);
+        }
+
+        public static IEnumerable<Range<T>> operator -(Range<T> one, Range<T> other)
+        {
+            return one.Substruct(other);
         }
 
         public static IEnumerable<Range<T>> SymmetricDifference(Range<T> one, Range<T> other)
@@ -61,8 +76,8 @@ namespace CS.Edu.Core
         {
             if (Intersects(other))
             {
-                T min = Operators.Max(Min, other.Min);
-                T max = Operators.Min(Max, other.Max);
+                T min = Operators.Max<T>(Min, other.Min);
+                T max = Operators.Min<T>(Max, other.Max);
                 return new Range<T>(min, max);
             }
 
