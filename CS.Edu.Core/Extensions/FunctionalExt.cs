@@ -23,5 +23,10 @@ namespace CS.Edu.Core.Extensions
         {
             return a => b => c => function(a, b, c);
         }
+
+        public static Func<T1, Func<T2, Func<T3, Func<T4, TResult>>>> Curry<T1, T2, T3, T4, TResult>(this Func<T1, T2, T3, T4, TResult> function)
+        {
+            return a => b => c => d => function(a, b, c, d);
+        }
     }
 }
