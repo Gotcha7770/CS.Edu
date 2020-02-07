@@ -1,6 +1,9 @@
+using System;
 using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Core.Helpers;
 using CS.Edu.Core.Interfaces;
 
@@ -42,6 +45,7 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
         TestClass _target;
         ISynchronizationContext<string> _sourceContext;
         ISynchronizationContext<string> _targetContext;
+        IDisposable _disposable;
 
         [GlobalSetup(Target = nameof(ReflectionSync))]
         public void ReflectionSyncSetup()
@@ -76,6 +80,19 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
                                                                               (c, v) => c.Value = v);
         }
 
+        [GlobalSetup(Target = nameof(RxPropertySync))]
+        public void RxPropertySyncSetup()
+        {
+            _source = new TestClass();
+            _target = new TestClass { Value = "initialValue" };
+        }
+
+        [GlobalCleanup(Target = nameof(RxPropertySync))]
+        public void GlobalCleanup()
+        {
+            _disposable.Dispose();
+        }
+
         [Benchmark]
         public string ReflectionSync()
         {
@@ -98,6 +115,17 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
         public string DirectPropertySync()
         {
             _synchronizer.Sync(_sourceContext, _targetContext);
+            _source.Value = "newValue";
+
+            return _target.Value;
+        }
+
+        [Benchmark]
+        public string RxPropertySync()
+        {
+            _disposable = ObservableExt.CreateFromProperty(_source, x => x.Value)
+                .Subscribe(x => _target.Value = x);
+
             _source.Value = "newValue";
 
             return _target.Value;

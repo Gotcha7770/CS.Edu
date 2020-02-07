@@ -1,5 +1,10 @@
+using System;
 using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reactive.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Core.Helpers;
 using CS.Edu.Core.Interfaces;
 using NUnit.Framework;
@@ -127,6 +132,49 @@ namespace CS.Edu.Tests.HelpersTests
 
             target.Value = "newTargetValue";
             Assert.That(source.Value, Is.EqualTo("newTargetValue"));
+        }
+
+        [Test]
+        public void ObservableFromPropertyTest()
+        {
+            var source = new TestClass();
+            var target = new TestClass { Value = "initialValue" };
+
+            ObservableExt.CreateFromProperty(source, x => x.Value)
+                .Subscribe(x => target.Value = x);
+
+            source.Value = "newValue";
+
+            Assert.That(target.Value, Is.EqualTo(source.Value));
+        }
+
+        [Test]
+        public void Method()
+        {
+            var source = new TestClass();
+            source.Value = "newValue";
+
+            Expression<Func<TestClass, string>> exp = (TestClass c) => c.Value;
+            MemberInfo member = ((MemberExpression)exp.Body).Member;
+
+            var func = ObservableExt.GetValueFetcherForProperty(member);
+
+            var result = func(source, Array.Empty<object>());
+        }
+
+        [Test]
+        public void Method2()
+        {
+            string result = "";
+            var source = new TestClass();
+
+            Observable.FromEvent<PropertyChangedEventHandler, string>(
+                x => (object sender, PropertyChangedEventArgs e) => x(e.PropertyName),
+                x => source.PropertyChanged += x,
+                x => source.PropertyChanged -= x)
+                .Subscribe(x => result = x);
+
+            source.Value = "newValue";
         }
     }
 }
