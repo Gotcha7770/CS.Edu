@@ -1,5 +1,8 @@
+using System;
 using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Core.Helpers;
 using CS.Edu.Core.Interfaces;
 using NUnit.Framework;
@@ -127,6 +130,20 @@ namespace CS.Edu.Tests.HelpersTests
 
             target.Value = "newTargetValue";
             Assert.That(source.Value, Is.EqualTo("newTargetValue"));
+        }
+
+        [Test]
+        public void ObservableFromPropertyTest()
+        {
+            var source = new TestClass();
+            var target = new TestClass { Value = "initialValue" };
+
+            ObservableExt.CreateFromProperty(source, x => x.Value)
+                .Subscribe(x => target.Value = x);
+
+            source.Value = "newValue";
+
+            Assert.That(target.Value, Is.EqualTo(source.Value));
         }
     }
 }

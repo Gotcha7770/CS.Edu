@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using CS.Edu.Core.Interfaces;
 
 namespace CS.Edu.Core.Helpers
 {
-    public interface ISynchronizationContext<T> : ISubject<T>
+    public interface ISynchronizationContext<T> : ISubject<T>, IDisposable
     {
         INotifyPropertyChanged Source { get; }
     }
@@ -26,6 +27,8 @@ namespace CS.Edu.Core.Helpers
             {
                 Source.PropertyChanged -= handler;
             }
+
+            //Source = null;
         }
 
         public virtual INotifyPropertyChanged Source { get; protected set; }

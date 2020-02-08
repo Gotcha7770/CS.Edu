@@ -1,6 +1,11 @@
+using System;
 using System.ComponentModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Order;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Core.Helpers;
 using CS.Edu.Core.Interfaces;
 
@@ -32,6 +37,8 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
     }
 
     [MemoryDiagnoser]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
+    [InvocationCount(1000)]
     [Config(typeof(DefaultConfig))]
     public class PropertySynchronizationBench
     {
@@ -40,46 +47,35 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
 
         TestClass _source;
         TestClass _target;
-        ISynchronizationContext<string> _sourceContext;
-        ISynchronizationContext<string> _targetContext;
+        IDisposable _disposable;
 
-        [GlobalSetup(Target = nameof(ReflectionSync))]
-        public void ReflectionSyncSetup()
+        [GlobalSetup]
+        public void RxPropertySyncSetup()
         {
             _source = new TestClass();
-            _sourceContext = new ReflectionSyncContext<string>(_source, _propertyName);
             _target = new TestClass { Value = "initialValue" };
-            _targetContext = new ReflectionSyncContext<string>(_target, _propertyName);
         }
 
-        [GlobalSetup(Target = nameof(DelegateSync))]
-        public void DelegateSyncSetup()
+        //[GlobalCleanup]
+        [IterationCleanup]
+        public void Cleanup()
         {
-            _source = new TestClass();
-            _sourceContext = new DelegateSyncContext<TestClass, string>(_source, _propertyName);
-            _target = new TestClass { Value = "initialValue" };
-            _targetContext = new DelegateSyncContext<TestClass, string>(_target, _propertyName);
-        }
-
-        [GlobalSetup(Target = nameof(DirectPropertySync))]
-        public void DirectPropertySyncSetup()
-        {
-            _source = new TestClass();
-            _sourceContext = new DirectPropertySyncContext<TestClass, string>(_source,
-                                                                              _propertyName,
-                                                                              (c) => c.Value,
-                                                                              (c, v) => c.Value = v);
-            _target = new TestClass { Value = "initialValue" };
-            _targetContext = new DirectPropertySyncContext<TestClass, string>(_target,
-                                                                              _propertyName,
-                                                                              (c) => c.Value,
-                                                                              (c, v) => c.Value = v);
+            _disposable.Dispose();
         }
 
         [Benchmark]
         public string ReflectionSync()
         {
-            _synchronizer.Sync(_sourceContext, _targetContext);
+            var sourceContext = new ReflectionSyncContext<string>(_source, _propertyName);
+            var targetContext = new ReflectionSyncContext<string>(_target, _propertyName);
+
+            _disposable = new CompositeDisposable
+            {
+                _synchronizer.Sync(sourceContext, targetContext),
+                sourceContext,
+                targetContext
+            };
+
             _source.Value = "newValue";
 
             return _target.Value;
@@ -88,7 +84,16 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
         [Benchmark]
         public string DelegateSync()
         {
-            _synchronizer.Sync(_sourceContext, _targetContext);
+            var sourceContext = new DelegateSyncContext<TestClass, string>(_source, _propertyName);
+            var targetContext = new DelegateSyncContext<TestClass, string>(_target, _propertyName);
+
+            _disposable = new CompositeDisposable
+            {
+                _synchronizer.Sync(sourceContext, targetContext),
+                sourceContext,
+                targetContext
+            };
+
             _source.Value = "newValue";
 
             return _target.Value;
@@ -97,7 +102,32 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
         [Benchmark]
         public string DirectPropertySync()
         {
-            _synchronizer.Sync(_sourceContext, _targetContext);
+            var sourceContext = new DirectPropertySyncContext<TestClass, string>(_source,
+                                                                                 _propertyName,
+                                                                                 (c) => c.Value,
+                                                                                 (c, v) => c.Value = v);
+            var targetContext = new DirectPropertySyncContext<TestClass, string>(_target,
+                                                                                 _propertyName,
+                                                                                 (c) => c.Value,
+                                                                                 (c, v) => c.Value = v);
+            _disposable = new CompositeDisposable
+            {
+                _synchronizer.Sync(sourceContext, targetContext),
+                sourceContext,
+                targetContext
+            };
+
+            _source.Value = "newValue";
+
+            return _target.Value;
+        }
+
+        [Benchmark]
+        public string RxPropertySync()
+        {
+            _disposable = ObservableExt.CreateFromProperty(_source, x => x.Value)
+                .Subscribe(x => _target.Value = x);
+
             _source.Value = "newValue";
 
             return _target.Value;
