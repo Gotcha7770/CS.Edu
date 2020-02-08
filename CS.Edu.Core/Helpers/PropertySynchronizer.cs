@@ -11,7 +11,7 @@ using CS.Edu.Core.Interfaces;
 
 namespace CS.Edu.Core.Helpers
 {
-    public interface ISynchronizationContext<T> : ISubject<T>
+    public interface ISynchronizationContext<T> : ISubject<T>, IDisposable
     {
         INotifyPropertyChanged Source { get; }
     }
@@ -27,6 +27,8 @@ namespace CS.Edu.Core.Helpers
             {
                 Source.PropertyChanged -= handler;
             }
+
+            //Source = null;
         }
 
         public virtual INotifyPropertyChanged Source { get; protected set; }
