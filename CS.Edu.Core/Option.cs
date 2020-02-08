@@ -19,7 +19,7 @@ namespace CS.Edu.Core
         {
             return optT.Match(() => None, x => Some(f(x)));
         }
-           
+
 
         public static Option<R> Select<T, R>(this Option<T> one, Func<T, R> func)
          => one.Map(func);
@@ -32,7 +32,7 @@ namespace CS.Edu.Core
 
         private Option(T value)
         {
-            _value = value ?? throw new ArgumentNullException();
+            _value = value;
             _isSome = true;
         }
 
@@ -72,7 +72,7 @@ namespace CS.Edu.Core
 
         internal Some(T value)
         {
-            Value = value ?? throw new ArgumentNullException(nameof(value), _nullValueMessage);
+            Value = value;
         }
     }
 }
