@@ -56,7 +56,6 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
             _target = new TestClass { Value = "initialValue" };
         }
 
-        //[GlobalCleanup]
         [IterationCleanup]
         public void Cleanup()
         {
