@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests
 {
-    class Container 
+    class Container
     {
         public int Id { get; set; }
 
