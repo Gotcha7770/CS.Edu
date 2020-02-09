@@ -20,15 +20,13 @@ namespace CS.Edu.Core
             return optT.Match(() => None, x => Some(f(x)));
         }
 
-
-        public static Option<R> Select<T, R>(this Option<T> one, Func<T, R> func)
-         => one.Map(func);
+        public static Option<R> Select<T, R>(this Option<T> one, Func<T, R> func) => one.Map(func);
     }
 
     public struct Option<T> : IEquatable<None>, IEquatable<Option<T>>
     {
-        readonly T _value;
-        readonly bool _isSome;
+        private readonly T _value;
+        private readonly bool _isSome;
 
         private Option(T value)
         {
@@ -52,22 +50,23 @@ namespace CS.Edu.Core
 
         public bool Equals(None other) => !_isSome;
 
+
         public bool Equals(Option<T> other)
         {
             return _isSome ? _value.Equals(other._value) : !other._isSome;
         }
 
         public static bool operator ==(Option<T> one, Option<T> other) => one.Equals(other);
+
         public static bool operator !=(Option<T> one, Option<T> other) => !(one == other);
 
         public override string ToString() => _isSome ? $"Some({_value})" : "None";
     }
+    
     public struct None { }
 
     public struct Some<T>
     {
-        private static readonly string _nullValueMessage = "Cannot wrap a null value in a 'Some'; use 'None' instead";
-
         internal T Value { get; }
 
         internal Some(T value)
