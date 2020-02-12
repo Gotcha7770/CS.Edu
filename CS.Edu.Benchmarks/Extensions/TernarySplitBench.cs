@@ -22,21 +22,21 @@ namespace CS.Edu.Benchmarks.Extensions
         //вернуть интервал - первый и последний индекс каждой последовательности
         //границы интервалов включены -> [0;5] [5;10] и т. д.
 
-        public IEnumerable<Indexed<int>> items = Enumerable.Range(0, 1000)
+        public IEnumerable<(int, int)> items = Enumerable.Range(0, 1000)
             .Paginate(50)
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
             .SelectMany(x => x)
-            .Select((x, i) => new Indexed<int>(i, x));
+            .Select((x, i) => (i, x));
 
-        Relation<Indexed<int>, Indexed<int>, Indexed<int>> isMonotone = (x, y, z) => x.Value <= y.Value ? y.Value <= z.Value : y.Value > z.Value;
+        Relation<(int, int), (int, int), (int, int)> isMonotone = (x, y, z) => x.Item2 <= y.Item2 ? y.Item2 <= z.Item2 : y.Item2 > z.Item2;
 
-        Relation<Indexed<int>, Indexed<int>, Direction> isDirectionChanged = (x, y, dir) => dir == Direction.Ascending ? x.Value > y.Value : x.Value < y.Value;
+        Relation<(int, int), (int, int), Direction> isDirectionChanged = (x, y, dir) => dir == Direction.Ascending ? x.Item2 > y.Item2 : x.Item2 < y.Item2;
 
         [Benchmark]
         public Range[] Split()
         {
             return items.Split(isMonotone, SplitOptions.IncludeBorders)
-                .Select(x => new Range(x.First().Index, x.Last().Index))
+                .Select(x => new Range(x.First().Item1, x.Last().Item1))
                 .ToArray();
         }
 
@@ -45,22 +45,22 @@ namespace CS.Edu.Benchmarks.Extensions
         {
             var result = new List<Range>();
 
-            Indexed<int> first = items.FirstOrDefault();
-            Indexed<int> second = items.Skip(1).FirstOrDefault();
-            int min = first.Index;
-            int max = second.Index;
+            (int, int) first = items.FirstOrDefault();
+            (int, int) second = items.Skip(1).FirstOrDefault();
+            int min = first.Item1;
+            int max = second.Item1;
             Direction currentDirection = min <= max ? Direction.Ascending : Direction.Descending;
 
             foreach (var item in items.Skip(2))
             {
                 first = second;
                 second = item;
-                max = second.Index;
+                max = second.Item1;
                 if (isDirectionChanged(first, second, currentDirection))
                 {
                     result.Add(min..max);
-                    currentDirection = first.Value < second.Value ? Direction.Ascending : Direction.Descending;
-                    min = second.Index;
+                    currentDirection = first.Item2 < second.Item2 ? Direction.Ascending : Direction.Descending;
+                    min = second.Item1;
                 }
             }
 
