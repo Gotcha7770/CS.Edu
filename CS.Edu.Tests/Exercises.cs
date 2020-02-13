@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using NUnit.Framework;
 using DynamicData;
 using DynamicData.Binding;
+using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Tests
 {
@@ -45,10 +46,10 @@ namespace CS.Edu.Tests
 
             var numbers = _input.Where(x => x.Any(c => char.IsNumber(c)))
                 .Select(x => int.Parse(x))
-                .OrderByDescending(x => x);
+                .OrderByDescending(x => x)
+                .Select(x => x.ToString());
 
-            var result = words.Zip(numbers, (l, r) => new[] { l, r.ToString() })
-                .SelectMany(x => x);
+            var result = words.FlatZip(numbers);
 
             // Assert.That(result, Is.EqualTo(_output));
         }
@@ -98,6 +99,6 @@ namespace CS.Edu.Tests
             
 
             //Assert.That(result, Is.EqualTo(_output));
-        }
+        }        
     }
 }
