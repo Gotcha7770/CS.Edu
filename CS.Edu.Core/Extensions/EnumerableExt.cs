@@ -36,6 +36,19 @@ namespace CS.Edu.Core.Extensions
             return EnumerableEx.If(condition, thenSource, elseSource);
         }
 
+        public static IEnumerable<T> FlatZip<T>(this IEnumerable<T> left, IEnumerable<T> right)
+        {
+            using(var leftEnumerator = left.GetEnumerator())
+            using(var rightEnumerator = right.GetEnumerator())
+            {
+                while(leftEnumerator.MoveNext() && rightEnumerator.MoveNext())
+                {
+                    yield return leftEnumerator.Current;
+                    yield return rightEnumerator.Current;
+                }
+            }
+        }
+
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, Relation<T> relation)
         {
             if (source == null)

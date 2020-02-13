@@ -33,6 +33,8 @@ namespace CS.Edu.Tests
 
                     yield return new TestCaseData(none, none).Returns(true);
                     yield return new TestCaseData(none, option).Returns(false);
+                    yield return new TestCaseData(option, none).Returns(false);
+                    yield return new TestCaseData(option, null).Returns(false);
                     yield return new TestCaseData(option, option).Returns(true);
                     yield return new TestCaseData(option, Option.Some(0)).Returns(true);
                     yield return new TestCaseData(option, Option.Some(1)).Returns(false);

@@ -6,24 +6,28 @@ namespace CS.Edu.Core.Extensions
     {
         public static Func<T, T, bool> ToFunc<T>(this Relation<T> relation)
         {
-            return new Func<T, T, bool>((x, y) => relation(x,y));
+            return new Func<T, T, bool>((x, y) => relation(x, y));
         }
 
         public static Func<T1, T2, bool> ToFunc<T1, T2>(this Relation<T1, T2> relation)
         {
-            return new Func<T1, T2, bool>((x, y) => relation(x,y));
+            return new Func<T1, T2, bool>((x, y) => relation(x, y));
         }
 
         public static Func<T, T, T> ToFunc<T>(this Merge<T> mergeFunc)
         {
-            return new Func<T, T, T>((x,y) => mergeFunc(x, y));
-        } 
+            return new Func<T, T, T>((x, y) => mergeFunc(x, y));
+        }
 
         public static Predicate<T> True<T>() => TruePredicate<T>.Value;
 
         public static Predicate<T> False<T>() => FalsePredicate<T>.Value;
 
         public static Func<T, T> Identity<T>() => IdentityFunc<T>.Value;
+
+        public static Action Empty() => EmptyAction.Value;
+        
+        public static Action<T> Empty<T>() => EmptyAction<T>.Value;
 
         private static class TruePredicate<T>
         {
@@ -44,6 +48,20 @@ namespace CS.Edu.Core.Extensions
             internal static readonly Func<T, T> Value = Id;
 
             private static T Id(T value) => value;
-        }        
+        }
+
+        private static class EmptyAction
+        {
+            internal static readonly Action Value = Empty;
+
+            private static void Empty() { }
+        }
+
+        private static class EmptyAction<T>
+        {
+            internal static readonly Action<T> Value = Empty;
+
+            private static void Empty(T @in) { }
+        }
     }
 }
