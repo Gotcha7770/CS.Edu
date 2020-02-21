@@ -56,5 +56,61 @@ namespace CS.Edu.Core.Extensions
                     : p;
             }
         }
+
+        public static void Swap<T>(ref T first, ref T second)
+        {
+            var tmp = first;
+            first = second;
+            second = tmp;
+        }
+
+        public static void Swap<T>(this IList<T> list, int first, int second)
+        {
+            var tmp = list[first];
+            list[first] = list[second];
+            list[second] = tmp;
+        }
+
+        public static void PartialSort<T>(T[] input, IComparer<T> comparer, Predicate<T> predicate)
+        {
+            int count = input.Length;
+
+            switch (count)
+            {
+                case 0:
+                case 1:
+                    break;
+                default:
+                    Sort(input, comparer, predicate);
+                    break;
+            }
+        }
+
+        private static void Sort<T>(T[] input, IComparer<T> comparer, Predicate<T> predicate)
+        {
+            int count = input.Length;
+            for (int i = 0; i < count; i++)
+            {
+                if (!predicate(input[i]))
+                    continue;
+
+                for (int j = i; j < count; j++)
+                {
+                    if (!predicate(input[j]))
+                        continue;
+
+                    if (comparer.Compare(input[i], input[j]) > 0)
+                        CollectionExt.Swap(ref input[i], ref input[j]);
+                }
+            }
+        }
+
+        public static T[] Copy<T>(this T[] source)
+        {
+            T[] result = new T[source.Length];
+            Array.Copy(source, result, source.Length);
+
+            return result;
+        }
     }
 }

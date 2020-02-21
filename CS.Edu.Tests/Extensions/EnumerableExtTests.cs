@@ -67,7 +67,7 @@ namespace CS.Edu.Tests.Extensions
             var items = Enumerable.Range(0, 5);
             var result = items.Except(10).ToArray();
             Assert.That(result, Is.EqualTo(new[] { 0, 1, 2, 3, 4 }));
-        }
+        }        
 
         [Test]
         public void TakeWhile_PrevLessThenNext_ReturnsFirst3Elements()

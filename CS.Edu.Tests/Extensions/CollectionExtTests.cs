@@ -46,10 +46,6 @@ namespace CS.Edu.Tests.Extensions
             source.Invalidate(patch, mergeFunc, x => x.Item2.Min);
             var result = source.OrderBy(x => x.Item2.Min).ToArray();
 
-            // var result = source.Merge(patch, mergeFunc, x => x.Item2.Min)
-            //     .OrderBy(x => x.Item2.Min)
-            //     .ToArray();
-
             Assert.That(result, Is.EqualTo(standard));
         }
     }
