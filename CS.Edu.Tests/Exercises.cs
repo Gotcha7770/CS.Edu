@@ -40,27 +40,9 @@ namespace CS.Edu.Tests
         };
 
         [Test]
-        public void Interactive()
-        {
-            var words = _input.Where(x => !x.IsNumber())
-                .OrderBy(x => x);
-
-            var numbers = _input.Where(x => x.IsNumber())
-                .Select(x => int.Parse(x))
-                .OrderByDescending(x => x)
-                .Select(x => x.ToString());
-
-            var result = words.FlatZip(numbers);
-
-            // Assert.That(result, Is.EqualTo(_output));
-        }
-
-        [Test]
-        public void Interactive2()
+        public void Interactive1()
         {
             var order = _input.Select(x => x.IsNumber() ? typeof(int) : typeof(string));
-
-            //var indexed = _input.Select((x,i) => (Index: i, Value: x));
 
             var words = _input.Where(x => !x.IsNumber())
                 .OrderBy(x => x)
@@ -85,25 +67,25 @@ namespace CS.Edu.Tests
         }
 
         [Test]
-        public void Interactive3()
+        public void Interactive2()
         {
             var indexed = _input.Select((x, i) => (Index: i, Value: x));
 
+            SortedSet<(int, string)> result = null;
             Func<(int, string), (int, string), int> compareFunc = (x, y) =>
             {
                 return (x.Item2.IsNumber(), y.Item2.IsNumber()) switch
                 {
-                    (true, true) => int.Parse(x.Item2).CompareTo(int.Parse(y.Item2)) * -1, //strict comparer
-                    (false, true) => x.Item1.CompareTo(y.Item1), //-1,
-                    (true, false) => x.Item1.CompareTo(y.Item1), //-1,
+                    (true, true) => int.Parse(x.Item2).CompareTo(int.Parse(y.Item2)) * -1, //strict comparer???
+                    (false, true) => result., //-1,
+                    (true, false) => , //-1,
                     _ => x.CompareTo(y)
                 };
             };
 
             var comparer = new GenericComparer<(int, string)>(compareFunc);
-            //var result = new SortedSet<string>(_input, comparer);
 
-            var result = new SortedSet<(int, string)>(comparer);
+            result = new SortedSet<(int, string)>(comparer);
 
             foreach (var item in indexed)
             {
@@ -114,7 +96,7 @@ namespace CS.Edu.Tests
         }
 
         [Test]
-        public void Interactive4()
+        public void Interactive3()
         {
             Func<string, string, int> compareFunc = (x, y) =>
             {
