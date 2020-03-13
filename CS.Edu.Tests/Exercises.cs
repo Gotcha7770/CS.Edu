@@ -69,35 +69,6 @@ namespace CS.Edu.Tests
         [Test]
         public void Interactive2()
         {
-            var indexed = _input.Select((x, i) => (Index: i, Value: x));
-
-            SortedSet<(int, string)> result = null;
-            Func<(int, string), (int, string), int> compareFunc = (x, y) =>
-            {
-                return (x.Item2.IsNumber(), y.Item2.IsNumber()) switch
-                {
-                    (true, true) => int.Parse(x.Item2).CompareTo(int.Parse(y.Item2)) * -1, //strict comparer???
-                    (false, true) => result., //-1,
-                    (true, false) => , //-1,
-                    _ => x.CompareTo(y)
-                };
-            };
-
-            var comparer = new GenericComparer<(int, string)>(compareFunc);
-
-            result = new SortedSet<(int, string)>(comparer);
-
-            foreach (var item in indexed)
-            {
-                result.Add(item);
-            }
-
-            Assert.That(result.Select(x => x.Item2), Is.EqualTo(_output));
-        }
-
-        [Test]
-        public void Interactive3()
-        {
             Func<string, string, int> compareFunc = (x, y) =>
             {
                 return (x.IsNumber(), y.IsNumber()) switch
