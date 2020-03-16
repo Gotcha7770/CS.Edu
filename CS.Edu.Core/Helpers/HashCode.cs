@@ -84,12 +84,15 @@ namespace CS.Edu.Core.Helpers
         }
 
         /// <inheritdoc />
-        public bool Equals(HashCode other) => _value.Equals(other._value);
+        public bool Equals(HashCode other)
+        {
+            return ReferenceEquals(this, other) || _value.Equals(other._value);
+        }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            return obj is HashCode other && (ReferenceEquals(this, other) || Equals(other));
+            return obj is HashCode other && Equals(other);
         }
 
         /// <summary>

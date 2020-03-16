@@ -87,33 +87,33 @@ namespace CS.Edu.Core
         public IEnumerable<Range<T>> Substruct(Range<T> other)
         {
             return DiffIterator(this, other).Where(x => !x.IsEmpty);
-        }        
+        }
 
         private static IEnumerable<Range<T>> DiffIterator(Range<T> minuend, Range<T> subtrahend)
         {
             //if s.Min < m.Min ⇒ s.Min < m.Max → [s.Min;s.Min] → ∅
             //if m.Max < s.Min ⇒ m.Min < s.Min ⇒ !∀[s.Min;m.Max]
-            var _1 = Operators.Min<T>(minuend.Min, subtrahend.Min);
-            var _2 = Operators.Min<T>(minuend.Max, subtrahend.Min);
+            T _1 = Operators.Min(minuend.Min, subtrahend.Min);
+            T _2 = Operators.Min(minuend.Max, subtrahend.Min);
 
             yield return new Range<T>(_1, _2);
 
             //if s.Max > m.Max ⇒ s.Max > m.Min → [s.Max;s.Max] → ∅
             //if m.Min > s.Max ⇒ m.Max > s.Max ⇒ !∀[m.Min;s.Max]
-            var _3 = Operators.Max<T>(minuend.Min, subtrahend.Max);
-            var _4 = Operators.Max<T>(minuend.Max, subtrahend.Max);
+            T _3 = Operators.Max(minuend.Min, subtrahend.Max);
+            T _4 = Operators.Max(minuend.Max, subtrahend.Max);
 
             yield return new Range<T>(_3, _4);
         }
 
         public override bool Equals(object obj)
         {
-            return obj is Range<T> other && (ReferenceEquals(this, other) || Equals(other));
+            return obj is Range<T> other && Equals(other);
         }
 
         public bool Equals(Range<T> other)
         {
-            return Equals(Min, other.Min) && Equals(Max, other.Max);
+            return ReferenceEquals(this, other) || (Equals(Min, other.Min) && Equals(Max, other.Max));
         }
 
         public override int GetHashCode()
