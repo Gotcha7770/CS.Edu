@@ -24,5 +24,14 @@ namespace CS.Edu.Tests
 
             Assert.That(predicate1, Is.EqualTo(predicate2));
         }
+
+        [Test]
+        public void TwoIdentityFunc_NotEquals()
+        {
+            var func1 = new Func<int, int>(x => x);
+            var func2 = new Func<int, int>(x => x);
+
+            Assert.That(func1, Is.Not.EqualTo(func2));
+        }
     }
 }
