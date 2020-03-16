@@ -113,17 +113,12 @@ namespace CS.Edu.Core
 
         public bool Equals(Range<T> other)
         {
-            return Equals(Min, other.Min)
-                    && Equals(Max, other.Max);
+            return Equals(Min, other.Min) && Equals(Max, other.Max);
         }
 
         public override int GetHashCode()
         {
-            int hash = 21;
-            hash = (hash * 13) + Min.GetHashCode();
-            hash = (hash * 13) + Max.GetHashCode();
-
-            return hash;
+            return HashCode.Combine(Min, Max);
         }
     }
 }

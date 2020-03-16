@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace CS.Edu.Core.Comparers
@@ -11,19 +10,21 @@ namespace CS.Edu.Core.Comparers
 
         public static EnumerableEqualityComparer<T> Instance => Lazy.Value;
         
-        public bool Equals([AllowNull] IEnumerable<T> one, [AllowNull] IEnumerable<T> other)
+        public bool Equals(IEnumerable<T> one, IEnumerable<T> other)
         {
             return ReferenceEquals(one, other) || (one != null && other != null && one.SequenceEqual(other));
         }
 
-        public int GetHashCode([DisallowNull] IEnumerable<T> enumerable)
+        public int GetHashCode(IEnumerable<T> enumerable)
         {
-            unchecked
+            var result = new HashCode();
+
+            foreach (var item in enumerable)
             {
-                return enumerable.Where(x => x != null)
-                    .Select(x => x.GetHashCode())
-                    .Aggregate(17, (acc, cur) => 23 * acc + cur);
+                result.Add(item);
             }
+
+            return result.ToHashCode();
         }
     }
 }
