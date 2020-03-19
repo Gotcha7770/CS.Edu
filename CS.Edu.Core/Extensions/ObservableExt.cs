@@ -12,13 +12,13 @@ namespace CS.Edu.Core.Extensions
                                                                               Expression<Func<TSender, TValue>> expression)
             where TSender : INotifyPropertyChanged
         {
-            if (expression == null)
+            if (!(expression?.Body is MemberExpression memberExpression))
             {
                 throw new ArgumentNullException(nameof(expression));
             }
 
             Func<TSender, TValue> getter = expression.Compile();
-            string propertyName = ((MemberExpression)expression.Body).Member.Name;
+            string propertyName = memberExpression.Member.Name;
 
             return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
                 x => source.PropertyChanged += x,
