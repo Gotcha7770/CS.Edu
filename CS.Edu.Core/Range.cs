@@ -16,6 +16,8 @@ namespace CS.Edu.Core
             Max = maximum;
         }
 
+        public Range((T Min, T Max) tuple) : this(tuple.Min, tuple.Max) { }
+
         public T Min { get; }
 
         public T Max { get; }
@@ -48,6 +50,8 @@ namespace CS.Edu.Core
         {
             return one.Substruct(other);
         }
+
+        public static explicit operator Range<T>((T Min, T Max) tuple) => new Range<T>(tuple);
 
         public static IEnumerable<Range<T>> SymmetricDifference(Range<T> one, Range<T> other)
         {
@@ -87,7 +91,7 @@ namespace CS.Edu.Core
         public IEnumerable<Range<T>> Substruct(Range<T> other)
         {
             return DiffIterator(this, other).Where(x => !x.IsEmpty);
-        }        
+        }
 
         private static IEnumerable<Range<T>> DiffIterator(Range<T> minuend, Range<T> subtrahend)
         {
