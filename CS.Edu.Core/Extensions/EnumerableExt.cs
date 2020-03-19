@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -46,6 +47,23 @@ namespace CS.Edu.Core.Extensions
                     yield return leftEnumerator.Current;
                     yield return rightEnumerator.Current;
                 }
+            }
+        }
+
+        public static IEnumerable<T> OfType<T>(this IEnumerable<T> source)
+        {
+            var genericType = new GenericType(typeof(T));
+            return source.Where(x => x.IsSubclassOf(genericType));
+        }
+
+        public static IEnumerable OfType(this IEnumerable source, GenericType constraint)
+        {
+            foreach (var item in source)
+            {
+                if(item.IsSubclassOf(constraint))
+                {
+                    yield return item;
+                }                
             }
         }
 
