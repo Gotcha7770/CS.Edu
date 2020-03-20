@@ -21,7 +21,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SplitFirstDiminsion_OneElement_ReturnsThatElement()
+        public void SplitFirstDimension_OneElement_ReturnsThatElement()
         {
             var items = new int[] { 1 };
             var result = items.Split(lessThan).ToArray();
@@ -43,7 +43,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SplitFirstDiminsion_WhilePrevLessThenNext_Returns2Groups()
+        public void SplitFirstDimension_WhilePrevLessThenNext_Returns2Groups()
         {
             var items = new int[] { 1, 2, 3, 2, 3 };
             var result = items.Split(lessThan)
@@ -55,7 +55,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SplitSecondDiminsion_WhilePrevLessThenNext_Returns2Groups()
+        public void SplitSecondDimension_WhilePrevLessThenNext_Returns2Groups()
         {
             var items = new int[] { 1, 2, 3, 2, 3 };
             var result = items.Split(lessThan)

@@ -107,7 +107,6 @@ namespace CS.Edu.Tests
         [Test]
         public void IsOfType_Generic()
         {
-            //var obj = new FirstLevelGeneric<TestType>();
             var obj = new TestClass();
 
             Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericB<C>)));
@@ -138,7 +137,7 @@ namespace CS.Edu.Tests
         [Test]
         public void IsIEnumerableOfType_Generic()
         {
-            var source = new List<GenericB<C>>
+            var source = new GenericB<C>[]
             {
                 new GenericB<C>(),
                 new TestClass()
@@ -153,18 +152,30 @@ namespace CS.Edu.Tests
         [Test]
         public void IsIEnumerableOfType_Generic2()
         {
+            var source = new object[]
+            {
+               new TestClass(),
+               new GenericB<C>(),
+               new C()
+            };
+
+            var result = source.OfType((GenericType)typeof(GenericA<>));
+
+            Assert.That(result, Is.EqualTo(new [] { source[0], source[1] }));
+        }
+
+        [Test]
+        public void IsIEnumerableOfType_Generic3()
+        {
             var taskC = Task<C>.Run(() => new C());
             var taskB = Task<B>.Run(() => new B());
 
-            var source = new List<Task>
+            var source = new Task[]
             {
                taskC,
                taskB,
                Task.Run(Empty)
             };
-
-            // source.Add(Task<C>.Run(() => new C()));
-            // source.Add(Task<B>.Run(() => new B()));
 
             var result = source.OfType((GenericType)typeof(Task<>));
 
