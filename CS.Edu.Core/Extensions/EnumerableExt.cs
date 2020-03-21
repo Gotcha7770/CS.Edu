@@ -132,13 +132,13 @@ namespace CS.Edu.Core.Extensions
                 T first = enumerator.Current;
 
                 if (!enumerator.MoveNext())
+                {
                     yield return EnumerableEx.Return(first);
+                    yield break;
+                }
 
                 T second = enumerator.Current;
                 acc = new List<T> { first, second };
-
-                if (!enumerator.MoveNext())
-                    yield return acc;
 
                 while (enumerator.MoveNext())
                 {
@@ -150,11 +150,12 @@ namespace CS.Edu.Core.Extensions
                     else
                     {
                         yield return acc;
-
-                        first = second;
-                        second = item;
+                        
                         acc = new List<T> { item };
                     }
+
+                    first = second;
+                    second = item;
                 }
             }
 
@@ -165,7 +166,44 @@ namespace CS.Edu.Core.Extensions
         static IEnumerable<IEnumerable<T>> SplitWithBordersIterator<T>(IEnumerable<T> source,
                                                                        Relation<T, T, T> relation)
         {
-            yield return Enumerable.Empty<T>();
+            List<T> acc;
+            using (var enumerator = source.GetEnumerator())
+            {
+                if (!enumerator.MoveNext())
+                    yield break;
+
+                T first = enumerator.Current;
+
+                if (!enumerator.MoveNext())
+                {
+                    yield return EnumerableEx.Return(first);
+                    yield break;
+                }
+
+                T second = enumerator.Current;
+                acc = new List<T> { first, second };
+
+                while (enumerator.MoveNext())
+                {
+                    T item = enumerator.Current;
+                    if (relation(first, second, item))
+                    {
+                        acc.Add(item);
+                    }
+                    else
+                    {
+                        yield return acc;
+                        
+                        acc = new List<T> { second, item };
+                    }
+
+                    first = second;
+                    second = item;
+                }
+            }
+
+            if (acc.Count > 0)
+                yield return acc;
         }
 
         public static IEnumerable<T> TakeWhile<T>(this IEnumerable<T> source, Relation<T> relation)
