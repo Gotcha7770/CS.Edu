@@ -25,7 +25,7 @@ namespace CS.Edu.Core.Extensions
         {
             number = Math.Abs(number);
 
-            return (number) switch
+            return number switch
             {
                 0 => Enumerable.Empty<long>(),
                 1 => EnumerableEx.Return(1L),

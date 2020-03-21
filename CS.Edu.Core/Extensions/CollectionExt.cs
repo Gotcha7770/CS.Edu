@@ -49,9 +49,9 @@ namespace CS.Edu.Core.Extensions
                                                               Merge<TValue> mergeFunc,
                                                               Func<TValue, TKey> keySelector)
         {
-            foreach (var p in patch)
+            foreach (TValue p in patch)
             {
-                yield return source.TryGetValue(keySelector(p), out var value)
+                yield return source.TryGetValue(keySelector(p), out TValue value)
                     ? mergeFunc(value, p)
                     : p;
             }
@@ -59,14 +59,14 @@ namespace CS.Edu.Core.Extensions
 
         public static void Swap<T>(ref T first, ref T second)
         {
-            var tmp = first;
+            T tmp = first;
             first = second;
             second = tmp;
         }
 
         public static void Swap<T>(this IList<T> list, int first, int second)
         {
-            var tmp = list[first];
+            T tmp = list[first];
             list[first] = list[second];
             list[second] = tmp;
         }
@@ -100,7 +100,7 @@ namespace CS.Edu.Core.Extensions
                         continue;
 
                     if (comparer.Compare(input[i], input[j]) > 0)
-                        CollectionExt.Swap(ref input[i], ref input[j]);
+                        Swap(ref input[i], ref input[j]);
                 }
             }
         }
