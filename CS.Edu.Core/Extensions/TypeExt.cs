@@ -1,19 +1,29 @@
 using System;
+using System.Collections;
 
 namespace CS.Edu.Core.Extensions
 {
     public class GenericType
     {
-        private readonly Type _type;
-
         public GenericType(Type type)
         {
             if(!CanConvertFrom(type))
                 throw new InvalidOperationException("The definition needs to be a GenericType or GenericTypeDefinition");
 
-            _type = type;
-            GenericTypeDefinition = _type.GetGenericTypeDefinition();
-            GenericParameterTypes = _type.GetGenericArguments();
+            GenericTypeDefinition = type.GetGenericTypeDefinition();
+            GenericParameterTypes = type.GetGenericArguments();
+        }
+
+        public GenericType(Type type, Type[] parameterTypes)
+        {
+            if(!CanConvertFrom(type))
+                throw new InvalidOperationException("The definition needs to be a GenericType or GenericTypeDefinition");
+
+            if(parameterTypes.IsNullOrEmpty())
+                throw new InvalidOperationException("You should pass one or more generic parameter types");
+
+            GenericTypeDefinition = type;
+            GenericParameterTypes = parameterTypes;
         }
 
         public Type GenericTypeDefinition { get; }
@@ -51,6 +61,11 @@ namespace CS.Edu.Core.Extensions
                 : false;
         }
 
+        public static bool IsSubclassOf(this object obj, GenericType baseType)
+        {
+            return obj.GetType().IsSubclassOf(baseType);
+        }
+
         public static bool IsSubclassOf(this Type type, GenericType baseType)
         {
             while (type != null && type != CLRRootType)
@@ -65,6 +80,6 @@ namespace CS.Edu.Core.Extensions
             }
 
             return false;
-        }
+        }        
     }    
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,13 +39,30 @@ namespace CS.Edu.Core.Extensions
 
         public static IEnumerable<T> FlatZip<T>(this IEnumerable<T> left, IEnumerable<T> right)
         {
-            using(var leftEnumerator = left.GetEnumerator())
-            using(var rightEnumerator = right.GetEnumerator())
+            using (var leftEnumerator = left.GetEnumerator())
+            using (var rightEnumerator = right.GetEnumerator())
             {
-                while(leftEnumerator.MoveNext() && rightEnumerator.MoveNext())
+                while (leftEnumerator.MoveNext() && rightEnumerator.MoveNext())
                 {
                     yield return leftEnumerator.Current;
                     yield return rightEnumerator.Current;
+                }
+            }
+        }
+
+        public static IEnumerable<T> OfType<T>(this IEnumerable<T> source)
+        {
+            var genericType = new GenericType(typeof(T));
+            return source.Where(x => x.IsSubclassOf(genericType));
+        }
+
+        public static IEnumerable OfType(this IEnumerable source, GenericType constraint)
+        {
+            foreach (var item in source)
+            {
+                if (item.IsSubclassOf(constraint))
+                {
+                    yield return item;
                 }
             }
         }
@@ -59,15 +77,33 @@ namespace CS.Edu.Core.Extensions
             return SplitIterator(source, relation);
         }
 
-        static IEnumerable<IEnumerable<T>> SplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
+        static IEnumerable<IEnumerable<T>> SplitIterator<T>(IEnumerable<T> source, Relation<T> relation, SplitOptions options = SplitOptions.None)
         {
-            int countToSkip = 0;
-            while (source.Skip(countToSkip).Any())
+            List<T> acc;
+            using (var enumerator = source.GetEnumerator())
             {
-                yield return TakeWhileIterator(source, countToSkip, relation);
+                if (!enumerator.MoveNext())
+                    yield break;
 
-                countToSkip += CounterIterator(source, countToSkip, relation);
+                acc = new List<T> { enumerator.Current };
+
+                while (enumerator.MoveNext())
+                {
+                    T item = enumerator.Current;
+                    if (relation(acc.Last(), item))
+                    {
+                        acc.Add(item);
+                    }
+                    else
+                    {
+                        yield return acc;
+                        acc = new List<T> { item };
+                    }
+                }
             }
+
+            if (acc.Count > 0)
+                yield return acc;
         }
 
         public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source,
@@ -87,25 +123,87 @@ namespace CS.Edu.Core.Extensions
 
         static IEnumerable<IEnumerable<T>> SplitIterator<T>(IEnumerable<T> source, Relation<T, T, T> relation)
         {
-            int countToSkip = 0;
-            while (source.Skip(countToSkip).Any())
+            List<T> acc;
+            using (var enumerator = source.GetEnumerator())
             {
-                yield return TakeWhileIterator(source, countToSkip, relation);
+                if (!enumerator.MoveNext())
+                    yield break;
 
-                countToSkip += CounterIterator(source, countToSkip, relation);
+                T first = enumerator.Current;
+
+                if (!enumerator.MoveNext())
+                {
+                    yield return EnumerableEx.Return(first);
+                    yield break;
+                }
+
+                T second = enumerator.Current;
+                acc = new List<T> { first, second };
+
+                while (enumerator.MoveNext())
+                {
+                    T item = enumerator.Current;
+                    if (relation(first, second, item))
+                    {
+                        acc.Add(item);
+                    }
+                    else
+                    {
+                        yield return acc;
+                        
+                        acc = new List<T> { item };
+                    }
+
+                    first = second;
+                    second = item;
+                }
             }
+
+            if (acc.Count > 0)
+                yield return acc;
         }
 
         static IEnumerable<IEnumerable<T>> SplitWithBordersIterator<T>(IEnumerable<T> source,
                                                                        Relation<T, T, T> relation)
         {
-            int countToSkip = 0;
-            while (source.Skip(countToSkip).Any())
+            List<T> acc;
+            using (var enumerator = source.GetEnumerator())
             {
-                yield return TakeWhileIterator(source, countToSkip, relation);
+                if (!enumerator.MoveNext())
+                    yield break;
 
-                countToSkip += CounterWithBorderIterator(source, countToSkip, relation);
+                T first = enumerator.Current;
+
+                if (!enumerator.MoveNext())
+                {
+                    yield return EnumerableEx.Return(first);
+                    yield break;
+                }
+
+                T second = enumerator.Current;
+                acc = new List<T> { first, second };
+
+                while (enumerator.MoveNext())
+                {
+                    T item = enumerator.Current;
+                    if (relation(first, second, item))
+                    {
+                        acc.Add(item);
+                    }
+                    else
+                    {
+                        yield return acc;
+                        
+                        acc = new List<T> { second, item };
+                    }
+
+                    first = second;
+                    second = item;
+                }
             }
+
+            if (acc.Count > 0)
+                yield return acc;
         }
 
         public static IEnumerable<T> TakeWhile<T>(this IEnumerable<T> source, Relation<T> relation)
@@ -178,160 +276,6 @@ namespace CS.Edu.Core.Extensions
                     else
                         yield break;
                 }
-            }
-        }
-
-        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source,
-                                                   int countToSkip,
-                                                   Relation<T> relation)
-        {
-            using (var enumerator = source.GetEnumerator())
-            {
-                while (countToSkip > 0 && enumerator.MoveNext())
-                    countToSkip--;
-
-                if (!enumerator.MoveNext())
-                    yield break;
-
-                T prev = enumerator.Current;
-                yield return prev;
-
-                while (enumerator.MoveNext())
-                {
-                    if (relation(prev, enumerator.Current))
-                    {
-                        prev = enumerator.Current;
-                        yield return prev;
-                    }
-                    else
-                        yield break;                    
-                }
-            }
-        }
-
-        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source,
-                                                   int countToSkip,
-                                                   Relation<T, T, T> relation)
-        {
-            using (var enumerator = source.GetEnumerator())
-            {
-                while (countToSkip > 0 && enumerator.MoveNext())
-                    countToSkip--;
-
-                if (!enumerator.MoveNext())
-                    yield break;
-
-                T first = enumerator.Current;
-                yield return first;
-
-                if (!enumerator.MoveNext())
-                    yield break;
-
-                T second = enumerator.Current;
-                yield return second;
-
-                while (enumerator.MoveNext())
-                {
-                    if (relation(first, second, enumerator.Current))
-                    {
-                        first = second;
-                        second = enumerator.Current;
-                        yield return second;
-                    }
-                    else
-                        break;
-                }
-            }
-        }
-
-        static int CounterIterator<T>(IEnumerable<T> source, int countToSkip, Relation<T> relation)
-        {
-            using (var enumerator = source.GetEnumerator())
-            {
-                while (countToSkip > 0 && enumerator.MoveNext())
-                    countToSkip--;
-
-                if (!enumerator.MoveNext())
-                    return 0;
-
-                int result = 1;
-                T prev = enumerator.Current;
-
-                while (enumerator.MoveNext() && relation(prev, enumerator.Current))
-                {
-                    result++;
-                    prev = enumerator.Current;
-                }
-
-                return result;
-            }
-        }
-
-        static int CounterIterator<T>(IEnumerable<T> source, int countToSkip, Relation<T, T, T> relation)
-        {
-            using (var enumerator = source.GetEnumerator())
-            {
-                while (countToSkip > 0 && enumerator.MoveNext())
-                    countToSkip--;
-
-                if (!enumerator.MoveNext())
-                    return 0;
-
-                T first = enumerator.Current;
-
-                if (!enumerator.MoveNext())
-                    return 1;
-
-                int result = 2;
-                T second = enumerator.Current;
-
-                while (enumerator.MoveNext() && relation(first, second, enumerator.Current))
-                {
-                    result++;
-                    first = second;
-                    second = enumerator.Current;
-                }
-
-                return result;
-            }
-        }
-
-        static int CounterWithBorderIterator<T>(IEnumerable<T> source,
-                                                int countToSkip,
-                                                Relation<T, T, T> relation)
-        {
-            using (var enumerator = source.GetEnumerator())
-            {
-                while (countToSkip > 0 && enumerator.MoveNext())
-                    countToSkip--;
-
-                if (!enumerator.MoveNext())
-                    return 0;
-
-                T first = enumerator.Current;
-
-                if (!enumerator.MoveNext())
-                    return 1;
-
-                int result = 2;
-                T second = enumerator.Current;
-
-                while (enumerator.MoveNext())
-                {
-                    if (relation(first, second, enumerator.Current))
-                    {
-                        result++;
-                        first = second;
-                        second = enumerator.Current;
-                    }
-                    else
-                    {
-                        result--;
-                        break;
-                    }
-                }
-
-                return result;
             }
         }
 

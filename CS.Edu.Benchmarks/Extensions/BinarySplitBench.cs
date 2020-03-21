@@ -55,62 +55,6 @@ namespace CS.Edu.Benchmarks.Extensions
             result.Consume(_consumer);
         }
 
-        static IEnumerable<IEnumerable<T>> PlainSplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
-        {
-            while (source.Any())
-            {
-                yield return source.TakeWhile(relation);
-                source = source.SkipWhile(relation);
-            }
-        }
-
-        [Benchmark]
-        public void PlainSplit()
-        {
-            var result = PlainSplitIterator(Items, bothAreZeroOrNot)
-                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
-
-            result.Consume(_consumer);
-        }
-
-        static IEnumerable<IEnumerable<T>> PlainSplitIterator2<T>(IEnumerable<T> source, Relation<T> relation)
-        {
-            List<T> acc;
-            using (var enumerator = source.GetEnumerator())
-            {
-                if (!enumerator.MoveNext())
-                    yield break;
-
-                acc = new List<T> { enumerator.Current };
-
-                while (enumerator.MoveNext())
-                {
-                    T item = enumerator.Current;
-                    if (relation(acc.Last(), item))
-                    {
-                        acc.Add(item);
-                    }
-                    else
-                    {
-                        yield return acc;
-                        acc = new List<T> { item };
-                    }
-                }
-            }
-
-            if (acc.Count > 0)
-                yield return acc;
-        }
-
-        [Benchmark]
-        public void PlainSplit2()
-        {
-            var result = PlainSplitIterator2(Items, bothAreZeroOrNot)
-                .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
-
-            result.Consume(_consumer);
-        }
-
         [Benchmark]
         public void Split()
         {

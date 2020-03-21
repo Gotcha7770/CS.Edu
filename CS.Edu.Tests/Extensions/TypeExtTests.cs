@@ -1,21 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
+using static CS.Edu.Core.Extensions.DelegateExtensions;
+
 namespace CS.Edu.Tests
 {
-    class TBase { }
-    
-    class FirstLevelType : TBase { }
+    class A { }
 
-    class TestType : FirstLevelType { }
+    class B : A { }
 
-    class BaseGeneric<T> where T : TBase { }
+    class C : B { }
 
-    class FirstLevelGeneric<T> : BaseGeneric<FirstLevelType> { }
+    class GenericA<T> where T : A { }
 
-    class TestClass : FirstLevelGeneric<TestType> { }
+    class GenericB<T> : GenericA<B> { } //???
+
+    class TestClass : GenericB<C> { }
 
     [TestFixture]
     public class TypeExtTests
@@ -24,13 +28,13 @@ namespace CS.Edu.Tests
         [Test]
         public void TestMethod()
         {
-            Type openBaseType = typeof(BaseGeneric<>);
-            Type baseType = typeof(BaseGeneric<TBase>);
-            Type testTypeGeneric = typeof(BaseGeneric<TestType>);            
+            Type openBaseType = typeof(GenericA<>);
+            Type baseType = typeof(GenericA<A>);
+            Type testTypeGeneric = typeof(GenericA<C>);
             Type testType = typeof(TestClass);
             GenericType genericType = (GenericType)baseType;
 
-            Assert.IsFalse(testType.IsSubclassOf(testTypeGeneric));            
+            Assert.IsFalse(testType.IsSubclassOf(testTypeGeneric));
             Assert.IsTrue(testType.IsSubclassOfGeneric(openBaseType));
             Assert.IsTrue(testType.IsSubclassOf(genericType));
         }
@@ -54,7 +58,7 @@ namespace CS.Edu.Tests
         [Test]
         public void CanConvertFrom_OpenGenericType_ReturnsTrue()
         {
-            bool result = GenericType.CanConvertFrom(typeof(BaseGeneric<>));
+            bool result = GenericType.CanConvertFrom(typeof(GenericA<>));
 
             Assert.That(result, Is.True);
         }
@@ -62,7 +66,7 @@ namespace CS.Edu.Tests
         [Test]
         public void CanConvertFrom_GenericType_ReturnsTrue()
         {
-            bool result = GenericType.CanConvertFrom(typeof(BaseGeneric<TBase>));
+            bool result = GenericType.CanConvertFrom(typeof(GenericA<A>));
 
             Assert.That(result, Is.True);
         }
@@ -98,6 +102,84 @@ namespace CS.Edu.Tests
 
             Assert.That(type.GenericTypeDefinition, Is.EqualTo(typeof(IEnumerable<>)));
             Assert.That(type.GenericParameterTypes, Is.EqualTo(new[] { typeof(int) }));
+        }
+
+        [Test]
+        public void IsOfType_Generic()
+        {
+            var obj = new TestClass();
+
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericB<C>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericB<B>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericB<A>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericA<C>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericA<B>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericA<A>)));
+            Assert.IsTrue(obj.IsSubclassOf(new GenericType(typeof(GenericB<>))));
+            Assert.IsTrue(obj.IsSubclassOf(new GenericType(typeof(GenericA<>))));
+        }
+
+        [Test]
+        public void IsOfType_Generic2()
+        {
+            var obj = new GenericB<C>();
+
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericB<C>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericB<B>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericB<A>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericA<C>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericA<B>)));
+            Assert.IsTrue(obj.IsSubclassOf((GenericType)typeof(GenericA<A>)));
+            Assert.IsTrue(obj.IsSubclassOf(new GenericType(typeof(GenericB<>))));
+            Assert.IsTrue(obj.IsSubclassOf(new GenericType(typeof(GenericA<>))));
+        }
+
+        [Test]
+        public void IsIEnumerableOfType_Generic()
+        {
+            var source = new GenericB<C>[]
+            {
+                new GenericB<C>(),
+                new TestClass()
+            };
+
+            //var result = source.OfType<GenericB<C>>();
+            var result = source.OfType((GenericType)typeof(GenericB<>));
+
+            Assert.That(result, Is.EqualTo(source));
+        }
+
+        [Test]
+        public void IsIEnumerableOfType_Generic2()
+        {
+            var source = new object[]
+            {
+               new TestClass(),
+               new GenericB<C>(),
+               new C()
+            };
+
+            var result = source.OfType((GenericType)typeof(GenericA<>));
+
+            Assert.That(result, Is.EqualTo(new [] { source[0], source[1] }));
+        }
+
+        [Test]
+        public void IsIEnumerableOfType_Generic3()
+        {
+            var taskC = Task<C>.Run(() => new C());
+            var taskB = Task<B>.Run(() => new B());
+
+            var source = new Task[]
+            {
+               taskC,
+               taskB,
+               Task.Run(Empty)
+            };
+
+            var result = source.OfType((GenericType)typeof(Task<>));
+
+            Assert.That(result, Is.EqualTo(new Task[] { taskC, taskB }));
         }
     }
 }
