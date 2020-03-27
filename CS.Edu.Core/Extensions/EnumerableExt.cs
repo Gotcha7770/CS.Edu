@@ -350,6 +350,14 @@ namespace CS.Edu.Core.Extensions
         /// </summary>
         public static IEnumerable<T> ShrinkDuplicates<T>(this IEnumerable<T> source, T value)
         {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            return ShrinkDuplicatesIterator(source, value);
+        }
+
+        static IEnumerable<T> ShrinkDuplicatesIterator<T>(IEnumerable<T> source, T value)
+        {
             var comparer = EqualityComparer<T>.Default;
             bool skipping = false;
 
@@ -372,7 +380,21 @@ namespace CS.Edu.Core.Extensions
         /// Сокращает последовательные вхождения элементов возвращающих одниковые значения 
         /// в последовательности в соответствии с переданной функцией до одного
         /// </summary>
-        public static IEnumerable<TValue> ShrinkDuplicates<TKey, TValue>(this IEnumerable<TValue> source, Func<TValue, TKey> keySelector, TKey value)
+        public static IEnumerable<TValue> ShrinkDuplicates<TKey, TValue>(this IEnumerable<TValue> source,
+                                                                         Func<TValue, TKey> keySelector,
+                                                                         TKey value)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (keySelector == null)
+                throw new ArgumentNullException(nameof(keySelector));
+
+            return ShrinkDuplicatesIterator(source, keySelector, value);
+        }
+
+        static IEnumerable<TValue> ShrinkDuplicatesIterator<TKey, TValue>(IEnumerable<TValue> source,
+                                                                          Func<TValue, TKey> keySelector,
+                                                                          TKey value)
         {
             var comparer = EqualityComparer<TKey>.Default;
             bool skipping = false;
@@ -389,6 +411,36 @@ namespace CS.Edu.Core.Extensions
                     skipping = true;
                     yield return item;
                 }
+            }
+        }
+
+        public static IEnumerable<T> ExceptIfLast<T>(this IEnumerable<T> source, T value)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            return ExceptIfLastIterator(source, value);
+        }
+
+        static IEnumerable<T> ExceptIfLastIterator<T>(IEnumerable<T> source, T value)
+        {
+            using(var enumerator = source.GetEnumerator())
+            {
+                if(!enumerator.MoveNext())
+                    yield break;
+
+                var comparer = EqualityComparer<T>.Default;
+                T prev = enumerator.Current;
+
+                while(enumerator.MoveNext())
+                {
+                    yield return prev;
+
+                    prev = enumerator.Current;
+                }
+
+                if(!comparer.Equals(prev, value))
+                    yield return prev;
             }
         }
     }

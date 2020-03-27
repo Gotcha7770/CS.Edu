@@ -67,7 +67,7 @@ namespace CS.Edu.Tests.Extensions
             var items = Enumerable.Range(0, 5);
             var result = items.Except(10).ToArray();
             Assert.That(result, Is.EqualTo(new[] { 0, 1, 2, 3, 4 }));
-        }        
+        }
 
         [Test]
         public void TakeWhile_PrevLessThenNext_ReturnsFirst3Elements()
@@ -159,7 +159,7 @@ namespace CS.Edu.Tests.Extensions
             Assert.That(paginated, Is.Not.Null);
             Assert.That(paginated, Is.Empty);
         }
-        
+
         [Test]
         public void Paginate_Null_ThrowsArgumentNullException()
         {
@@ -190,7 +190,7 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Test()
+        public void ShrinkDuplicatesTest()
         {
             var points = new[]
             {
@@ -221,9 +221,9 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Test2()
+        public void ShrinkDuplicatesWithKeySelectorTest()
         {
-            var points = new []
+            var points = new[]
             {
                 new Point{ X = 0, Y = -9999},
                 new Point{ X = 5, Y = -9999},
@@ -238,7 +238,7 @@ namespace CS.Edu.Tests.Extensions
                 new Point{ X = 100, Y = 0},
             };
 
-            var standard = new []
+            var standard = new[]
             {
                 new Point{ X = 10, Y = 0},
                 new Point{ X = 20, Y = 1},
@@ -251,9 +251,33 @@ namespace CS.Edu.Tests.Extensions
 
             var result = points.SkipWhile(x => x.Y == -9999)
                 .ShrinkDuplicates(x => x.Y, -9999)
-                .Select(x => x.Y == -9999 ? new Point{ X = x.X, Y = double.NaN } : x);
+                .Select(x => x.Y == -9999 ? new Point { X = x.X, Y = double.NaN } : x);
 
             Assert.That(result, Is.EqualTo(standard));
+        }
+
+        [TestCaseSource(typeof(ExceptIfLastTestsDataSource), "TestCases")]
+        public IEnumerable<int> Test(IEnumerable<int> input)
+        {
+            return input.ExceptIfLast(1);
+        }
+
+        internal class ExceptIfLastTestsDataSource
+        {
+            public static IEnumerable TestCases
+            {
+                get
+                {
+                    yield return new TestCaseData(Enumerable.Empty<int>()).Returns(Enumerable.Empty<int>());
+                    yield return new TestCaseData(EnumerableEx.Return(0)).Returns(EnumerableEx.Return(0));
+                    yield return new TestCaseData(EnumerableEx.Return(1)).Returns(Enumerable.Empty<int>());
+                    yield return new TestCaseData(new[] { 0, 1 }).Returns(EnumerableEx.Return(0));
+                    yield return new TestCaseData(new[] { 1, 1 }).Returns(EnumerableEx.Return(1));
+                    yield return new TestCaseData(new[] { 1, 0 }).Returns(new[] { 1, 0 });
+                    yield return new TestCaseData(new[] { 1, 0, 1 }).Returns(new[] { 1, 0 });
+                    yield return new TestCaseData(new[] { 1, 0, 1, 0 }).Returns(new[] { 1, 0, 1, 0 });
+                }
+            }
         }
     }
 }
