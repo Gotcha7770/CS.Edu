@@ -443,5 +443,39 @@ namespace CS.Edu.Core.Extensions
                     yield return prev;
             }
         }
+
+        public static IEnumerable<TValue> ExceptIfLast<TValue, TKey>(this IEnumerable<TValue> source, 
+                                                                     Func<TValue, TKey> keySelector, 
+                                                                     TKey value)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            return ExceptIfLastIterator(source, keySelector, value);
+        }
+
+        static IEnumerable<TValue> ExceptIfLastIterator<TValue, TKey>(IEnumerable<TValue> source, 
+                                                                      Func<TValue, TKey> keySelector, 
+                                                                      TKey value)
+        {
+            using(var enumerator = source.GetEnumerator())
+            {
+                if(!enumerator.MoveNext())
+                    yield break;
+
+                var comparer = EqualityComparer<TKey>.Default;
+                TValue prev = enumerator.Current;
+
+                while(enumerator.MoveNext())
+                {
+                    yield return prev;
+
+                    prev = enumerator.Current;
+                }
+
+                if(!comparer.Equals(keySelector(prev), value))
+                    yield return prev;
+            }
+        }
     }
 }

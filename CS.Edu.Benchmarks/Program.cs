@@ -28,7 +28,8 @@ namespace CS.Edu.Benchmarks
                 typeof(InvalidateCollectionBench),
                 typeof(JaggedVsRectArrayBench),
                 typeof(DictionaryVsLookupBench),
-                typeof(DoubleEnumerationBench)
+                typeof(DoubleEnumerationBench),
+                typeof(TestBench)
             });
 
             switcher.Run();
