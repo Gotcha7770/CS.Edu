@@ -56,6 +56,14 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
+        public void SplitWithLINQ()
+        {
+            var result = Items.ShrinkDuplicates(0);
+            
+            result.Consume(_consumer);
+        }
+
+        [Benchmark]
         public void Split()
         {
             var result = Items.Split(bothAreZeroOrNot)

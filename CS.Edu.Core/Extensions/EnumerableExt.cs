@@ -150,7 +150,7 @@ namespace CS.Edu.Core.Extensions
                     else
                     {
                         yield return acc;
-                        
+
                         acc = new List<T> { item };
                     }
 
@@ -193,7 +193,7 @@ namespace CS.Edu.Core.Extensions
                     else
                     {
                         yield return acc;
-                        
+
                         acc = new List<T> { second, item };
                     }
 
@@ -323,7 +323,7 @@ namespace CS.Edu.Core.Extensions
 
         /// <summary>
         /// Постранично разбивает входную последовательность 
-        ///в соответствии с заданным параметром размера страницы
+        /// в соответствии с заданным параметром размера страницы
         /// </summary>
         public static IEnumerable<IEnumerable<T>> Paginate<T>(this IEnumerable<T> source, int pageSize)
         {
@@ -342,6 +342,53 @@ namespace CS.Edu.Core.Extensions
             {
                 yield return left.Take(pageSize);
                 left = left.Skip(pageSize);
+            }
+        }
+
+        /// <summary>
+        /// Сокращает последовательные вхождения конкретного элемента в последовательности до одного
+        /// </summary>
+        public static IEnumerable<T> ShrinkDuplicates<T>(this IEnumerable<T> source, T value)
+        {
+            var comparer = EqualityComparer<T>.Default;
+            bool skipping = false;
+
+            foreach (T item in source)
+            {
+                if (!comparer.Equals(item, value))
+                {
+                    skipping = false;
+                    yield return item;
+                }
+                else if (!skipping)
+                {
+                    skipping = true;
+                    yield return item;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Сокращает последовательные вхождения элементов возвращающих одниковые значения 
+        /// в последовательности в соответствии с переданной функцией до одного
+        /// </summary>
+        public static IEnumerable<TValue> ShrinkDuplicates<TKey, TValue>(this IEnumerable<TValue> source, Func<TValue, TKey> keySelector, TKey value)
+        {
+            var comparer = EqualityComparer<TKey>.Default;
+            bool skipping = false;
+
+            foreach (TValue item in source)
+            {
+                if (!Equals(keySelector(item), value))
+                {
+                    skipping = false;
+                    yield return item;
+                }
+                else if (!skipping)
+                {
+                    skipping = true;
+                    yield return item;
+                }
             }
         }
     }
