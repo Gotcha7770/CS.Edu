@@ -77,7 +77,7 @@ namespace CS.Edu.Core.Extensions
             return SplitIterator(source, relation);
         }
 
-        static IEnumerable<IEnumerable<T>> SplitIterator<T>(IEnumerable<T> source, Relation<T> relation, SplitOptions options = SplitOptions.None)
+        static IEnumerable<IEnumerable<T>> SplitIterator<T>(IEnumerable<T> source, Relation<T> relation)
         {
             List<T> acc;
             using (var enumerator = source.GetEnumerator())

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace CS.Edu.Core.Comparers
 {
@@ -13,7 +12,7 @@ namespace CS.Edu.Core.Comparers
             _compareFunc = compareFunc;
         }
 
-        public int Compare([AllowNull] T x, [AllowNull] T y)
+        public int Compare(T x, T y)
         {
             return _compareFunc(x,y);
         }

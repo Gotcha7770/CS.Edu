@@ -59,7 +59,7 @@ namespace CS.Edu.Benchmarks
         public void ImprovedMethod()
         {
             var result = items.SkipWhile(x => double.Equals(x.Y, -9999))
-                .ShrinkDuplicates(x => x.Y, -9999))
+                .ShrinkDuplicates(x => x.Y, -9999)
                 .ExceptIfLast(x => x.Y, -9999);
 
             result.Consume(_consumer);

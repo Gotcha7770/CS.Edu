@@ -142,35 +142,6 @@ namespace CS.Edu.Core.Helpers
         }
     }
 
-    public class DirectPropertySyncContext<TComponent, TProperty>
-        : PropertySyncContextBase<TProperty>
-    {
-        private readonly DirectPropertyDescriptor<TComponent, TProperty> _propertyDescriptor;
-        private string propertyName;
-
-        public DirectPropertySyncContext(INotifyPropertyChanged source,
-                                         string propertyName,
-                                         Func<TComponent, TProperty> getter,
-                                         Action<TComponent, TProperty> setter)
-        {
-            Source = source;
-            PropertyName = propertyName;
-            _propertyDescriptor = new DirectPropertyDescriptor<TComponent, TProperty>(PropertyName,
-                                                                                      getter,
-                                                                                      setter);
-        }
-
-        protected override TProperty GetValue()
-        {
-            return (TProperty)_propertyDescriptor.GetValue(Source);
-        }
-
-        protected override void SetValue(TProperty value)
-        {
-            _propertyDescriptor.SetValue(Source, value);
-        }
-    }
-
     public class PropertySynchronizer<T> : IPropertySynchronizer<T>
     {
         public IDisposable Sync(INotifyPropertyChanged source,

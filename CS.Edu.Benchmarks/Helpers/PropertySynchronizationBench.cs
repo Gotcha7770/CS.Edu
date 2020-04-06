@@ -99,29 +99,6 @@ namespace CS.Edu.Benchmarks.PropertySynchronization
         }
 
         [Benchmark]
-        public string DirectPropertySync()
-        {
-            var sourceContext = new DirectPropertySyncContext<TestClass, string>(_source,
-                                                                                 _propertyName,
-                                                                                 (c) => c.Value,
-                                                                                 (c, v) => c.Value = v);
-            var targetContext = new DirectPropertySyncContext<TestClass, string>(_target,
-                                                                                 _propertyName,
-                                                                                 (c) => c.Value,
-                                                                                 (c, v) => c.Value = v);
-            _disposable = new CompositeDisposable
-            {
-                _synchronizer.Sync(sourceContext, targetContext),
-                sourceContext,
-                targetContext
-            };
-
-            _source.Value = "newValue";
-
-            return _target.Value;
-        }
-
-        [Benchmark]
         public string RxPropertySync()
         {
             _disposable = ObservableExt.CreateFromProperty(_source, x => x.Value)

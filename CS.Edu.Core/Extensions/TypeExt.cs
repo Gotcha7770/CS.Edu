@@ -56,9 +56,8 @@ namespace CS.Edu.Core.Extensions
 
         public static bool IsSubclassOfGeneric(this Type type, Type baseType) //???
         {
-            return GenericType.CanConvertFrom(baseType) 
-                ? type.IsSubclassOf((GenericType)baseType)
-                : false;
+            return GenericType.CanConvertFrom(baseType)
+                && type.IsSubclassOf((GenericType)baseType);
         }
 
         public static bool IsSubclassOf(this object obj, GenericType baseType)

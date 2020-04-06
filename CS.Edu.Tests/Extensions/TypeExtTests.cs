@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
-using static CS.Edu.Core.Extensions.DelegateExtensions;
-
 namespace CS.Edu.Tests
 {
     class A { }
@@ -174,7 +172,7 @@ namespace CS.Edu.Tests
             {
                taskC,
                taskB,
-               Task.Run(Empty)
+               Task.Run(Actions.Empty)
             };
 
             var result = source.OfType((GenericType)typeof(Task<>));
