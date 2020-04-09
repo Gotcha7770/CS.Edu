@@ -5,8 +5,8 @@ namespace CS.Edu.Core.Comparers
 {
     public class GenericEqualityComparer<TKey, TValue> : IEqualityComparer<TValue>
     {
-        private Func<TValue, TValue, bool> _equalsFunction;
-        private Func<TValue, int> _hashCodeFunction;
+        private readonly Func<TValue, TValue, bool> _equalsFunction;
+        private readonly Func<TValue, int> _hashCodeFunction;
  
         public GenericEqualityComparer(Func<TValue, TKey> keySelector)
         {
@@ -20,7 +20,7 @@ namespace CS.Edu.Core.Comparers
                 return Equals(one, other);
             });
 
-            _hashCodeFunction = new Func<TValue, int>((x) => keySelector(x).GetHashCode());
+            _hashCodeFunction = new Func<TValue, int>(x => keySelector(x).GetHashCode());
         }
 
         public bool Equals(TValue x, TValue y)

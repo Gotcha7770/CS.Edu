@@ -1,6 +1,6 @@
 namespace CS.Edu.Core
 {
-    public delegate bool Relation<T>(T one, T other);
+    public delegate bool Relation<in T>(T one, T other);
 
     public delegate bool Relation<in T1, in T2>(T1 one, T2 other);
 
