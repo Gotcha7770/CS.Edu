@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using DynamicData;
-using DynamicData.Binding;
 using NUnit.Framework;
 
-namespace CS.Edu.Tests.ExpandTests
+namespace CS.Edu.Tests.ReactiveTests
 {
     [TestFixture]
     public class SortChangeSetTests
@@ -12,12 +13,12 @@ namespace CS.Edu.Tests.ExpandTests
         [Test]
         public void SortTest()
         {
-            var output = new ObservableCollectionExtended<int>();
+            ReadOnlyObservableCollection<int> output;
             var changeSet = new SourceList<int>();
             var subscribtion = changeSet
                 .Connect()
                 .Sort(Comparer<int>.Default)
-                .Bind(output)
+                .Bind(out output)
                 .Subscribe();
 
             changeSet.Add(10);
@@ -26,7 +27,7 @@ namespace CS.Edu.Tests.ExpandTests
             changeSet.Add(4);
             changeSet.Add(8);
 
-            Assert.That(output, Is.EqualTo(new [] {2, 4, 6, 8, 10}));
+            Assert.That(output, Is.EqualTo(new[] { 2, 4, 6, 8, 10 }));
         }
     }
 }
