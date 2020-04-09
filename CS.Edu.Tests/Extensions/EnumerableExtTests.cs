@@ -240,18 +240,17 @@ namespace CS.Edu.Tests.Extensions
 
             var standard = new[]
             {
+                new Point{ X = 0, Y = -9999},
                 new Point{ X = 10, Y = 0},
                 new Point{ X = 20, Y = 1},
-                new Point{ X = 30, Y = double.NaN},
+                new Point{ X = 30, Y = -9999},
                 new Point{ X = 40, Y = 4},
-                new Point{ X = 60, Y = double.NaN},
+                new Point{ X = 60, Y = -9999},
                 new Point{ X = 90, Y = 0},
                 new Point{ X = 100, Y = 0},
             };
 
-            var result = points.SkipWhile(x => x.Y == -9999)
-                .ShrinkDuplicates(x => x.Y, -9999)
-                .Select(x => x.Y == -9999 ? new Point { X = x.X, Y = double.NaN } : x);
+            var result = points.ShrinkDuplicates(x => x.Y, -9999);
 
             Assert.That(result, Is.EqualTo(standard));
         }

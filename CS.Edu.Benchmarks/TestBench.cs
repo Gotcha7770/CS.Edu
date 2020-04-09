@@ -59,10 +59,17 @@ namespace CS.Edu.Benchmarks
         public void ImprovedMethod()
         {
             var result = items.SkipWhile(x => double.Equals(x.Y, -9999))
-                .ShrinkDuplicates(x => x.Y, -9999))
-                .ExceptIfLast(x => x.Y, -9999);
+                .ShrinkDuplicates(x => x.Y, -9999)
+                .ExceptIfLast(x => x.Y, -9999)
+                .Do(Replace);
 
             result.Consume(_consumer);
+        }
+
+        private void Replace(Point point)
+        {
+            if(double.Equals(point.Y, -9999))
+                point.Y = double.NaN;
         }
 
         private static Point GetRandomPoint(int arg)
