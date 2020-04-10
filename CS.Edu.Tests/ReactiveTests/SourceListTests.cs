@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Linq;
 using CS.Edu.Tests.Utils;
 using DynamicData;
@@ -45,7 +46,8 @@ namespace CS.Edu.Tests.ReactiveTests
 
             testObj.Value = "newValue";
 
-            Assert.IsTrue(true);
+            Assert.That(results.Count == 2);
+            Assert.That(results[1].First().Reason == ListChangeReason.Refresh);
         }
     }
 }
