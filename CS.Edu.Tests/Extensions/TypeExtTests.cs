@@ -15,13 +15,12 @@ namespace CS.Edu.Tests
 
     class GenericA<T> where T : A { }
 
-    class GenericB<T> : GenericA<B> { } //???
-
-    class TestClass : GenericB<C> { }
+    class GenericB<T> : GenericA<B> { } //???    
 
     [TestFixture]
     public class TypeExtTests
     {
+        private class TestClass : GenericB<C> { }
 
         [Test]
         public void TestMethod()
