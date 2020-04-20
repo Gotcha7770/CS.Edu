@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using CS.Edu.Tests.Utils;
 using DynamicData;
+using DynamicData.Tests;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests.ReactiveTests
@@ -36,18 +37,22 @@ namespace CS.Edu.Tests.ReactiveTests
         public void ChangeTest()
         {
             var source = new SourceList<TestClass>();
-            var results = new List<IChangeSet<TestClass>>();
-
-            source.Connect().AutoRefresh(x => x.Value)
-                .Subscribe(x => results.Add(x));
-
             var testObj = new TestClass();
             source.Add(testObj);
 
+            ChangeSetAggregator<TestClass> results;
+
+            results = source.Connect()
+                .AutoRefresh(x => x.Value)
+                .AsAggregator();
+
             testObj.Value = "newValue";
 
-            Assert.That(results.Count == 2);
-            Assert.That(results[1].First().Reason == ListChangeReason.Refresh);
-        }
+            var refreshes = results.Messages
+                .SelectMany(x => x)
+                .Where(x => x.Reason == ListChangeReason.Refresh);
+
+            Assert.That(refreshes, Has.Exactly(1).Items);
+        }        
     }
 }
