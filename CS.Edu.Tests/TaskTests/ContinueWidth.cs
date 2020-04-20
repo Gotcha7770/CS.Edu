@@ -11,17 +11,15 @@ namespace CS.Edu.Tests.TaskTests
 {
     public class ContinueWidth
     {
-        private readonly IObservable<int> _observeable = Observable.Zip(
-            Observable.Range(0, 100),
-            Observable.Interval(TimeSpan.FromSeconds(0.5)),
-            (item, timer) => item);
+        private readonly IObservable<long> _observeable = Observable.Interval(TimeSpan.FromSeconds(0.5))
+            .Take(100);
 
         [Test]
         public void ContinueWidthTest()
         {
-            Task<(int, bool)> _current = Task.FromResult((0, false));
+            Task<(long, bool)> _current = Task.FromResult((0L, false));
             ManualResetEvent mre = new ManualResetEvent(false);
-            List<int> output = new List<int>();
+            List<long> output = new List<long>();
 
             _observeable.Subscribe(
                 x => _current = _current.ContinueWith(t => { output.Add(x); return (x, x.IsEven()); }),
