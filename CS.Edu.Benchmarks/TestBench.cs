@@ -53,12 +53,13 @@ namespace CS.Edu.Benchmarks
             RemoveCoordinateIfNanByIndex(xValues, yValues, yValues.Count - 1);            
 
             xValues.Consume(_consumer);
+            yValues.Consume(_consumer);
         }
 
         [Benchmark]
         public void ImprovedMethod()
         {
-            var result = items.SkipWhile(x => double.Equals(x.Y, -9999))
+            var result = items.SkipWhile(x => Equals(x.Y, -9999))
                 .ShrinkDuplicates(x => x.Y, -9999)
                 .ExceptIfLast(x => x.Y, -9999)
                 .Do(Replace);
@@ -68,7 +69,7 @@ namespace CS.Edu.Benchmarks
 
         private void Replace(Point point)
         {
-            if(double.Equals(point.Y, -9999))
+            if(Equals(point.Y, -9999))
                 point.Y = double.NaN;
         }
 
