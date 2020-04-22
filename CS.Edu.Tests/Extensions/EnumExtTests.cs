@@ -5,8 +5,8 @@ namespace CS.Edu.Tests.Extensions
 {
     enum TestEnum
     {
-        One, 
-        Two, 
+        One,
+        Two,
         Three
     }
 
@@ -18,7 +18,7 @@ namespace CS.Edu.Tests.Extensions
         {
             var values = EnumExt.GetValues<TestEnum>();
 
-            Assert.That(values, Is.EqualTo(new [] {TestEnum.One, TestEnum.Two, TestEnum.Three}));
+            CollectionAssert.AreEqual(values, new [] {TestEnum.One, TestEnum.Two, TestEnum.Three});
         }
     }
 }

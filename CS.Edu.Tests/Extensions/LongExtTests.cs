@@ -13,7 +13,7 @@ namespace CS.Edu.Tests.Extensions
         {
             IEnumerable<long> items = LongExt.Range(0, 0);
 
-            Assert.That(items.IsEmpty);
+            CollectionAssert.IsEmpty(items);
         }
 
         [Test]
@@ -21,7 +21,7 @@ namespace CS.Edu.Tests.Extensions
         {
             IEnumerable<long> items = LongExt.Range(0, 1);
 
-            Assert.That(items.Single(), Is.EqualTo(1));
+            Assert.AreEqual(items.Single(), 0);
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace CS.Edu.Tests.Extensions
         {
             IEnumerable<long> items = LongExt.Range(0, 10);
 
-            Assert.That(items, Is.EqualTo(new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
+            CollectionAssert.AreEqual(items, new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace CS.Edu.Tests.Extensions
         {
             IEnumerable<long> items = LongExt.Range(0, 10, 10);
 
-            Assert.That(items, Is.EqualTo(new[] { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 }));
+            CollectionAssert.AreEqual(items, new[] { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 });
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace CS.Edu.Tests.Extensions
         {
             IEnumerable<long> items = LongExt.Range(long.MaxValue - 1, 1);
 
-            Assert.That(items.Last(), Is.EqualTo(long.MaxValue - 1));
+            Assert.AreEqual(items.Last(), long.MaxValue - 1);
         }
     }
 }
