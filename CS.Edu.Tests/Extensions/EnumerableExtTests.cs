@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
+using CS.Edu.Tests.Utils;
 
 namespace CS.Edu.Tests.Extensions
 {
@@ -15,21 +16,21 @@ namespace CS.Edu.Tests.Extensions
         public void NullOrEmpty_Null_ReturnsTrue()
         {
             IEnumerable<int> empty = null;
-            Assert.That(empty.IsNullOrEmpty(), Is.True);
+            Assert.IsTrue(empty.IsNullOrEmpty());
         }
 
         [Test]
         public void NullOrEmpty_Empty_ReturnsTrue()
         {
             var empty = Enumerable.Empty<int>();
-            Assert.That(empty.IsNullOrEmpty(), Is.True);
+            Assert.IsTrue(empty.IsNullOrEmpty());
         }
 
         [Test]
         public void NullOrEmpty_NotEmpty_ReturnsFalse()
         {
             var items = Enumerable.Range(0, 85);
-            Assert.That(items.IsNullOrEmpty(), Is.False);
+            Assert.False(items.IsNullOrEmpty());
         }
 
         [Test]
@@ -43,52 +44,54 @@ namespace CS.Edu.Tests.Extensions
         public void Except_Empty_ReturnsEmpty()
         {
             var items = Enumerable.Empty<int>();
-            Assert.That(items.Except(0), Is.Empty);
+            CollectionAssert.IsEmpty(items.Except(0));
         }
 
         [Test]
         public void Except_OnlyTargetItem_ReturnsEmpty()
         {
-            var items = Enumerable.Range(0, 1);
-            Assert.That(items.Except(0), Is.Empty);
+            var items = EnumerableEx.Return(0);
+            CollectionAssert.IsEmpty(items.Except(0));
         }
 
         [Test]
         public void Except_EnumerableWithTargetItem_ReturnsWithoutTargetItem()
         {
             var items = Enumerable.Range(0, 3);
-            var result = items.Except(1).ToArray();
-            Assert.That(result, Is.EqualTo(new[] { 0, 2 }));
+            var result = items.Except(1);
+
+            CollectionAssert.AreEqual(result, new[] {0, 2});
         }
 
         [Test]
         public void Except_EnumerableWithoutTargetItem_ReturnsSource()
         {
             var items = Enumerable.Range(0, 5);
-            var result = items.Except(10).ToArray();
-            Assert.That(result, Is.EqualTo(new[] { 0, 1, 2, 3, 4 }));
+            var result = items.Except(10);
+
+            CollectionAssert.AreEqual(result, new[] {0, 1, 2, 3, 4});
         }
 
         [Test]
         public void TakeWhile_PrevLessThenNext_ReturnsFirst3Elements()
         {
-            var items = new int[] { 1, 2, 3, 2, 1 };
+            var items = new[] {1, 2, 3, 2, 1};
             Relation<int> lessThan = (x, y) => x < y;
 
-            var result = items.TakeWhile(lessThan).ToArray();
+            var result = items.TakeWhile(lessThan);
 
-            Assert.That(result, Is.EqualTo(new int[] { 1, 2, 3 }));
+            CollectionAssert.AreEqual(result, new[] {1, 2, 3});
         }
 
         [Test]
         public void TakeWhile_OneElement_ReturnsThatElement()
         {
-            var items = new int[] { 1 };
+            var items = EnumerableEx.Return(1);
             Relation<int> lessThan = (x, y) => x < y;
 
-            var result = items.TakeWhile(lessThan).ToArray();
+            var result = items.TakeWhile(lessThan);
 
-            Assert.That(result, Is.EqualTo(new int[] { 1 }));
+            CollectionAssert.AreEqual(result, new[] {1});
         }
 
         [Test]
@@ -97,31 +100,31 @@ namespace CS.Edu.Tests.Extensions
             var items = Enumerable.Empty<int>();
             Relation<int> lessThan = (x, y) => x < y;
 
-            var result = items.TakeWhile(lessThan).ToArray();
+            var result = items.TakeWhile(lessThan);
 
-            Assert.That(result, Is.EqualTo(Array.Empty<int>()));
+            CollectionAssert.AreEqual(result, Array.Empty<int>());
         }
 
         [Test]
         public void SkipWhile_PrevLessThenNext_SkipFirst2Elements()
         {
-            var items = new int[] { 1, 2, 3, 2, 1 };
+            var items = new int[] {1, 2, 3, 2, 1};
             Relation<int> lessThan = (x, y) => x < y;
 
-            var result = items.SkipWhile(lessThan).ToArray();
+            var result = items.SkipWhile(lessThan);
 
-            Assert.That(result, Is.EqualTo(new int[] { 2, 1 }));
+            CollectionAssert.AreEqual(result, new [] {2, 1} );
         }
 
         [Test]
         public void SkipWhile_OneElement_ReturnsEmpty()
         {
-            var items = new List<int> { 1 };
+            var items = new List<int> {1};
             Relation<int> lessThan = (x, y) => x < y;
 
-            var result = items.SkipWhile(lessThan).ToArray();
+            var result = items.SkipWhile(lessThan);
 
-            Assert.That(result, Is.EqualTo(Array.Empty<int>()));
+            CollectionAssert.AreEqual(result, (Array.Empty<int>()));
         }
 
         [Test]
@@ -130,9 +133,9 @@ namespace CS.Edu.Tests.Extensions
             var items = Array.Empty<int>();
             Relation<int> lessThan = (x, y) => x < y;
 
-            var result = items.SkipWhile(lessThan).ToArray();
+            var result = items.SkipWhile(lessThan);
 
-            Assert.That(result, Is.EqualTo(Array.Empty<int>()));
+            CollectionAssert.AreEqual(result, Array.Empty<int>());
         }
 
         [Test]
@@ -143,10 +146,9 @@ namespace CS.Edu.Tests.Extensions
 
             var paginated = items.Paginate(pageSize).ToArray();
 
-            Assert.That(paginated, Is.Not.Empty);
-            Assert.That(paginated.Length, Is.EqualTo(((items.Count() - 1) / pageSize) + 1));
-            Assert.That(paginated.First(), Is.InstanceOf<IEnumerable>());
-            Assert.That(paginated.First().Count(), Is.EqualTo(pageSize));
+            CollectionAssert.IsNotEmpty(paginated);
+            Assert.AreEqual(paginated.Length, 5);
+            Assert.AreEqual(paginated.First().Count(), pageSize);
         }
 
         [Test]
@@ -156,8 +158,8 @@ namespace CS.Edu.Tests.Extensions
 
             var paginated = items.Paginate(5);
 
-            Assert.That(paginated, Is.Not.Null);
-            Assert.That(paginated, Is.Empty);
+            Assert.IsNotNull(paginated);
+            CollectionAssert.IsEmpty(paginated);
         }
 
         [Test]
@@ -184,40 +186,19 @@ namespace CS.Edu.Tests.Extensions
             var second = paginated.Skip(10).First().ToArray();
             var third = paginated.Skip(1).First().First();
 
-            Assert.That(first, Is.EqualTo(Enumerable.Range(125, 25)));
-            Assert.That(second, Is.EqualTo(Enumerable.Range(250, 25)));
-            Assert.That(third, Is.EqualTo(25));
+            CollectionAssert.AreEqual(first, Enumerable.Range(125, 25));
+            CollectionAssert.AreEqual(second, Enumerable.Range(250, 25));
+            Assert.AreEqual(third, 25);
         }
 
         [Test]
         public void ShrinkDuplicatesTest()
         {
-            var points = new[]
-            {
-                0,
-                1,
-                0,
-                0,
-                1,
-                1,
-                0,
-                1,
-                1,
-                1,
-                1,
-                0
-            };
+            var points = new[] {0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0};
 
-            var result = points
-                .ShrinkDuplicates(1);
+            var result = points.ShrinkDuplicates(1);
 
-            Assert.That(result, Is.EqualTo(new[] { 0, 1, 0, 0, 1, 0, 1, 0 }));
-        }
-
-        struct Point
-        {
-            public double X { get; set; }
-            public double Y { get; set; }
+            CollectionAssert.AreEqual(result, new[] {0, 1, 0, 0, 1, 0, 1, 0});
         }
 
         [Test]
@@ -225,37 +206,37 @@ namespace CS.Edu.Tests.Extensions
         {
             var points = new[]
             {
-                new Point{ X = 0, Y = -9999},
-                new Point{ X = 5, Y = -9999},
-                new Point{ X = 10, Y = 0},
-                new Point{ X = 20, Y = 1},
-                new Point{ X = 30, Y = -9999},
-                new Point{ X = 40, Y = 4},
-                new Point{ X = 60, Y = -9999},
-                new Point{ X = 70, Y = -9999},
-                new Point{ X = 80, Y = -9999},
-                new Point{ X = 90, Y = 0},
-                new Point{ X = 100, Y = 0},
+                new Point {X = 0, Y = -9999},
+                new Point {X = 5, Y = -9999},
+                new Point {X = 10, Y = 0},
+                new Point {X = 20, Y = 1},
+                new Point {X = 30, Y = -9999},
+                new Point {X = 40, Y = 4},
+                new Point {X = 60, Y = -9999},
+                new Point {X = 70, Y = -9999},
+                new Point {X = 80, Y = -9999},
+                new Point {X = 90, Y = 0},
+                new Point {X = 100, Y = 0},
             };
 
             var standard = new[]
             {
-                new Point{ X = 0, Y = -9999},
-                new Point{ X = 10, Y = 0},
-                new Point{ X = 20, Y = 1},
-                new Point{ X = 30, Y = -9999},
-                new Point{ X = 40, Y = 4},
-                new Point{ X = 60, Y = -9999},
-                new Point{ X = 90, Y = 0},
-                new Point{ X = 100, Y = 0},
+                new Point {X = 0, Y = -9999},
+                new Point {X = 10, Y = 0},
+                new Point {X = 20, Y = 1},
+                new Point {X = 30, Y = -9999},
+                new Point {X = 40, Y = 4},
+                new Point {X = 60, Y = -9999},
+                new Point {X = 90, Y = 0},
+                new Point {X = 100, Y = 0},
             };
 
             var result = points.ShrinkDuplicates(x => x.Y, -9999);
 
-            Assert.That(result, Is.EqualTo(standard));
+            CollectionAssert.AreEqual(result, standard);
         }
 
-        [TestCaseSource(typeof(ExceptIfLastTestsDataSource), "TestCases")]
+        [TestCaseSource(typeof(ExceptIfLastTestsDataSource), nameof(ExceptIfLastTestsDataSource.TestCases))]
         public IEnumerable<int> Test(IEnumerable<int> input)
         {
             return input.ExceptIfLast(1);
@@ -270,11 +251,11 @@ namespace CS.Edu.Tests.Extensions
                     yield return new TestCaseData(Enumerable.Empty<int>()).Returns(Enumerable.Empty<int>());
                     yield return new TestCaseData(EnumerableEx.Return(0)).Returns(EnumerableEx.Return(0));
                     yield return new TestCaseData(EnumerableEx.Return(1)).Returns(Enumerable.Empty<int>());
-                    yield return new TestCaseData(new[] { 0, 1 }).Returns(EnumerableEx.Return(0));
-                    yield return new TestCaseData(new[] { 1, 1 }).Returns(EnumerableEx.Return(1));
-                    yield return new TestCaseData(new[] { 1, 0 }).Returns(new[] { 1, 0 });
-                    yield return new TestCaseData(new[] { 1, 0, 1 }).Returns(new[] { 1, 0 });
-                    yield return new TestCaseData(new[] { 1, 0, 1, 0 }).Returns(new[] { 1, 0, 1, 0 });
+                    yield return new TestCaseData(new[] {0, 1}).Returns(EnumerableEx.Return(0));
+                    yield return new TestCaseData(new[] {1, 1}).Returns(EnumerableEx.Return(1));
+                    yield return new TestCaseData(new[] {1, 0}).Returns(new[] {1, 0});
+                    yield return new TestCaseData(new[] {1, 0, 1}).Returns(new[] {1, 0});
+                    yield return new TestCaseData(new[] {1, 0, 1, 0}).Returns(new[] {1, 0, 1, 0});
                 }
             }
         }

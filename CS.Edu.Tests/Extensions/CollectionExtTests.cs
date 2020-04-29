@@ -44,9 +44,9 @@ namespace CS.Edu.Tests.Extensions
             };
 
             source.Invalidate(patch, mergeFunc, x => x.Item2.Min);
-            var result = source.OrderBy(x => x.Item2.Min).ToArray();
+            var result = source.OrderBy(x => x.Item2.Min);
 
-            Assert.That(result, Is.EqualTo(standard));
+            CollectionAssert.AreEqual(result, standard);
         }
     }
 }
