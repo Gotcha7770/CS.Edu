@@ -27,7 +27,7 @@ namespace CS.Edu.Benchmarks.Extensions
         [GlobalSetup]
         public void GlobalSetup()
         {
-            Items = Enumerable.Range(0, 1000)
+            Items = Enumerable.Range(0, 10000)
                 .Select(x => _random.Next(0, 2) == 0 ? _random.Next(1, 10) : 0)
                 .ToArray();
         }
@@ -56,7 +56,7 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
-        public void SplitWithLINQ()
+        public void SplitWithShrinkDuplicates()
         {
             var result = Items.ShrinkDuplicates(0);
             

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
 using DynamicData;
 using DynamicData.Tests;
@@ -34,7 +35,7 @@ namespace CS.Edu.Tests.ReactiveTests
         }
 
         [Test]
-        public void ChangeTest()
+        public void WatchPropertyTest()
         {
             var source = new SourceList<TestClass>();
             var testObj = new TestClass();
@@ -53,6 +54,31 @@ namespace CS.Edu.Tests.ReactiveTests
                 .Where(x => x.Reason == ListChangeReason.Refresh);
 
             Assert.That(refreshes, Has.Exactly(1).Items);
-        }        
+        } 
+
+        [Test]   
+        public void SubscribeManyTest()
+        {
+            var source = new SourceList<TestClass>();
+            var testObj = new TestClass();
+            source.Add(testObj);
+
+            var changeHistory = new List<string>();
+            ChangeSetAggregator<TestClass> results;
+
+            results = source.Connect()
+                .SubscribeMany(data => ObservableExt.CreateFromProperty(data, x => x.Value)
+                    .Subscribe(x => changeHistory.Add(x)))
+                .AsAggregator();
+
+            testObj.Value = "newValue";
+            testObj.Value = "anotherNewValue";
+
+            source.Remove(testObj);
+
+            testObj.Value = "lastValue";
+
+            Assert.IsTrue(true);
+        }    
     }
 }
