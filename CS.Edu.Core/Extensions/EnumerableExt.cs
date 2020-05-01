@@ -29,7 +29,7 @@ namespace CS.Edu.Core.Extensions
 
         public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item)
         {
-            return source.Except(EnumerableEx.Return(item));
+            return source.Where(x => !Equals(x, item));
         }
 
         public static IEnumerable<T> If<T>(this IEnumerable<T> thenSource, Func<bool> condition, IEnumerable<T> elseSource)
@@ -322,7 +322,7 @@ namespace CS.Edu.Core.Extensions
         }
 
         /// <summary>
-        /// Постранично разбивает входную последовательность 
+        /// Постранично разбивает входную последовательность
         /// в соответствии с заданным параметром размера страницы
         /// </summary>
         public static IEnumerable<IEnumerable<T>> Paginate<T>(this IEnumerable<T> source, int pageSize)
@@ -377,7 +377,7 @@ namespace CS.Edu.Core.Extensions
         }
 
         /// <summary>
-        /// Сокращает последовательные вхождения элементов возвращающих одниковые значения 
+        /// Сокращает последовательные вхождения элементов возвращающих одниковые значения
         /// в последовательности в соответствии с переданной функцией до одного
         /// </summary>
         public static IEnumerable<TValue> ShrinkDuplicates<TKey, TValue>(this IEnumerable<TValue> source,
@@ -444,8 +444,8 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        public static IEnumerable<TValue> ExceptIfLast<TValue, TKey>(this IEnumerable<TValue> source, 
-                                                                     Func<TValue, TKey> keySelector, 
+        public static IEnumerable<TValue> ExceptIfLast<TValue, TKey>(this IEnumerable<TValue> source,
+                                                                     Func<TValue, TKey> keySelector,
                                                                      TKey value)
         {
             if (source == null)
@@ -454,8 +454,8 @@ namespace CS.Edu.Core.Extensions
             return ExceptIfLastIterator(source, keySelector, value);
         }
 
-        static IEnumerable<TValue> ExceptIfLastIterator<TValue, TKey>(IEnumerable<TValue> source, 
-                                                                      Func<TValue, TKey> keySelector, 
+        static IEnumerable<TValue> ExceptIfLastIterator<TValue, TKey>(IEnumerable<TValue> source,
+                                                                      Func<TValue, TKey> keySelector,
                                                                       TKey value)
         {
             using(var enumerator = source.GetEnumerator())

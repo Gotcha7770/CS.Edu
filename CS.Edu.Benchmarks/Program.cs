@@ -30,7 +30,8 @@ namespace CS.Edu.Benchmarks
                 typeof(DictionaryVsLookupBench),
                 typeof(DoubleEnumerationBench),
                 typeof(TestBench),
-                typeof(PullOutBench)
+                typeof(PullOutBench),
+                typeof(ExceptBench)
             });
 
             switcher.Run();
