@@ -34,7 +34,7 @@ namespace CS.Edu.Benchmarks
             var isMissingValue = false;
             foreach (var point in items)
             {
-                if (!double.Equals(point.Y, -9999))
+                if (!Equals(point.Y, -9999D))
                 {
                     isMissingValue = false;
                     xValues.Add(point.X);
@@ -50,7 +50,7 @@ namespace CS.Edu.Benchmarks
 
             //обрезка NaN в начале и в конце
             RemoveCoordinateIfNanByIndex(xValues, yValues, 0);
-            RemoveCoordinateIfNanByIndex(xValues, yValues, yValues.Count - 1);            
+            RemoveCoordinateIfNanByIndex(xValues, yValues, yValues.Count - 1);
 
             xValues.Consume(_consumer);
             yValues.Consume(_consumer);
@@ -59,7 +59,7 @@ namespace CS.Edu.Benchmarks
         [Benchmark]
         public void ImprovedMethod()
         {
-            var result = items.SkipWhile(x => Equals(x.Y, -9999))
+            var result = items.SkipWhile(x => Equals(x.Y, -9999D))
                 .ShrinkDuplicates(x => x.Y, -9999)
                 .ExceptIfLast(x => x.Y, -9999)
                 .Do(Replace);
@@ -69,7 +69,7 @@ namespace CS.Edu.Benchmarks
 
         private void Replace(Point point)
         {
-            if(Equals(point.Y, -9999))
+            if(Equals(point.Y, -9999D))
                 point.Y = double.NaN;
         }
 

@@ -10,9 +10,9 @@ namespace CS.Edu.Tests.IteratorsTests
     public class TrimIteratorTests
     {
         [TestCaseSource(typeof(TrimIteratorTestCaseSource), nameof(TrimIteratorTestCaseSource.TestCases))]
-        public IEnumerable<int> TrimIterator_Trim0(IEnumerable<int> source)
+        public IEnumerable<int> TrimStartIteratorTests(IEnumerable<int> source)
         {
-            return TestIterator(source, 0);
+            return TrimStartIterator(source, 0);
         }
 
         // [Test]
@@ -29,7 +29,7 @@ namespace CS.Edu.Tests.IteratorsTests
         //     Assert.IsTrue(true);
         // }
 
-        private IEnumerable<int> TestIterator(IEnumerable<int> source, int valueToTrim)
+        private IEnumerable<int> TrimStartIterator(IEnumerable<int> source, int valueToTrim)
         {
             using (var enumerator = new TrimStartIterator<int>(source, valueToTrim))
             {
