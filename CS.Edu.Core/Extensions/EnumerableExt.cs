@@ -32,11 +32,6 @@ namespace CS.Edu.Core.Extensions
             return source.Where(x => !Equals(x, item));
         }
 
-        public static IEnumerable<T> If<T>(this IEnumerable<T> thenSource, Func<bool> condition, IEnumerable<T> elseSource)
-        {
-            return EnumerableEx.If(condition, thenSource, elseSource);
-        }
-
         public static IEnumerable<T> FlatZip<T>(this IEnumerable<T> left, IEnumerable<T> right)
         {
             using (var leftEnumerator = left.GetEnumerator())
