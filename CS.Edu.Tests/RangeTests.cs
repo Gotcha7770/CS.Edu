@@ -9,13 +9,13 @@ namespace CS.Edu.Tests
     [TestFixture]
     public class RangeTests
     {
-        [TestCaseSource(typeof(EqualsTestsDataSource), "TestCases")]
+        [TestCaseSource(typeof(EqualsTestsDataSource), nameof(EqualsTestsDataSource.TestCases))]
         public bool EqualsTest(Range<int> one, Range<int> other)
         {
             return Equals(one, other);
         }
 
-        internal class EqualsTestsDataSource
+        class EqualsTestsDataSource
         {
             public static IEnumerable TestCases
             {
@@ -191,7 +191,7 @@ namespace CS.Edu.Tests
                         .Returns(new[] { new Range<int>(6, 9) });
                     yield return new TestCaseData(range, new Range<int>(0, 8))
                         .Returns(new[] { new Range<int>(8, 9) });
-                    
+
                     yield return new TestCaseData(range, new Range<int>(0, 9))
                         .Returns(Array.Empty<Range<int>>());
                     yield return new TestCaseData(range, new Range<int>(0, 10))
@@ -205,7 +205,7 @@ namespace CS.Edu.Tests
                         .Returns(new[] { new Range<int>(5, 6), new Range<int>(8, 9) });
                     yield return new TestCaseData(range, new Range<int>(7, 7))
                         .Returns(new[] { new Range<int>(5, 7), new Range<int>(7, 9) });
-                    
+
                     yield return new TestCaseData(range, new Range<int>(6, 10))
                         .Returns(new[] { new Range<int>(5, 6) });
                     yield return new TestCaseData(range, new Range<int>(8, 10))
