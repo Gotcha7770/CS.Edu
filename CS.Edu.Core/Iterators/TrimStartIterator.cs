@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CS.Edu.Core.StateMachine;
 
 namespace CS.Edu.Core.Iterators
 {
@@ -21,25 +22,22 @@ namespace CS.Edu.Core.Iterators
 
     public class TrimIteratorStateMachine<T> : LightStateMachine<TrimIteratorStates, TrimIteratorTriggers>
     {
-        private readonly Predicate<T> _match;
-
-        public TrimIteratorStateMachine(Predicate<T> match)
+        public TrimIteratorStateMachine(Func<T, bool> skipStartGuard)
         {
-            _match = match;
+            SkipStartGuard = skipStartGuard;
         }
 
-        public TrimIteratorStateMachine(T valueToSkip)
-        {
-            var comparer = EqualityComparer<T>.Default;
-            _match = x => comparer.Equals(x, valueToSkip);
-        }
+        public Func<T, bool> SkipStartGuard { get; }
+        public Func<bool> SkipEndtGuard { get; }
 
-        public bool IsMatch(T value) => _match(value);
+        public void Reset()
+        {
+            State = TrimIteratorStates.StartTrimming;
+        }
     }
 
     public sealed class TrimStartIterator<T> : Iterator<T, TrimIteratorStates, TrimIteratorTriggers>
     {
-        //private readonly T _valueToSkip;
         private readonly IEnumerator<T> _enumerator;
 
         public TrimStartIterator(IEnumerable<T> source, TrimIteratorStateMachine<T> state)
@@ -49,18 +47,13 @@ namespace CS.Edu.Core.Iterators
 
             state.WhenActive(TrimIteratorStates.StartTrimming)
                 .CanFire(TrimIteratorTriggers.Dispose, TrimIteratorStates.Disposed)
-                .CanFire(TrimIteratorTriggers.UseRegular, TrimIteratorStates.Regular, () => !state.IsMatch(Current));
+                .CanFire(TrimIteratorTriggers.UseRegular, TrimIteratorStates.Regular, () => !state.SkipStartGuard(Current));
 
             state.WhenActive(TrimIteratorStates.Regular)
-                .CanFire(TrimIteratorTriggers.Dispose, TrimIteratorStates.Disposed);
+                .CanFire(TrimIteratorTriggers.Dispose, TrimIteratorStates.Disposed)
+                .CanFire(TrimIteratorTriggers.TrimEnd, TrimIteratorStates.EndTrimming);
 
             //.OnEntryFrom(TrimIteratorTriggers.TrimStart, );
-
-        }
-
-        public TrimStartIterator(IEnumerable<T> source, T valueToTrim)
-            : this(source, new TrimIteratorStateMachine<T>(valueToTrim))
-        {
         }
 
         public bool SkipStart()
@@ -77,29 +70,6 @@ namespace CS.Edu.Core.Iterators
                 Dispose();
                 return false;
             }
-
-            // switch (_state)
-            // {
-            //     case 1:
-            //         _enumerator = _source.GetEnumerator();
-            //         _state = 2;
-            //         goto case 2;
-            //     case 2:
-            //         if (_enumerator.MoveNext())
-            //         {
-            //             Current = _enumerator.Current;
-            //             if (comparer.Equals(Current, _valueToSkip))
-            //             {
-            //                 return true;
-            //             }
-            //
-            //             _state = 3;
-            //             return false;
-            //         }
-            //
-            //         Dispose();
-            //         break;
-            // }
 
             return false;
         }
@@ -122,30 +92,12 @@ namespace CS.Edu.Core.Iterators
                     break;
             }
 
-            // switch (_state)
-            // {
-            //     case 1:
-            //     case 2:
-            //         while (SkipStart()) { }
-            //
-            //         if (_state != 3)
-            //             break;
-            //         goto case 3;
-            //     case 3:
-            //         _state = 4;
-            //         return true;
-            //     case 4:
-            //         if (_enumerator.MoveNext())
-            //         {
-            //             Current = _enumerator.Current;
-            //             return true;
-            //         }
-            //
-            //         Dispose();
-            //         break;
-            // }
-
             return false;
+        }
+
+        public bool SkipEnd()
+        {
+            return true;
         }
 
         public override void Dispose()

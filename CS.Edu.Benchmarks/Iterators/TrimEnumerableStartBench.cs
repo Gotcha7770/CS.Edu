@@ -16,6 +16,8 @@ namespace CS.Edu.Benchmarks.Iterators
             .Concat(Enumerable.Range(1, 2000))
             .Concat(Enumerable.Repeat(0, 1000));
 
+        private readonly TrimIteratorStateMachine<int> _state = new TrimIteratorStateMachine<int>(x => x == 0);
+
         private readonly Consumer _consumer = new Consumer();
 
         [Benchmark]
@@ -35,18 +37,20 @@ namespace CS.Edu.Benchmarks.Iterators
         [Benchmark]
         public void TrimStartWithTrimIterator()
         {
-            TrimStartTestIterator(_input, 0).Consume(_consumer);
+            _state.Reset();
+            TrimStartTestIterator(_input).Consume(_consumer);
         }
 
         [Benchmark]
         public void TrimStartAndReplaceWithTrimIterator()
         {
-            TrimStartAndReplaceTestIterator(_input, 0).Consume(_consumer);
+            _state.Reset();
+            TrimStartAndReplaceTestIterator(_input).Consume(_consumer);
         }
 
-        private IEnumerable<int> TrimStartTestIterator(IEnumerable<int> input, int toTrim)
+        private IEnumerable<int> TrimStartTestIterator(IEnumerable<int> input)
         {
-            using (var iterator = new TrimStartIterator<int>(input, toTrim))
+            using (var iterator = new TrimStartIterator<int>(input, _state))
             {
                 while (iterator.MoveNext())
                 {
@@ -55,13 +59,13 @@ namespace CS.Edu.Benchmarks.Iterators
             }
         }
 
-        private IEnumerable<int> TrimStartAndReplaceTestIterator(IEnumerable<int> input, int toTrim)
+        private IEnumerable<int> TrimStartAndReplaceTestIterator(IEnumerable<int> input)
         {
-            using (var iterator = new TrimStartIterator<int>(input, toTrim))
+            using (var iterator = new TrimStartIterator<int>(input, _state))
             {
                 while (iterator.MoveNext())
                 {
-                    if (iterator.Current == toTrim)
+                    if (iterator.Current == 0)
                     {
                         yield return -1;
                     }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using CS.Edu.Core.Interfaces;
+using CS.Edu.Core.StateMachine;
 
 namespace CS.Edu.Core.Iterators
 {
@@ -9,8 +11,6 @@ namespace CS.Edu.Core.Iterators
         where TTrigger : Enum
     {
         protected readonly IEnumerable<T> _source;
-
-        //protected int _state = 1;
 
         protected Iterator(IEnumerable<T> source, LightStateMachine<TState, TTrigger> state)
         {

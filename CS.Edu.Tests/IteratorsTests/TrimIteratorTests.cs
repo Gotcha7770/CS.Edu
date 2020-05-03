@@ -9,52 +9,89 @@ namespace CS.Edu.Tests.IteratorsTests
     [TestFixture]
     public class TrimIteratorTests
     {
-        [TestCaseSource(typeof(TrimIteratorTestCaseSource), nameof(TrimIteratorTestCaseSource.TestCases))]
-        public IEnumerable<int> TrimStartIteratorTests(IEnumerable<int> source)
+        private readonly TrimIteratorStateMachine<int> _state = new TrimIteratorStateMachine<int>(x => x == 0);
+
+        [SetUp]
+        public void Setup()
         {
-            return TrimStartIterator(source, 0);
+            _state.Reset();
         }
 
-        // [Test]
-        // public void Test()
-        // {
-        //     IEnumerable<int> source = Enumerable.Repeat(0, 5)
-        //         .Concat(Enumerable.Range(0, 10))
-        //         .Concat(Enumerable.Repeat(0, 3))
-        //         .Concat(Enumerable.Range(0, 10))
-        //         .Concat(Enumerable.Repeat(0, 5));
-        //
-        //     var result = TestIterator(source, 0);
-        //
-        //     Assert.IsTrue(true);
-        // }
-
-        private IEnumerable<int> TrimStartIterator(IEnumerable<int> source, int valueToTrim)
+        [TestCaseSource(typeof(TrimIteratorTestCaseSource), nameof(TrimIteratorTestCaseSource.TrimStartTestCases))]
+        public IEnumerable<int> TrimStartIteratorTests(IEnumerable<int> source)
         {
-            using (var enumerator = new TrimStartIterator<int>(source, valueToTrim))
+            return TrimStartIterator(source);
+        }
+
+        [TestCaseSource(typeof(TrimIteratorTestCaseSource), nameof(TrimIteratorTestCaseSource.ReplaceMiddleTestCases))]
+        public IEnumerable<int> ReplaceOnlyInTheMiddleIteratorTests(IEnumerable<int> source)
+        {
+            return TrimStartIterator(source);
+        }
+
+        [TestCaseSource(typeof(TrimIteratorTestCaseSource), nameof(TrimIteratorTestCaseSource.TrimEndTestCases))]
+        public IEnumerable<int> TrimEndIteratorTests(IEnumerable<int> source)
+        {
+            return TrimStartIterator(source);
+        }
+
+        private IEnumerable<int> TrimStartIterator(IEnumerable<int> source)
+        {
+            using (var enumerator = new TrimStartIterator<int>(source, _state))
             {
-                // while (enumerator.SkipStart())
-                // {
-                //     yield return enumerator.Current;
-                // }
+                while (enumerator.MoveNext())
+                {
+                    yield return enumerator.Current;
+                }
+
+                while (enumerator.SkipEnd())
+                {
+                    yield return enumerator.Current;
+                }
+            }
+        }
+
+        private IEnumerable<int> ReplaceOnlyInTheMiddleIterator(IEnumerable<int> source)
+        {
+            using (var enumerator = new TrimStartIterator<int>(source, _state))
+            {
+                while (enumerator.SkipStart())
+                {
+                    yield return enumerator.Current;
+                }
+
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Current == 0)
+                    {
+                        yield return -1;
+                    }
+                    else
+                    {
+                        yield return enumerator.Current;
+                    }
+                }
+
+                while (enumerator.SkipEnd())
+                {
+                    yield return enumerator.Current;
+                }
+            }
+        }
+
+        private IEnumerable<int> TrimEndIterator(IEnumerable<int> source)
+        {
+            using (var enumerator = new TrimStartIterator<int>(source, _state))
+            {
+                while (enumerator.SkipStart())
+                {
+                    yield return enumerator.Current;
+                }
 
                 while (enumerator.MoveNext())
                 {
                     yield return enumerator.Current;
-                    // if (enumerator.Current == 0)
-                    // {
-                    //     yield return -1;
-                    // }
-                    // else
-                    // {
-                    //     yield return enumerator.Current;
-                    // }
                 }
-
-                // while (enumerator.SkipEnd())
-                // {
-                //     yield return enumerator.Current;
-                // }
             }
         }
 
@@ -63,28 +100,56 @@ namespace CS.Edu.Tests.IteratorsTests
         {
             private static readonly IEnumerable<int> Empty = Enumerable.Empty<int>();
 
-            public static IEnumerable TestCases
+            public static IEnumerable TrimStartTestCases
             {
                 get
                 {
                     yield return new TestCaseData(Empty)
                         .Returns(Empty)
+                        .SetCategory("TrimStart")
                         .SetName("EmptySourceTest");
                     yield return new TestCaseData(EnumerableEx.Return(0))
                         .Returns(Empty)
+                        .SetCategory("TrimStart")
                         .SetName("OneValueToTrimTest");
                     yield return new TestCaseData(Enumerable.Repeat(0, 10))
                         .Returns(Empty)
+                        .SetCategory("TrimStart")
                         .SetName("OnlyValuesToTrimTest");
                     yield return new TestCaseData(EnumerableEx.Return(1))
                         .Returns(EnumerableEx.Return(1))
+                        .SetCategory("TrimStart")
                         .SetName("OneValueTest");
                     yield return new TestCaseData(Enumerable.Repeat(1, 10))
                         .Returns(Enumerable.Repeat(1, 10))
+                        .SetCategory("TrimStart")
                         .SetName("NoValuesToTrimTest");
                     yield return new TestCaseData(new[] {0, 0, 0, 1, 0, 0, 1, 1})
                         .Returns(new[] {1, 0, 0, 1, 1})
+                        .SetCategory("TrimStart")
                         .SetName("TrimValuesOnlyFromStartTest");
+                }
+            }
+
+            public static IEnumerable ReplaceMiddleTestCases
+            {
+                get
+                {
+                    yield return new TestCaseData(Empty)
+                        .Returns(Empty)
+                        .SetCategory("ReplaceMiddle")
+                        .SetName("EmptySourceTest");
+                }
+            }
+
+            public static IEnumerable TrimEndTestCases
+            {
+                get
+                {
+                    yield return new TestCaseData(Empty)
+                        .Returns(Empty)
+                        .SetCategory("TrimEnd")
+                        .SetName("EmptySourceTest");
                 }
             }
         }
