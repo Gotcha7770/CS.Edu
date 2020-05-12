@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
@@ -29,6 +30,45 @@ namespace CS.Edu.Core.Extensions
             .Select(x => getter(source));
         }
 
+        public static IObservable<IChangeSet<TOut>> Product<TIn, TOut>(this IObservable<IChangeSet<TIn>> one,
+            IObservable<IChangeSet<TIn>> other,
+            Func<TIn, TIn, TOut> productSelector)
+        {
+            return ObservableChangeSet.Create<TOut>(list =>
+            {
+                var left = one.Bind(out ReadOnlyObservableCollection<TIn> leftCache)
+                    .Subscribe();
+
+                var right = other.Bind(out ReadOnlyObservableCollection<TIn> rightCache)
+                    .Subscribe();
+
+                var reasons = new[]
+                {
+                    ListChangeReason.Add,
+                    ListChangeReason.AddRange,
+                    ListChangeReason.Remove,
+                    ListChangeReason.RemoveRange,
+                    ListChangeReason.Clear
+                };
+
+                var subscription = one.Merge(other)
+                    .WhereReasonsAre(reasons)
+                    .Subscribe(c =>
+                    {
+                        list.EditDiff(from x in leftCache
+                            from y in rightCache
+                            select productSelector(x, y));
+                    });
+
+                return new CompositeDisposable
+                {
+                    subscription,
+                    left,
+                    right
+                };
+            });
+        }
+
         public static IObservable<IChangeSet<T>> Tail<T>(this IObservable<IChangeSet<T>> source,
                                                          int numberOfItems)
         {
@@ -47,7 +87,7 @@ namespace CS.Edu.Core.Extensions
         public class TailRequest<T> : IVirtualRequest, IDisposable
         {
             private readonly IDisposable _subscription;
-            private int _count;            
+            private int _count;
 
             public TailRequest(IObservable<IChangeSet<T>> source, int numberOfItems)
             {

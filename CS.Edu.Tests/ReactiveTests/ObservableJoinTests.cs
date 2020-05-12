@@ -1,15 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
+using System.Reactive.Disposables;
+using CS.Edu.Core.Extensions;
 using DynamicData;
-using DynamicData.Alias;
-using DynamicData.Kernel;
-using DynamicData.Tests;
-using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests.ReactiveTests
@@ -36,10 +31,6 @@ namespace CS.Edu.Tests.ReactiveTests
     [TestFixture]
     public class ObservableJoinTests
     {
-        private readonly SourceCache<Curve, Guid> _left = new SourceCache<Curve, Guid>(x => x.Id);
-        private readonly SourceCache<Curve, Guid> _right = new SourceCache<Curve, Guid>(x => x.Id);
-        private ChangeSetAggregator<CurveRelation, int> _result;
-
         [Test]
         public void EnumerableCartesian()
         {
@@ -75,54 +66,98 @@ namespace CS.Edu.Tests.ReactiveTests
             IObservable<IChangeSet<int>> one = Enumerable.Range(0, 2).AsObservableChangeSet();
             IObservable<IChangeSet<int>> other = Enumerable.Range(0, 2).AsObservableChangeSet();
 
-            var subscription = one.Merge(other)
-                .Bind(out ReadOnlyObservableCollection<int> cartesian)
+            var subscription = one.Product(other, (x, y) => (x, y))
+                .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
                 .Subscribe();
 
             CollectionAssert.AreEqual(cartesian, standard);
         }
 
         [Test]
+        public void ObservableListCartesian()
+        {
+            SourceList<int> left = new SourceList<int>();
+            SourceList<int> right = new SourceList<int>();
+
+            var subscription = left.Connect()
+                .Product(right.Connect(), (l, r) => (l, r))
+                .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
+                .Subscribe();
+
+            CollectionAssert.IsEmpty(cartesian);
+
+            left.AddRange(Enumerable.Range(0, 2));
+
+            CollectionAssert.IsEmpty(cartesian);
+
+            right.Add(0);
+
+            CollectionAssert.AreEqual(cartesian, new[] {(0, 0), (1, 0)});
+
+            right.Add(1);
+
+            CollectionAssert.AreEqual(cartesian, new[] {(0, 0), (1, 0), (0, 1), (1, 1)});
+
+            left.Remove(0);
+
+            CollectionAssert.AreEqual(cartesian, new[] {(1, 0), (1, 1)});
+
+            right.Clear();
+
+            CollectionAssert.IsEmpty(cartesian);
+        }
+
+        [Test]
         public void DynamicDataJoinTest()
         {
-            // _result = _left.Connect()
-            //     .FullJoinMany(_right.Connect(), x => x.WellId, (l, g) => g.Items.Select(x => l.HasValue ? Optional.Some(new CurveRelation(x, l.Value)) : Optional<CurveRelation>.None))
-            //     .Filter(x => x.HasValue)
-            //     .AsAggregator();
+            SourceCache<Curve, Guid> left = new SourceCache<Curve, Guid>(x => x.Id);
+            SourceCache<Curve, Guid> right = new SourceCache<Curve, Guid>(x => x.Id);
 
-            var lGrouping = _left.Connect()
+            var result = left.Connect()
                 .Group(x => x.WellId)
-                .AsObservableCache();
+                .LeftJoinMany<IGroup<Curve, Guid, int>, int, Curve, Guid, IEnumerable<CurveRelation>>(right.Connect(), x => x.WellId, (l, r) => Product1(l.Cache.Items, r.Items))
+                .Bind(out ReadOnlyObservableCollection<IEnumerable<CurveRelation>> relations)
+                //.Bind(out ReadOnlyObservableCollection<CurveRelation> relations)
+                .Subscribe();
 
-            var rGrouping = _right.Connect()
-                .Group(x => x.WellId)
-                .AsObservableCache();;
+            var subscription = right.Connect()
+                .Bind(out ReadOnlyObservableCollection<Curve> curves)
+                .Subscribe();
 
-            // var result = _left.Connect()
-            //     .Group(x => x.WellId)
-            //     .LeftJoinMany<IGroup<Curve, Guid, int>, int, Curve, Guid, IObservable<IChangeSet<CurveRelation, Guid>>>(_right.Connect(), x => x.WellId, (l, r) => Product(l, r))
-            //     .TransformMany(x => x.C, x => x.Changes)
-            //     .AsAggregator();
-
-            _left.Edit(innerCache =>
+            left.Edit(innerCache =>
             {
                 innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
                 innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
             });
 
-            _right.Edit(innerCache =>
-            {
-                innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
-                innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 2 });
-            });
+            // right.Edit(innerCache =>
+            // {
+            //     innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
+            //     innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
+            // });
+
+            right.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
+            right.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
 
 
             Assert.IsTrue(true);
             // [x1, y1], [x2, y1]
         }
 
-        // private IObservable<IChangeSet<CurveRelation, Guid>> Product(IGroup<Curve,Guid,int> @group, IGrouping<Curve,Guid,int> grouping)
-        // {
-        // }
+        private IEnumerable<CurveRelation> Product1(IEnumerable<Curve> one, IEnumerable<Curve> other)
+        {
+            return from x in one
+                from y in other
+                select new CurveRelation(x, y);
+        }
+
+        private IObservable<IChangeSet<CurveRelation>> Product(IEnumerable<Curve> one, IEnumerable<Curve> other)
+        {
+            return ObservableChangeSet.Create<CurveRelation>(list =>
+            {
+                list.AddRange(Product1(one, other));
+                return new CompositeDisposable();
+            });
+        }
     }
 }
