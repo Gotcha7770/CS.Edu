@@ -30,6 +30,15 @@ namespace CS.Edu.Core.Extensions
             .Select(x => getter(source));
         }
 
+        private static readonly ListChangeReason[] ProductChangeReason =
+        {
+            ListChangeReason.Add,
+            ListChangeReason.AddRange,
+            ListChangeReason.Remove,
+            ListChangeReason.RemoveRange,
+            ListChangeReason.Clear
+        };
+
         public static IObservable<IChangeSet<TOut>> Product<TIn, TOut>(this IObservable<IChangeSet<TIn>> one,
             IObservable<IChangeSet<TIn>> other,
             Func<TIn, TIn, TOut> productSelector)
@@ -42,22 +51,15 @@ namespace CS.Edu.Core.Extensions
                 var right = other.Bind(out ReadOnlyObservableCollection<TIn> rightCache)
                     .Subscribe();
 
-                var reasons = new[]
-                {
-                    ListChangeReason.Add,
-                    ListChangeReason.AddRange,
-                    ListChangeReason.Remove,
-                    ListChangeReason.RemoveRange,
-                    ListChangeReason.Clear
-                };
-
                 var subscription = one.Merge(other)
-                    .WhereReasonsAre(reasons)
+                    .WhereReasonsAre(ProductChangeReason)
                     .Subscribe(c =>
                     {
-                        list.EditDiff(from x in leftCache
+                        var all = from x in leftCache
                             from y in rightCache
-                            select productSelector(x, y));
+                            select productSelector(x, y);
+                            
+                        list.EditDiff(all);
                     });
 
                 return new CompositeDisposable

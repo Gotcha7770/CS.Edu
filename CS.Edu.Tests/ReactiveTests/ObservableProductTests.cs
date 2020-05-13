@@ -29,7 +29,7 @@ namespace CS.Edu.Tests.ReactiveTests
     }
 
     [TestFixture]
-    public class ObservableJoinTests
+    public class ObservableProductTests
     {
         [Test]
         public void EnumerableCartesian()
