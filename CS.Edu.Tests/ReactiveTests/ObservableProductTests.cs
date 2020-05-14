@@ -2,32 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Disposables;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using CS.Edu.Core.Extensions;
 using DynamicData;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests.ReactiveTests
 {
-    class Curve
-    {
-        public Guid Id { get; set; }
-
-        public int WellId { get; set; }
-    }
-
-    class CurveRelation
-    {
-        public CurveRelation(Curve x, Curve y)
-        {
-            CurveX = x.Id;
-            CurveY = y.Id;
-        }
-
-        public Guid CurveX {get; set;}
-        public Guid CurveY {get; set;}
-    }
-
     [TestFixture]
     public class ObservableProductTests
     {
@@ -46,14 +29,81 @@ namespace CS.Edu.Tests.ReactiveTests
             IEnumerable<int> other = Enumerable.Range(0, 2);
 
             var cartesian = from x in one
-                from y in other
-                select (x, y);
+                            from y in other
+                            select (x, y);
 
             CollectionAssert.AreEqual(cartesian, standard);
         }
 
         [Test]
-        public void ChangeSetsCartesian()
+        public void ObservableCartesianCold()
+        {
+            var standard = new[]
+            {
+                (0, 0),
+                (1, 0),
+                (0, 1),                
+                (1, 1),
+            };
+
+            var cartesian = new List<(int, int)>();
+
+            IObservable<int> one = Enumerable.Range(0, 2).ToObservable();
+            IObservable<int> other = Enumerable.Range(0, 2).ToObservable();
+
+            var subscription = one.GroupJoin(other,
+                          _ => Observable.Never<Unit>(),
+                          _ => Observable.Never<Unit>(),
+                          (l, r) => (Left: l, Right: r))
+            .Subscribe(x =>
+            {
+                x.Right.Subscribe(r =>
+                {
+                    cartesian.Add((x.Left, r));
+                });
+            });
+
+            CollectionAssert.AreEqual(cartesian, standard);
+        }
+
+        [Test]
+        public void ObservableCartesianHot()
+        {
+            Subject<int> left = new Subject<int>();
+            Subject<int> right = new Subject<int>();
+
+            var cartesian = new List<(int, int)>();
+
+            var subscription = left.GroupJoin(right,
+                          _ => Observable.Never<Unit>(),
+                          _ => Observable.Never<Unit>(),
+                          (l, r) => (Left: l, Right: r))
+            .Subscribe(x =>
+            {
+                x.Right.Subscribe(r =>
+                {
+                    cartesian.Add((x.Left, r));
+                });
+            });
+
+            CollectionAssert.IsEmpty(cartesian);
+
+            left.OnNext(0);
+            left.OnNext(1);
+
+            CollectionAssert.IsEmpty(cartesian);
+
+            right.OnNext(0);
+
+            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
+
+            right.OnNext(1);
+
+            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+        }
+
+        [Test]
+        public void ObservableChangeSetCartesianCold()
         {
             var standard = new[]
             {
@@ -74,7 +124,7 @@ namespace CS.Edu.Tests.ReactiveTests
         }
 
         [Test]
-        public void ObservableListCartesian()
+        public void ObservableChangeSetCartesianHot()
         {
             SourceList<int> left = new SourceList<int>();
             SourceList<int> right = new SourceList<int>();
@@ -92,72 +142,19 @@ namespace CS.Edu.Tests.ReactiveTests
 
             right.Add(0);
 
-            CollectionAssert.AreEqual(cartesian, new[] {(0, 0), (1, 0)});
+            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
 
             right.Add(1);
 
-            CollectionAssert.AreEqual(cartesian, new[] {(0, 0), (1, 0), (0, 1), (1, 1)});
+            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
 
             left.Remove(0);
 
-            CollectionAssert.AreEqual(cartesian, new[] {(1, 0), (1, 1)});
+            CollectionAssert.AreEqual(cartesian, new[] { (1, 0), (1, 1) });
 
             right.Clear();
 
             CollectionAssert.IsEmpty(cartesian);
-        }
-
-        [Test]
-        public void DynamicDataJoinTest()
-        {
-            SourceCache<Curve, Guid> left = new SourceCache<Curve, Guid>(x => x.Id);
-            SourceCache<Curve, Guid> right = new SourceCache<Curve, Guid>(x => x.Id);
-
-            var result = left.Connect()
-                .Group(x => x.WellId)
-                .LeftJoinMany<IGroup<Curve, Guid, int>, int, Curve, Guid, IEnumerable<CurveRelation>>(right.Connect(), x => x.WellId, (l, r) => Product1(l.Cache.Items, r.Items))
-                .Bind(out ReadOnlyObservableCollection<IEnumerable<CurveRelation>> relations)
-                //.Bind(out ReadOnlyObservableCollection<CurveRelation> relations)
-                .Subscribe();
-
-            var subscription = right.Connect()
-                .Bind(out ReadOnlyObservableCollection<Curve> curves)
-                .Subscribe();
-
-            left.Edit(innerCache =>
-            {
-                innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
-                innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
-            });
-
-            // right.Edit(innerCache =>
-            // {
-            //     innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
-            //     innerCache.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
-            // });
-
-            right.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
-            right.AddOrUpdate(new Curve { Id = Guid.NewGuid(), WellId = 1 });
-
-
-            Assert.IsTrue(true);
-            // [x1, y1], [x2, y1]
-        }
-
-        private IEnumerable<CurveRelation> Product1(IEnumerable<Curve> one, IEnumerable<Curve> other)
-        {
-            return from x in one
-                from y in other
-                select new CurveRelation(x, y);
-        }
-
-        private IObservable<IChangeSet<CurveRelation>> Product(IEnumerable<Curve> one, IEnumerable<Curve> other)
-        {
-            return ObservableChangeSet.Create<CurveRelation>(list =>
-            {
-                list.AddRange(Product1(one, other));
-                return new CompositeDisposable();
-            });
         }
     }
 }
