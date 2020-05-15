@@ -42,7 +42,7 @@ namespace CS.Edu.Tests.ReactiveTests
             {
                 (0, 0),
                 (1, 0),
-                (0, 1),                
+                (0, 1),
                 (1, 1),
             };
 
@@ -67,6 +67,32 @@ namespace CS.Edu.Tests.ReactiveTests
         }
 
         [Test]
+        public void ObservableCartesianCold2()
+        {
+            var standard = new[]
+            {
+                (0, 0),
+                (0, 1),
+                (1, 0),
+                (1, 1),
+            };
+
+            var cartesian = new List<(int, int)>();
+
+            IObservable<int> one = Enumerable.Range(0, 2).ToObservable();
+            IObservable<int> other = Enumerable.Range(0, 2).ToObservable();
+
+            var product = from x in one
+                          from y in other
+                          select (x, y);
+
+            var subscription = product
+                .Subscribe(x => cartesian.Add(x));
+
+            CollectionAssert.AreEqual(cartesian, standard);
+        }
+
+        [Test]
         public void ObservableCartesianHot()
         {
             Subject<int> left = new Subject<int>();
@@ -85,6 +111,37 @@ namespace CS.Edu.Tests.ReactiveTests
                     cartesian.Add((x.Left, r));
                 });
             });
+
+            CollectionAssert.IsEmpty(cartesian);
+
+            left.OnNext(0);
+            left.OnNext(1);
+
+            CollectionAssert.IsEmpty(cartesian);
+
+            right.OnNext(0);
+
+            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
+
+            right.OnNext(1);
+
+            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+        }
+
+        [Test]
+        public void ObservableCartesianHot2()
+        {
+            Subject<int> left = new Subject<int>();
+            Subject<int> right = new Subject<int>();
+
+            var cartesian = new List<(int, int)>();
+
+            var product = from x in left
+                          from y in right
+                          select (x, y);
+
+            var subscription = product
+                .Subscribe(x => cartesian.Add(x));
 
             CollectionAssert.IsEmpty(cartesian);
 
