@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CS.Edu.Core.Extensions;
@@ -14,122 +13,46 @@ namespace CS.Edu.Tests.ReactiveTests
     [TestFixture]
     public class ObservableProductTests
     {
+        static readonly (int, int)[] Standard =
+        {
+            (0, 0),
+            (0, 1),
+            (1, 0),
+            (1, 1),
+        };
+
+        static readonly int[] Left = {0, 1};
+        static readonly int[] Right = {0, 1};
+
         [Test]
         public void EnumerableCartesian()
         {
-            var standard = new[]
-            {
-                (0, 0),
-                (0, 1),
-                (1, 0),
-                (1, 1),
-            };
-
-            IEnumerable<int> one = Enumerable.Range(0, 2);
-            IEnumerable<int> other = Enumerable.Range(0, 2);
-
-            var cartesian = from x in one
-                            from y in other
+            var cartesian = from x in Left
+                            from y in Right
                             select (x, y);
 
-            CollectionAssert.AreEqual(cartesian, standard);
+            CollectionAssert.AreEqual(cartesian, Standard);
         }
 
         [Test]
         public void ObservableCartesianCold()
         {
-            var standard = new[]
-            {
-                (0, 0),
-                (1, 0),
-                (0, 1),
-                (1, 1),
-            };
-
             var cartesian = new List<(int, int)>();
 
-            IObservable<int> one = Enumerable.Range(0, 2).ToObservable();
-            IObservable<int> other = Enumerable.Range(0, 2).ToObservable();
-
-            var subscription = one.GroupJoin(other,
-                          _ => Observable.Never<Unit>(),
-                          _ => Observable.Never<Unit>(),
-                          (l, r) => (Left: l, Right: r))
-            .Subscribe(x =>
-            {
-                x.Right.Subscribe(r =>
-                {
-                    cartesian.Add((x.Left, r));
-                });
-            });
-
-            CollectionAssert.AreEqual(cartesian, standard);
-        }
-
-        [Test]
-        public void ObservableCartesianCold2()
-        {
-            var standard = new[]
-            {
-                (0, 0),
-                (0, 1),
-                (1, 0),
-                (1, 1),
-            };
-
-            var cartesian = new List<(int, int)>();
-
-            IObservable<int> one = Enumerable.Range(0, 2).ToObservable();
-            IObservable<int> other = Enumerable.Range(0, 2).ToObservable();
-
-            var product = from x in one
-                          from y in other
+            var product = from x in Left.ToObservable()
+                          from y in Right.ToObservable()
                           select (x, y);
+
+            //var product = one.SelectMany(x => other, (x,y) => (x, y));
 
             var subscription = product
                 .Subscribe(x => cartesian.Add(x));
 
-            CollectionAssert.AreEqual(cartesian, standard);
-        }
+            CollectionAssert.AreEqual(cartesian, Standard);
+        }        
 
         [Test]
         public void ObservableCartesianHot()
-        {
-            Subject<int> left = new Subject<int>();
-            Subject<int> right = new Subject<int>();
-
-            var cartesian = new List<(int, int)>();
-
-            var subscription = left.GroupJoin(right,
-                          _ => Observable.Never<Unit>(),
-                          _ => Observable.Never<Unit>(),
-                          (l, r) => (Left: l, Right: r))
-            .Subscribe(x =>
-            {
-                x.Right.Subscribe(r =>
-                {
-                    cartesian.Add((x.Left, r));
-                });
-            });
-
-            CollectionAssert.IsEmpty(cartesian);
-
-            left.OnNext(0);
-            left.OnNext(1);
-
-            CollectionAssert.IsEmpty(cartesian);
-
-            right.OnNext(0);
-
-            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
-
-            right.OnNext(1);
-
-            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
-        }
-
-        [Test]
-        public void ObservableCartesianHot2()
         {
             Subject<int> left = new Subject<int>();
             Subject<int> right = new Subject<int>();
@@ -162,22 +85,38 @@ namespace CS.Edu.Tests.ReactiveTests
         [Test]
         public void ObservableChangeSetCartesianCold()
         {
-            var standard = new[]
-            {
-                (0, 0),
-                (0, 1),
-                (1, 0),
-                (1, 1),
-            };
-
             IObservable<IChangeSet<int>> one = Enumerable.Range(0, 2).AsObservableChangeSet();
             IObservable<IChangeSet<int>> other = Enumerable.Range(0, 2).AsObservableChangeSet();
 
-            var subscription = one.Product(other, (x, y) => (x, y))
+            // var subscription = one.Product(other, (x, y) => (x, y))
+            //     .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
+            //     .Subscribe();
+
+            var product = from x in one
+                          from y in other
+                          select (x, y);
+
+            //IObservable<(IChangeset<T1>, IChangeset<T2>) -> IObservable<IChangeset<(T1, T2)>>
+            
+            // var subscription = one.TransformMany<(int, int), int>(x => Transformation(x, other))
+            //     .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
+            //     .Subscribe();
+
+            var subscription = one.SelectMany(x => other, (x, y) => ProductChangeSets(x, y))
                 .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
                 .Subscribe();
 
-            CollectionAssert.AreEqual(cartesian, standard);
+            CollectionAssert.AreEqual(cartesian, Standard);
+        }
+
+        private IChangeSet<(int x, int y)> ProductChangeSets(IChangeSet<int> x, IChangeSet<int> y)
+        {
+            throw new NotImplementedException();
+        }
+
+        private IEnumerable<(int, int)> Transformation(int one, IObservable<IChangeSet<int>> other)
+        {
+            return Enumerable.Empty<(int, int)>();
         }
 
         [Test]
