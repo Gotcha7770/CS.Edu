@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using CS.Edu.Core.Comparers;
 using DynamicData;
 
 namespace CS.Edu.Core.Extensions
@@ -30,14 +31,24 @@ namespace CS.Edu.Core.Extensions
             .Select(x => getter(source));
         }
 
-        private static readonly ListChangeReason[] ProductChangeReason =
+        private readonly struct ProductChangeReasons
         {
-            ListChangeReason.Add,
-            ListChangeReason.AddRange,
-            ListChangeReason.Remove,
-            ListChangeReason.RemoveRange,
-            ListChangeReason.Clear
-        };
+            public static readonly ListChangeReason[] ForList =
+            {
+                ListChangeReason.Add,
+                ListChangeReason.AddRange,
+                ListChangeReason.Remove,
+                ListChangeReason.RemoveRange,
+                ListChangeReason.Clear
+            };
+
+            public static readonly ChangeReason[] ForCache =
+            {
+                ChangeReason.Add,
+                ChangeReason.Update, //???
+                ChangeReason.Remove,
+            };
+        }
 
         public static IObservable<IChangeSet<TOut>> Product<TIn, TOut>(this IObservable<IChangeSet<TIn>> one,
             IObservable<IChangeSet<TIn>> other,
@@ -52,13 +63,13 @@ namespace CS.Edu.Core.Extensions
                     .Subscribe();
 
                 var subscription = one.Merge(other)
-                    .WhereReasonsAre(ProductChangeReason)
+                    .WhereReasonsAre(ProductChangeReasons.ForList)
                     .Subscribe(c =>
                     {
                         var all = from x in leftCache
-                            from y in rightCache
-                            select productSelector(x, y);
-                            
+                                  from y in rightCache
+                                  select productSelector(x, y);
+
                         list.EditDiff(all);
                     });
 
@@ -69,6 +80,40 @@ namespace CS.Edu.Core.Extensions
                     right
                 };
             });
+        }
+
+        public static IObservable<IChangeSet<TOut, TOutKey>> Product<TIn, TOut, TInKey, TOutKey>(this IObservable<IChangeSet<TIn, TInKey>> one,
+            IObservable<IChangeSet<TIn, TInKey>> other,
+            Func<TIn, TIn, TOut> productSelector,
+            Func<TOut, TOutKey> keySelector)
+        {
+            return ObservableChangeSet.Create(cache =>
+            {
+                var left = one.Bind(out ReadOnlyObservableCollection<TIn> leftCache)
+                    .Subscribe();
+
+                var right = other.Bind(out ReadOnlyObservableCollection<TIn> rightCache)
+                    .Subscribe();
+
+                var subscription = one.Merge(other)
+                    .WhereReasonsAre(ProductChangeReasons.ForCache)
+                    .Subscribe(c =>
+                    {
+                        var all = from x in leftCache
+                            from y in rightCache
+                            select productSelector(x, y);
+
+                        var comparer = new GenericEqualityComparer<TOut, TOutKey>(keySelector);
+                        cache.EditDiff(all, comparer);
+                    });
+
+                return new CompositeDisposable
+                {
+                    subscription,
+                    left,
+                    right
+                };
+            }, keySelector);
         }
 
         public static IObservable<IChangeSet<T>> Tail<T>(this IObservable<IChangeSet<T>> source,
