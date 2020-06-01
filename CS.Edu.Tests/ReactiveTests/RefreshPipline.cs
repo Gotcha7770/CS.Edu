@@ -35,6 +35,9 @@ namespace CS.Edu.Tests.ReactiveTests
 
             products.AddOrUpdate(new Product("Apple"));
             Assert.AreEqual(result[0].Cart[0].Content, "Apple");
+
+            products.AddOrUpdate(new Product("Banana"));
+            Assert.AreEqual(result[0].Cart.Select(x => x.Content), new[] { "Apple", "Banana" });
         }
     }
 }
