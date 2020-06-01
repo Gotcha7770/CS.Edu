@@ -5,18 +5,20 @@ using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core
 {
-    public struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>, IEquatable<T>
+    public readonly struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>, IEquatable<T>
     {
         public static Range<T> Default { get; } = new Range<T>();
 
         public Range(T minimum, T maximum)
         {
-            //if minimum > maximum???
+            if (Comparer<T>.Default.Compare(minimum, maximum) > 0)
+                throw new ArgumentException($"{minimum} should be less then {maximum}");
+
             Min = minimum;
             Max = maximum;
         }
 
-        public Range((T Min, T Max) tuple) : this(tuple.Min, tuple.Max) { }
+        private Range((T Min, T Max) tuple) : this(tuple.Min, tuple.Max) { }
 
         public T Min { get; }
 
@@ -48,14 +50,14 @@ namespace CS.Edu.Core
 
         public static IEnumerable<Range<T>> operator -(Range<T> one, Range<T> other)
         {
-            return one.Substruct(other);
+            return one.Subtract(other);
         }
 
         public static explicit operator Range<T>((T Min, T Max) tuple) => new Range<T>(tuple);
 
         public static IEnumerable<Range<T>> SymmetricDifference(Range<T> one, Range<T> other)
         {
-            return one.Substruct(other).Concat(other.Substruct(one));
+            return one.Subtract(other).Concat(other.Subtract(one));
         }
 
         public bool Contains(T value)
@@ -88,7 +90,7 @@ namespace CS.Edu.Core
             return Default;
         }
 
-        public IEnumerable<Range<T>> Substruct(Range<T> other)
+        public IEnumerable<Range<T>> Subtract(Range<T> other)
         {
             return DiffIterator(this, other).Where(x => !x.IsEmpty);
         }
@@ -117,7 +119,7 @@ namespace CS.Edu.Core
 
         public bool Equals(Range<T> other)
         {
-            return ReferenceEquals(this, other) || (Equals(Min, other.Min) && Equals(Max, other.Max));
+            return Equals(Min, other.Min) && Equals(Max, other.Max);
         }
 
         public override int GetHashCode()

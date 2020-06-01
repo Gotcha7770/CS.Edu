@@ -49,13 +49,13 @@ namespace CS.Edu.Tests
             return range.Contains(value);
         }
 
-        [TestCaseSource(typeof(ContainsTestsDataSource), "TestCases")]
+        [TestCaseSource(typeof(ContainsTestsDataSource), nameof(ContainsTestsDataSource.TestCases))]
         public bool ContainsRangeTests(Range<int> one, Range<int> other)
         {
             return one.Contains(other);
         }
 
-        internal class ContainsTestsDataSource
+        class ContainsTestsDataSource
         {
             public static IEnumerable TestCases
             {
@@ -85,13 +85,13 @@ namespace CS.Edu.Tests
             }
         }
 
-        [TestCaseSource(typeof(IntersectsTestsDataSource), "TestCases")]
+        [TestCaseSource(typeof(IntersectsTestsDataSource), nameof(IntersectsTestsDataSource.TestCases))]
         public bool IntersectsTests(Range<int> one, Range<int> other)
         {
             return one.Intersects(other);
         }
 
-        internal class IntersectsTestsDataSource
+        class IntersectsTestsDataSource
         {
             public static IEnumerable TestCases
             {
@@ -127,13 +127,13 @@ namespace CS.Edu.Tests
             }
         }
 
-        [TestCaseSource(typeof(IntersectionTestsDataSource), "TestCases")]
+        [TestCaseSource(typeof(IntersectionTestsDataSource), nameof(IntersectionTestsDataSource.TestCases))]
         public Range<int> IntersectionTests(Range<int> one, Range<int> other)
         {
             return one.Intersection(other);
         }
 
-        internal class IntersectionTestsDataSource
+        class IntersectionTestsDataSource
         {
             public static IEnumerable TestCases
             {
@@ -169,13 +169,13 @@ namespace CS.Edu.Tests
             }
         }
 
-        [TestCaseSource(typeof(SubstructionTestsDataSource), "TestCases")]
-        public Range<int>[] SubstructionTests(Range<int> one, Range<int> other)
+        [TestCaseSource(typeof(SubtractionTestsDataSource), nameof(SubtractionTestsDataSource.TestCases))]
+        public Range<int>[] SubtractionTests(Range<int> one, Range<int> other)
         {
-            return one.Substruct(other).ToArray();
+            return one.Subtract(other).ToArray();
         }
 
-        internal class SubstructionTestsDataSource
+        class SubtractionTestsDataSource
         {
             public static IEnumerable TestCases
             {
