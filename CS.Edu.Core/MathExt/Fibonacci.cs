@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace CS.Edu.Core.MathExt
 {
     public static class Fibonacci
-    { 
+    {
         public static int Recursive(int n)
         {
             return GetNthFibonacci(0, 1, n);
@@ -16,7 +16,7 @@ namespace CS.Edu.Core.MathExt
 
         public static IEnumerable<int> Iterator()
         {
-            for (int x = 0, y = 1; ; y = x + y, x = y - x)
+            for (int x = 0, y = 1 ;; y = x + y, x = y - x)
             {
                 yield return y;
             }
