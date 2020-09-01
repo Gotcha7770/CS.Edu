@@ -13,22 +13,35 @@ namespace CS.Edu.Core.Extensions
     public static class ObservableExt
     {
         public static IObservable<TValue> CreateFromProperty<TSender, TValue>(TSender source,
-                                                                              Expression<Func<TSender, TValue>> expression)
+                                                                              Expression<Func<TSender, TValue>> expression,
+                                                                              bool notifyInitial = true)
             where TSender : INotifyPropertyChanged
         {
             if (!(expression?.Body is MemberExpression memberExpression))
-            {
                 throw new ArgumentNullException(nameof(expression));
-            }
 
-            Func<TSender, TValue> getter = expression.Compile();
-            string propertyName = memberExpression.Member.Name;
 
-            return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
-                x => source.PropertyChanged += x,
-                x => source.PropertyChanged -= x)
-            .Where(x => propertyName.Equals(x.EventArgs.PropertyName, StringComparison.InvariantCulture))
-            .Select(x => getter(source));
+            return Observable.Create<TValue>(observer =>
+            {
+                Func<TSender, TValue> getter = expression.Compile();
+                string propertyName = memberExpression.Member.Name;
+
+                var propertyChanged = Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+                    x => source.PropertyChanged += x,
+                    x => source.PropertyChanged -= x)
+                    .Where(x => propertyName.Equals(x.EventArgs.PropertyName, StringComparison.InvariantCulture))
+                    .Select(x => getter(source));
+
+                if (notifyInitial)
+                {
+                    propertyChanged = Observable.Return(getter(source))
+                        .Concat(propertyChanged);
+                }
+
+                var subscription = propertyChanged.Subscribe(observer);
+
+                return new CompositeDisposable(subscription);
+            });
         }
 
         private readonly struct ProductChangeReasons
