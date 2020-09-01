@@ -15,33 +15,13 @@ namespace CS.Edu.Tests.ReactiveTests
     public class SourceListTests
     {
         [Test]
-        public void SortTest()
-        {
-            var source = new SourceList<int>();
-
-            var subscribtion = source
-                .Connect()
-                .Sort(Comparer<int>.Default)
-                .Bind(out ReadOnlyObservableCollection<int> output)
-                .Subscribe();
-
-            source.Add(10);
-            source.Add(2);
-            source.Add(6);
-            source.Add(4);
-            source.Add(8);
-
-            Assert.That(output, Is.EqualTo(new[] { 2, 4, 6, 8, 10 }));
-        }
-
-        [Test]
         public void WatchPropertyTest()
         {
-            var source = new SourceList<TestClass>();
-            var testObj = new TestClass();
+            var source = new SourceList<Valuable<string>>();
+            var testObj = new Valuable<string>("value");
             source.Add(testObj);
 
-            ChangeSetAggregator<TestClass> results;
+            ChangeSetAggregator<Valuable<string>> results;
 
             results = source.Connect()
                 .AutoRefresh(x => x.Value)
@@ -54,17 +34,17 @@ namespace CS.Edu.Tests.ReactiveTests
                 .Where(x => x.Reason == ListChangeReason.Refresh);
 
             Assert.That(refreshes, Has.Exactly(1).Items);
-        } 
+        }
 
-        [Test]   
+        [Test]
         public void SubscribeManyTest()
         {
-            var source = new SourceList<TestClass>();
-            var testObj = new TestClass();
+            var source = new SourceList<Valuable<string>>();
+            var testObj = new Valuable<string>("value");
             source.Add(testObj);
 
             var changeHistory = new List<string>();
-            ChangeSetAggregator<TestClass> results;
+            ChangeSetAggregator<Valuable<string>> results;
 
             results = source.Connect()
                 .SubscribeMany(data => ObservableExt.CreateFromProperty(data, x => x.Value)
@@ -79,6 +59,6 @@ namespace CS.Edu.Tests.ReactiveTests
             testObj.Value = "lastValue";
 
             Assert.IsTrue(true);
-        }    
+        }
     }
 }

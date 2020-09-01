@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using CS.Edu.Tests.Utils;
@@ -32,13 +33,13 @@ namespace CS.Edu.Tests.ReactiveTests
         [Test]
         public void LastChangedTest()
         {
-            Selectable selected = null;
+            Selectable<object> selected = null;
 
-            var first = new Selectable();
-            var second = new Selectable();
-            var third = new Selectable();
+            var first = new Selectable<object>();
+            var second = new Selectable<object>();
+            var third = new Selectable<object>();
 
-            var source = new SourceCache<Selectable, Guid>(x => x.Id);
+            var source = new SourceCache<Selectable<object>, Guid>(x => x.Key);
             source.AddOrUpdate(new[] { first, third });
 
             var autoSelector = source.Connect()
@@ -66,11 +67,11 @@ namespace CS.Edu.Tests.ReactiveTests
         [Test]
         public void LastChangedOrDefaultTest()
         {
-            Selectable selected = null;
+            Selectable<object> selected = null;
 
-            var first = new Selectable();
-            var second = new Selectable { IsSelected = true };
-            var source = new SourceCache<Selectable, Guid>(x => x.Id);
+            var first = new Selectable<object>();
+            var second = new Selectable<object> { IsSelected = true };
+            var source = new SourceCache<Selectable<object>, Guid>(x => x.Key);
 
             var autoSelector = source.Connect()
                 .AutoRefresh(x => x.IsSelected)

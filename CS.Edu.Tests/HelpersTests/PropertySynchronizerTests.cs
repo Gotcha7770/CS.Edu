@@ -8,14 +8,14 @@ namespace CS.Edu.Tests.HelpersTests
     [TestFixture]
     public class PropertySynchronizerTests
     {
-        string _propertyName = nameof(TestClass.Value);
+        string _propertyName = nameof(Valuable<string>.Value);
         IPropertySynchronizer<string> _synchronizer = new PropertySynchronizer<string>();
 
         [Test]
         public void ReflectionSyncTest_TargetValueBecomesEqualToSource()
         {
-            var source = new TestClass();
-            var target = new TestClass { Value = "initialValue" };
+            var source = new Valuable<string>(string.Empty);
+            var target = new Valuable<string>("initialValue");
 
             _synchronizer.Sync(source, target, _propertyName);
             source.Value = "newValue";
@@ -26,10 +26,10 @@ namespace CS.Edu.Tests.HelpersTests
         [Test]
         public void DelegateSyncTest_TargetValueBecomesEqualToSource()
         {
-            var source = new TestClass();
-            var sourceContext = new DelegateSyncContext<TestClass, string>(source, _propertyName);
-            var target = new TestClass { Value = "initialValue" };
-            var targetContext = new DelegateSyncContext<TestClass, string>(target, _propertyName);
+            var source = new Valuable<string>(string.Empty);
+            var sourceContext = new DelegateSyncContext<Valuable<string>, string>(source, _propertyName);
+            var target = new Valuable<string>("initialValue");
+            var targetContext = new DelegateSyncContext<Valuable<string>, string>(target, _propertyName);
 
             _synchronizer.Sync(sourceContext, targetContext);
             source.Value = "newValue";
@@ -40,10 +40,10 @@ namespace CS.Edu.Tests.HelpersTests
         [Test]
         public void SyncDisposingTest_NoValueSynchronizationAfterDisposing()
         {
-            var source = new TestClass();
-            var target = new TestClass { Value = "initialValue" };
+            var source = new Valuable<string>(string.Empty);
+            var target = new Valuable<string>("initialValue");
 
-            using (_synchronizer.Sync(source, target, nameof(TestClass.Value)))
+            using (_synchronizer.Sync(source, target, nameof(Valuable<string>.Value)))
             {
                 source.Value = "syncValue";
             }
@@ -56,8 +56,8 @@ namespace CS.Edu.Tests.HelpersTests
         [Test]
         public void OneWaySyncTest_TargetValueBecomesEqualToSourceButNotViceVersa()
         {
-            var source = new TestClass();
-            var target = new TestClass { Value = "initialValue" };
+            var source = new Valuable<string>(string.Empty);
+            var target = new Valuable<string>("initialValue");
 
             _synchronizer.Sync(source, target, _propertyName, SyncMode.OneWay);
 
@@ -71,8 +71,8 @@ namespace CS.Edu.Tests.HelpersTests
         [Test]
         public void OneWayToSourceSyncTest_SourceValueBecomesEqualToTargetButNotViceVersa()
         {
-            var source = new TestClass();
-            var target = new TestClass { Value = "initialValue" };
+            var source = new Valuable<string>(string.Empty);
+            var target = new Valuable<string>("initialValue");
 
             _synchronizer.Sync(source, target, _propertyName, SyncMode.OneWayToSource);
 
@@ -81,6 +81,6 @@ namespace CS.Edu.Tests.HelpersTests
 
             target.Value = "newTargetValue";
             Assert.That(source.Value, Is.EqualTo("newTargetValue"));
-        }        
+        }
     }
 }
