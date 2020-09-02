@@ -18,4 +18,17 @@
     <ProjectReference Include="..\CS.Edu.Core\CS.Edu.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="BenchmarkDotNet.Artifacts\CS.Edu.Benchmarks.FirstOrDefaultTypeBench-20191216-102344.log" />
+    <None Remove="BenchmarkDotNet.Artifacts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="BenchmarkDotNet.Artifacts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="BenchmarkDotNet.Artifacts\**" />
+  </ItemGroup>
+
 </Project>

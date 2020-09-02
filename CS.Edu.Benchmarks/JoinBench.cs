@@ -9,14 +9,14 @@ namespace CS.Edu.Benchmarks
     [Config(typeof(DefaultConfig))]
     public class JoinBench
     {
-        private readonly IEnumerable<int> Source = Enumerable.Range(0, 50);
+        private readonly IEnumerable<int> _source = Enumerable.Range(0, 50);
         private readonly Consumer _consumer = new Consumer();
 
         [Benchmark]
         public void WhereQueryBench()
         {
-            var query = from x in Source
-                        from y in Source
+            var query = from x in _source
+                        from y in _source
                         where x * x == y
                         select (x, y);
 
@@ -26,8 +26,8 @@ namespace CS.Edu.Benchmarks
         [Benchmark]
         public void JoinQueryBench()
         {
-            var query = from x in Source
-                        join y in Source on x * x equals y
+            var query = from x in _source
+                        join y in _source on x * x equals y
                         select (x, y);
 
             query.Consume(_consumer);
