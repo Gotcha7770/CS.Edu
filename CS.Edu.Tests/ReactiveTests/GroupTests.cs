@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
-using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
 using DynamicData;
 using DynamicData.Tests;
@@ -13,16 +12,19 @@ namespace CS.Edu.Tests.ReactiveTests
     [TestFixture]
     public class GroupTests
     {
-        private Valuable<bool>[] _items = Enumerable.Range(1, 10)
-            .Select(i => new Valuable<bool>(i.IsEven()))
+        private Groupable<int, string>[] _items = Enumerable.Range(1, 10)
+            .Select(x => new Groupable<int, string>(x, "Group1"))
+            .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group2")))
+            .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group3")))
+            .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group4")))
             .ToArray();
 
         [Test]
-        public void GroupTest_RefreshItem()
+        public void GroupTest_RefreshItemWithoutGroupKeyChanged()
         {
-            using (var cache = new SourceCache<Valuable<bool>, Guid>(x => x.Key))
+            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
             using (var aggregator = cache.Connect()
-                .Group(x => x.Value)
+                .Group(x => x.GroupKey)
                 .AsAggregator())
             {
                 cache.AddOrUpdate(_items);
@@ -34,12 +36,12 @@ namespace CS.Edu.Tests.ReactiveTests
         }
 
         [Test]
-        public void GroupTest_RefreshGroups()
+        public void GroupTest_RefreshGroupsWithoutGroupKeyChanged()
         {
             using (var refresher = new Subject<Unit>())
-            using (var cache = new SourceCache<Valuable<bool>, Guid>(x => x.Key))
+            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
             using (var aggregator = cache.Connect()
-                .Group(x => x.Value, refresher)
+                .Group(x => x.GroupKey, refresher)
                 .AsAggregator())
             {
                 cache.AddOrUpdate(_items);
@@ -53,24 +55,24 @@ namespace CS.Edu.Tests.ReactiveTests
         [Test]
         public void GroupTest_Add()
         {
-            using (var cache = new SourceCache<Valuable<bool>, Guid>(x => x.Key))
+            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
             using (var aggregator = cache.Connect()
-                .Group(x => x.Value)
+                .Group(x => x.GroupKey)
                 .AsAggregator())
             {
                 cache.AddOrUpdate(_items);
-                cache.AddOrUpdate(new Valuable<bool>(false));
+                cache.AddOrUpdate(new Groupable<int, string>(1, "Group 2"));
 
-                Assert.AreEqual(1, aggregator.Messages.Count);
+                Assert.AreEqual(2, aggregator.Messages.Count);
             }
         }
 
         [Test]
         public void GroupTest_Update()
         {
-            using (var cache = new SourceCache<Valuable<bool>, Guid>(x => x.Key))
+            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
             using (var aggregator = cache.Connect()
-                .Group(x => x.Value)
+                .Group(x => x.GroupKey)
                 .AsAggregator())
             {
                 cache.AddOrUpdate(_items);
