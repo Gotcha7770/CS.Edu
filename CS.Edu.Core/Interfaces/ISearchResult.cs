@@ -13,12 +13,9 @@ namespace CS.Edu.Core.Interfaces
         /// <param name="predicate">условие</param>
         ISearchResult<T> ThenFind(Predicate<T> predicate);
 
-        /// <summary>Значение, определяющее, был ли найден искомый объект</summary>
-        //bool IsFound { get; }
-
         /// <summary>
         /// Результат поиска,
-        /// искомый объект или значение типа по умолчанию
+        /// искомый объект или <see cref="Optional{T}.None"/>
         /// </summary>
         Optional<T> Result { get; }
     }

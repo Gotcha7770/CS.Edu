@@ -11,7 +11,7 @@ namespace CS.Edu.Core.Helpers
     {
         /// <summary>
         /// Ищет значение в перечислении, удовлетворяющее переданному предикату
-        /// и возвращает результат, завернутый в интерфейс <see cref="T:ExtLib.IFindResult`1" />,
+        /// и возвращает результат, завернутый в интерфейс <see cref="ISearchResult{T}"/>,
         /// на основании которого можно выстраивать цепочку поиска.
         /// Первое же совпадение в цепочке предикатов возвращает значение,
         /// если ни одного совпадения не было возвращается значение типа по умолчанию.
@@ -29,15 +29,12 @@ namespace CS.Edu.Core.Helpers
             {
                 Source = source;
                 Result = source.FirstOrOptional(x => predicate(x));
-                //IsFound = !EqualityComparer<T>.Default.Equals(Result, default); //???
             }
 
             public ISearchResult<T> ThenFind(Predicate<T> predicate)
             {
                 return Result.HasValue ? this : new SerialSearchResult<T>(Source, predicate);
             }
-
-            //public bool IsFound { get; }
 
             public Optional<T> Result { get; }
         }
@@ -56,18 +53,13 @@ namespace CS.Edu.Core.Helpers
                 _predicates = predicate == null
                     ? throw new ArgumentNullException(nameof(predicate))
                     : new List<Predicate<T>> {predicate};
-                //Result = source.FirstOrOptional(x => predicate(x));
-                //_queue.Enqueue(source.FirstOrOptional(x => predicate(x)));
             }
 
             public ISearchResult<T> ThenFind(Predicate<T> predicate)
             {
-                //Result = source.FirstOrOptional(x => predicate(x));
                 _predicates.Add(predicate);
                 return this;
             }
-
-            //public bool IsFound { get; }
 
             public Optional<T> Result
             {
