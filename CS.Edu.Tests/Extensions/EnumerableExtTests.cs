@@ -5,7 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
+using CS.Edu.Core.Helpers;
 using CS.Edu.Tests.Utils;
+using DynamicData.Kernel;
+using EnumerableEx = System.Linq.EnumerableEx;
 
 namespace CS.Edu.Tests.Extensions
 {
@@ -234,6 +237,18 @@ namespace CS.Edu.Tests.Extensions
             var result = points.ShrinkDuplicates(x => x.Y, -9999);
 
             CollectionAssert.AreEqual(result, standard);
+        }
+
+        [Test]
+        public void FluentFindTest()
+        {
+            IEnumerable<int> source = Enumerable.Range(1, 99);
+
+            int result = source.Find(x => x.IsEven()).Result.Value;
+            Assert.AreEqual(2, result);
+
+            result = source.Find(x => x == 101).ThenFind(x => x % 3 == 0).Result.Value;
+            Assert.AreEqual(3, result);
         }
 
         [TestCaseSource(typeof(ExceptIfLastTestsDataSource), nameof(ExceptIfLastTestsDataSource.TestCases))]
