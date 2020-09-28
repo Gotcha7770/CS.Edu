@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
@@ -9,7 +8,7 @@ using CS.Edu.Core.Extensions;
 using CS.Edu.Core.Helpers;
 using CS.Edu.Core.Interfaces;
 
-namespace CS.Edu.Benchmarks.PropertySynchronization
+namespace CS.Edu.Benchmarks.Helpers
 {
     class TestClass : INotifyPropertyChanged
     {

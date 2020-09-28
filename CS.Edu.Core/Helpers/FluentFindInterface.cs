@@ -16,8 +16,11 @@ namespace CS.Edu.Core.Helpers
         /// Первое же совпадение в цепочке предикатов возвращает значение,
         /// если ни одного совпадения не было возвращается значение типа по умолчанию.
         /// </summary>
-        public static ISearchResult<T> Find<T>(this IEnumerable<T> source, Predicate<T> predicate)
+        public static ISearchResult<T> Find<T>(this IEnumerable<T> source, Predicate<T> predicate, bool useParallel = false)
         {
+            if (useParallel)
+                return new ParallelSearchResult<T>(source, predicate);
+
             return new SerialSearchResult<T>(source, predicate);
         }
 
@@ -28,7 +31,17 @@ namespace CS.Edu.Core.Helpers
             public SerialSearchResult(IEnumerable<T> source, Predicate<T> predicate)
             {
                 Source = source;
-                Result = source.FirstOrOptional(x => predicate(x));
+                Result = Optional<T>.None;
+
+                using var enumerator = Source.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    if (predicate(enumerator.Current))
+                    {
+                        Result = enumerator.Current;
+                        break;
+                    }
+                }
             }
 
             public ISearchResult<T> ThenFind(Predicate<T> predicate)
@@ -42,7 +55,6 @@ namespace CS.Edu.Core.Helpers
         class ParallelSearchResult<T> : ISearchResult<T>
         {
             private readonly List<Predicate<T>> _predicates;
-            private Optional<T>[] _results;
 
             protected IEnumerable<T> Source { get; }
 
@@ -65,8 +77,7 @@ namespace CS.Edu.Core.Helpers
             {
                 get
                 {
-                    _results = new Optional<T>[_predicates.Count - 1];
-
+                    var results = new Optional<T>[_predicates.Count];
                     using var enumerator = Source.GetEnumerator();
                     while (enumerator.MoveNext())
                     {
@@ -78,11 +89,12 @@ namespace CS.Edu.Core.Helpers
 
                         for (int i = 1; i < _predicates.Count; i++)
                         {
-                            _results[i - 1] = _predicates[i](current) ? current : Optional<T>.None;
+                            if (!results[i - 1].HasValue && _predicates[i](current))
+                                results[i - 1] = current;
                         }
                     }
 
-                    return _results.FirstOrDefault(x => x.HasValue);
+                    return results.FirstOrDefault(x => x.HasValue);
                 }
             }
         }
