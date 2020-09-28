@@ -33,8 +33,7 @@ namespace CS.Edu.Benchmarks
                 typeof(TestBench),
                 typeof(PullOutBench),
                 typeof(ExceptBench),
-                typeof(TrimEnumerableStartBench),
-                typeof(FluentFindBench)
+                typeof(TrimEnumerableStartBench)
             });
 
             switcher.Run();

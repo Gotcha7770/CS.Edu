@@ -11,8 +11,8 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void ObservableFromPropertyTest()
         {
-            var source = new TestClass();
-            var target = new TestClass { Value = "initialValue" };
+            var source = new Valuable<string>(string.Empty);
+            var target = new Valuable<string>("initialValue");
 
             ObservableExt.CreateFromProperty(source, x => x.Value)
                 .Subscribe(x => target.Value = x);

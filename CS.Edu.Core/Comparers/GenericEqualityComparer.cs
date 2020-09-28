@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace CS.Edu.Core.Comparers
 {
-    public class GenericEqualityComparer<TKey, TValue> : IEqualityComparer<TValue>
+    public class GenericEqualityComparer<TValue, TKey> : IEqualityComparer<TValue>
     {
         private readonly Func<TValue, TValue, bool> _equalsFunction;
         private readonly Func<TValue, int> _hashCodeFunction;
- 
+
         public GenericEqualityComparer(Func<TValue, TKey> keySelector)
         {
             if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
-        
-            _equalsFunction = new Func<TValue, TValue, bool>((x, y) => 
+
+            _equalsFunction = new Func<TValue, TValue, bool>((x, y) =>
             {
                 TKey one = keySelector(x);
                 TKey other = keySelector(y);

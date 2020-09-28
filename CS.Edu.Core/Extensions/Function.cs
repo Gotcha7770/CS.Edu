@@ -2,7 +2,7 @@ using System;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static class Fucntions
+    public static class Function
     {
         public static Func<T, T, bool> ToFunc<T>(this Relation<T> relation)
         {

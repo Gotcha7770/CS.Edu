@@ -14,7 +14,7 @@ namespace CS.Edu.Core.MathExt
 
         public static IEnumerable<int> Iterator()
         {
-            for (int i = 1, acc = 1; ; i++)
+            for (int i = 1, acc = 1 ;; i++)
             {
                 yield return acc;
                 acc *= i;
