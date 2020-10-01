@@ -1,8 +1,8 @@
 using System;
 using BenchmarkDotNet.Running;
 using CS.Edu.Benchmarks.Extensions;
+using CS.Edu.Benchmarks.Helpers;
 using CS.Edu.Benchmarks.Iterators;
-using CS.Edu.Benchmarks.PropertySynchronization;
 
 namespace CS.Edu.Benchmarks
 {
@@ -33,9 +33,7 @@ namespace CS.Edu.Benchmarks
                 typeof(TestBench),
                 typeof(PullOutBench),
                 typeof(ExceptBench),
-                typeof(TrimEnumerableStartBench),
-                typeof(JoinBench),
-                typeof(AggregateBench)
+                typeof(TrimEnumerableStartBench)
             });
 
             switcher.Run();

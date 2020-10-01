@@ -3,9 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
+using CS.Edu.Core.Helpers;
 using CS.Edu.Tests.Utils;
+using DynamicData.Kernel;
+using EnumerableEx = System.Linq.EnumerableEx;
 
 namespace CS.Edu.Tests.Extensions
 {
@@ -113,7 +117,7 @@ namespace CS.Edu.Tests.Extensions
 
             var result = items.SkipWhile(lessThan);
 
-            CollectionAssert.AreEqual(result, new [] {2, 1} );
+            CollectionAssert.AreEqual(result, new[] {2, 1});
         }
 
         [Test]
@@ -206,34 +210,74 @@ namespace CS.Edu.Tests.Extensions
         {
             var points = new[]
             {
-                new Point {X = 0, Y = -9999},
-                new Point {X = 5, Y = -9999},
-                new Point {X = 10, Y = 0},
-                new Point {X = 20, Y = 1},
-                new Point {X = 30, Y = -9999},
-                new Point {X = 40, Y = 4},
-                new Point {X = 60, Y = -9999},
-                new Point {X = 70, Y = -9999},
-                new Point {X = 80, Y = -9999},
-                new Point {X = 90, Y = 0},
-                new Point {X = 100, Y = 0},
+                new Point {X = 0, Y = -9999}, new Point {X = 5, Y = -9999}, new Point {X = 10, Y = 0},
+                new Point {X = 20, Y = 1}, new Point {X = 30, Y = -9999}, new Point {X = 40, Y = 4},
+                new Point {X = 60, Y = -9999}, new Point {X = 70, Y = -9999}, new Point {X = 80, Y = -9999},
+                new Point {X = 90, Y = 0}, new Point {X = 100, Y = 0},
             };
 
             var standard = new[]
             {
-                new Point {X = 0, Y = -9999},
-                new Point {X = 10, Y = 0},
-                new Point {X = 20, Y = 1},
-                new Point {X = 30, Y = -9999},
-                new Point {X = 40, Y = 4},
-                new Point {X = 60, Y = -9999},
-                new Point {X = 90, Y = 0},
-                new Point {X = 100, Y = 0},
+                new Point {X = 0, Y = -9999}, new Point {X = 10, Y = 0}, new Point {X = 20, Y = 1},
+                new Point {X = 30, Y = -9999}, new Point {X = 40, Y = 4}, new Point {X = 60, Y = -9999},
+                new Point {X = 90, Y = 0}, new Point {X = 100, Y = 0},
             };
 
             var result = points.ShrinkDuplicates(x => x.Y, -9999);
 
             CollectionAssert.AreEqual(result, standard);
+        }
+
+        [Test]
+        public void FluentFindTest()
+        {
+            IEnumerable<int> source = Enumerable.Range(1, 99);
+
+            int result = source.Find(x => x.IsEven(), true).Result.Value;
+            Assert.AreEqual(2, result);
+
+            result = source.Find(x => x == 101, true).ThenFind(x => x % 3 == 0).Result.Value;
+            Assert.AreEqual(3, result);
+        }
+
+        [Test]
+        public void ParallelFindTest()
+        {
+            IEnumerable<int> source = Enumerable.Range(1, 99);
+
+            int result = FindMethod(source, x => x.IsEven()).Value;
+            Assert.AreEqual(2, result);
+
+            result = FindMethod(source, x => x == 101, x => x % 3 == 0).Value;
+            Assert.AreEqual(3, result);
+        }
+
+        private Optional<T> FindMethod<T>(IEnumerable<T> items, params Predicate<T>[] predicates)
+        {
+            var results = new Optional<T>[predicates.Length];
+            Parallel.ForEach(predicates, (cur, state, index) =>
+            {
+                using (var enumerator = items.GetEnumerator())
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        if (cur(enumerator.Current))
+                        {
+                            results[index] = enumerator.Current;
+
+                            if (index == 0)
+                                state.Stop();
+
+                            break;
+                        }
+
+                        if (state.IsStopped)
+                            break;
+                    }
+                }
+            });
+
+            return results.FirstOrDefault(x => x.HasValue);
         }
 
         [TestCaseSource(typeof(ExceptIfLastTestsDataSource), nameof(ExceptIfLastTestsDataSource.TestCases))]
