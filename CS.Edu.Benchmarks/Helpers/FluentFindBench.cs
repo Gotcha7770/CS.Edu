@@ -25,44 +25,49 @@ namespace CS.Edu.Benchmarks.Helpers
             }
         }
 
-        private IEnumerable<MyClass> _items = Enumerable.Range(0, 20000)
-            .Where(x => x.IsEven())
-            .Select(x => new MyClass(x));
+        [ParamsSource(nameof(ValuesForSource))]
+        public (int Sought, IEnumerable<MyClass> Items) Source;
+
+        public IEnumerable<(int, MyClass[])> ValuesForSource => new[] {100, 1000, 10000, 100000}
+            .Select(x => (x, Enumerable.Range(0, x * 5)
+                .Where(y => y.IsEven())
+                .Select(y => new MyClass(y))
+                .ToArray()));
 
         [Benchmark]
         public MyClass SimpleSearch()
         {
-            return _items.FirstOrDefault(x => !x.Value.IsEven())
-                   ?? _items.FirstOrDefault(x => x.Value == 10000);
+            return Source.Items.FirstOrDefault(x => !x.Value.IsEven())
+                   ?? Source.Items.FirstOrDefault(x => x.Value == Source.Sought);
         }
 
         [Benchmark]
         public MyClass OptionalSearch()
         {
-            return _items.FirstOrOptional(x => !x.Value.IsEven())
-                .ValueOr(() => _items.FirstOrDefault(x => x.Value == 10000));
+            return Source.Items.FirstOrOptional(x => !x.Value.IsEven())
+                .ValueOr(() => Source.Items.FirstOrDefault(x => x.Value == Source.Sought));
         }
 
         [Benchmark]
         public MyClass SerialSearch()
         {
-            return _items.Find(x => !x.Value.IsEven())
-                .ThenFind(x => x.Value == 10000)
+            return Source.Items.Find(x => !x.Value.IsEven())
+                .ThenFind(x => x.Value == Source.Sought)
                 .Result.Value;
         }
 
         [Benchmark]
         public MyClass ParallelSearch()
         {
-            return _items.Find(x => !x.Value.IsEven(), true)
-                .ThenFind(x => x.Value == 10000)
+            return Source.Items.Find(x => !x.Value.IsEven(), true)
+                .ThenFind(x => x.Value == Source.Sought)
                 .Result.Value;
         }
 
         [Benchmark]
         public MyClass MultiThreadSearch()
         {
-            return FindMethod(_items, x => !x.Value.IsEven(), x => x.Value == 10000).Value;
+            return FindMethod(Source.Items, x => !x.Value.IsEven(), x => x.Value == Source.Sought).Value;
         }
 
         private Optional<T> FindMethod<T>(IEnumerable<T> items, params Predicate<T>[] predicates)

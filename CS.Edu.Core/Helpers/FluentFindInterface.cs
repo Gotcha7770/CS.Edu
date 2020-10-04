@@ -30,7 +30,7 @@ namespace CS.Edu.Core.Helpers
 
             public SerialSearchResult(IEnumerable<T> source, Predicate<T> predicate)
             {
-                Source = source;
+                Source = source ?? throw new ArgumentNullException(nameof(source));
                 Result = Optional<T>.None;
 
                 using var enumerator = Source.GetEnumerator();

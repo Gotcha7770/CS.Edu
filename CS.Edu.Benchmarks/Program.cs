@@ -2,7 +2,6 @@ using System;
 using BenchmarkDotNet.Running;
 using CS.Edu.Benchmarks.Extensions;
 using CS.Edu.Benchmarks.Helpers;
-using CS.Edu.Benchmarks.Iterators;
 
 namespace CS.Edu.Benchmarks
 {
@@ -33,7 +32,9 @@ namespace CS.Edu.Benchmarks
                 typeof(TestBench),
                 typeof(PullOutBench),
                 typeof(ExceptBench),
-                typeof(TrimEnumerableStartBench)
+                typeof(JoinBench),
+                typeof(AggregateBench),
+                typeof(FluentFindBench)
             });
 
             switcher.Run();
