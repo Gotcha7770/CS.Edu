@@ -2,7 +2,6 @@
 using System.Linq;
 using CS.Edu.Core;
 using CS.Edu.Core.Iterators;
-using CS.Edu.Tests.Utils;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests.IteratorsTests
@@ -39,7 +38,7 @@ namespace CS.Edu.Tests.IteratorsTests
         }
 
         [Test]
-        public void Test()
+        public void MiddleItems_AllItemsHasPreviousAndNextValues()
         {
             var iterator = _items.ToPrevNextIterator().Skip(1).Take(3);
             var standard = new[]
@@ -53,7 +52,7 @@ namespace CS.Edu.Tests.IteratorsTests
         }
 
         [Test]
-        public void LastTest()
+        public void LastItemWithNoneNextValue()
         {
             var first = _items.ToPrevNextIterator().Last();
             var standard = new PrevNextValue<int>(3, 4, Option.None);
