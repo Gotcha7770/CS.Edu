@@ -49,45 +49,40 @@ namespace CS.Edu.Tests
                 .ToArray();
 
             var numbers = _input.Where(x => x.IsNumber())
-                .Select(x => int.Parse(x))
+                .Select(int.Parse)
                 .OrderByDescending(x => x)
                 .Select(x => x.ToString())
                 .ToArray();
 
-            List<string> result = new List<string>();
             int i = 0;
             int j = 0;
 
-            foreach (var item in order)
-            {
-                result.Add(item == typeof(int) ? numbers[j++] : words[i++]);
-            }
+            var result = order.Select(x => x == typeof(int) ? numbers[j++] : words[i++])
+                .ToArray();
 
-            Assert.That(result, Is.EqualTo(_output));
+            Assert.AreEqual(_output, result);
         }
 
         [Test]
         public void Interactive2()
         {
-            Func<string, string, int> compareFunc = (x, y) =>
+            Comparison<string> comparsion = (x, y) =>
             {
                 return (x.IsNumber(), y.IsNumber()) switch
                 {
                     (true, true) => int.Parse(x).CompareTo(int.Parse(y)) * -1,
-                    _ => x.CompareTo(y)
+                    _ => string.Compare(x, y, StringComparison.Ordinal)
                 };
             };
 
-            var comparer = new GenericComparer<string>(compareFunc);
-
+            var comparer = Comparer<string>.Create(comparsion);
             string[] result = _input.Copy();
 
             CollectionExt.PartialSort(result, Comparer<string>.Default, x => !x.IsNumber());
             CollectionExt.PartialSort(result, comparer, x => x.IsNumber());
 
-            Assert.That(result, Is.EqualTo(_output));
+            Assert.AreEqual(_output, result);
         }
-
 
         [Test]
         public void Reactive()
