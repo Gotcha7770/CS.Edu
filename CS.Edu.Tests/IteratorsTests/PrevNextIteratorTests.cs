@@ -22,10 +22,10 @@ namespace CS.Edu.Tests.IteratorsTests
         [Test]
         public void SourceWithSingleValue_ReturnsJustCurrent()
         {
-            var first = EnumerableEx.Return(0).ToPrevNextIterator().First();
-            var standard = new PrevNextValue<int>(Option.None, 0, Option.None);
+            var iterator = EnumerableEx.Return(0).ToPrevNextIterator();
+            var standard = new[] {new PrevNextValue<int>(Option.None, 0, Option.None)};
 
-            Assert.AreEqual(standard, first);
+            CollectionAssert.AreEqual(iterator, standard);
         }
 
         [Test]

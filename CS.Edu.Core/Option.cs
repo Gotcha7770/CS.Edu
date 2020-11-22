@@ -25,14 +25,15 @@ namespace CS.Edu.Core
 
     public struct Option<T> : IEquatable<None>, IEquatable<Option<T>>
     {
-        private readonly T _value;
         private readonly bool _isSome;
 
         private Option(T value)
         {
-            _value = value;
+            Value = value;
             _isSome = true;
         }
+
+        public T Value { get; }
 
         public static implicit operator Option<T>(None _) => new Option<T>();
 
@@ -40,12 +41,14 @@ namespace CS.Edu.Core
 
         public static implicit operator Option<T>(T value) => value == null ? Option.None : Option.Some(value);
 
-        public R Match<R>(Func<R> None, Func<T, R> Some) => _isSome ? Some(_value) : None();
+        public static explicit operator T(Option<T> value) => value.Value;
+
+        public R Match<R>(Func<R> None, Func<T, R> Some) => _isSome ? Some(Value) : None();
 
         public IEnumerable<T> AsEnumerable()
         {
             if (_isSome)
-                yield return _value;
+                yield return Value;
         }
 
         public bool Equals(None other) => !_isSome;
@@ -53,16 +56,16 @@ namespace CS.Edu.Core
 
         public bool Equals(Option<T> other)
         {
-            return _isSome ? _value.Equals(other._value) : !other._isSome;
+            return _isSome ? Value.Equals(other.Value) : !other._isSome;
         }
 
         public static bool operator ==(Option<T> one, Option<T> other) => one.Equals(other);
 
         public static bool operator !=(Option<T> one, Option<T> other) => !(one == other);
 
-        public override string ToString() => _isSome ? $"Some({_value})" : "None";
+        public override string ToString() => _isSome ? $"Some({Value})" : "None";
     }
-    
+
     public struct None { }
 
     public struct Some<T>

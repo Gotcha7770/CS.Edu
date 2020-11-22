@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 namespace CS.Edu.Core.Extensions
 {
@@ -27,7 +26,7 @@ namespace CS.Edu.Core.Extensions
         }
 
         public Type GenericTypeDefinition { get; }
-        
+
         public Type[] GenericParameterTypes { get; }
 
         public static explicit operator GenericType(Type type) => new GenericType(type);
@@ -48,7 +47,7 @@ namespace CS.Edu.Core.Extensions
     public static class TypeExt
     {
         public static readonly Type CLRRootType = typeof(object);
-        
+
         public static bool IsSubclassOfGeneric(this object obj, Type baseType)
         {
             return obj.GetType().IsSubclassOfGeneric(baseType);
@@ -79,6 +78,6 @@ namespace CS.Edu.Core.Extensions
             }
 
             return false;
-        }        
-    }    
+        }
+    }
 }

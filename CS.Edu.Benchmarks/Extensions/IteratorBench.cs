@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 using CS.Edu.Core;
+using CS.Edu.Core.Iterators;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
@@ -10,22 +12,22 @@ namespace CS.Edu.Benchmarks.Extensions
     public class IteratorBench
     {
         public IEnumerable<int> items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 };
-
-        public Relation<int> relation = new Relation<int>((x, y) => x == 0 ? y == 0 : y != 0);
+        public Relation<int> relation = (x, y) => x == 0 ? y == 0 : y != 0;
+        private readonly Consumer _consumer = new Consumer();
 
         [Benchmark]
-        public int[] EnumerableIterator()
+        public void EnumerableIterator()
         {
-            static IEnumerable<TSource> TakeWhileIterator<TSource>(IEnumerable<TSource> source, Relation<TSource> relation)
+            static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, Relation<T> relation)
             {
-                TSource prev = source.FirstOrDefault();
+                T prev = source.FirstOrDefault();
 
                 if (source.Any())
                 {
                     yield return prev;
                 }
 
-                foreach (TSource item in source.Skip(1))
+                foreach (T item in source.Skip(1))
                 {
                     if (!relation(prev, item))
                         break;
@@ -35,20 +37,20 @@ namespace CS.Edu.Benchmarks.Extensions
                 }
             }
 
-            return TakeWhileIterator(items, relation).ToArray();
+            TakeWhileIterator(items, relation).Consume(_consumer);
         }
 
         [Benchmark]
-        public int[] EnumeratorIterator()
+        public void EnumeratorIterator()
         {
-            static IEnumerable<TSource> TakeWhileIterator<TSource>(IEnumerable<TSource> source, Relation<TSource> relation)
+            static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, Relation<T> relation)
             {
                 using (var enumerator = source.GetEnumerator())
                 {
                     if (!enumerator.MoveNext())
                         yield break;
 
-                    TSource prev = enumerator.Current;
+                    T prev = enumerator.Current;
                     yield return prev;
 
                     while (enumerator.MoveNext())
@@ -62,7 +64,28 @@ namespace CS.Edu.Benchmarks.Extensions
                 }
             }
 
-            return TakeWhileIterator(items, relation).ToArray();
+            TakeWhileIterator(items, relation).Consume(_consumer);
+        }
+
+        [Benchmark]
+        public void PrevNextIterator()
+        {
+            static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source,
+                Relation<T> relation)
+            {
+                foreach (PrevNextValue<T> value in source.ToPrevNextIterator())
+                {
+                    if (value.Next == Option.None || !relation(value.Current, (T)value.Next))
+                    {
+                        yield return value.Current;
+                        break;
+                    }
+
+                    yield return value.Current;
+                }
+            }
+
+            TakeWhileIterator(items, relation).Consume(_consumer);
         }
     }
 }
