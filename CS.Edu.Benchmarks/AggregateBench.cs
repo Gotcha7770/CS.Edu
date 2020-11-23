@@ -10,7 +10,7 @@ namespace CS.Edu.Benchmarks
     [Config(typeof(DefaultConfig))]
     public class AggregateBench
     {
-        private readonly IEnumerable<IEnumerable<int>> _source = Enumerable.Range(0, 10).Select(x => ( x, "Group1"))
+        private readonly IEnumerable<IEnumerable<int>> _source = Enumerable.Range(0, 10).Select(x => (x, "Group1"))
             .Concat(Enumerable.Range(0, 5).Select(x => (x, "Group2")))
             .Concat(Enumerable.Range(3, 4).Select(x => (x, "Group3")))
             .Concat(Enumerable.Range(5, 5).Select(x => (x, "Group4")))
@@ -40,14 +40,14 @@ namespace CS.Edu.Benchmarks
         public void Aggragate2()
         {
             var query = _source.Aggregate((HashSet<int>)null, (agg, cur) =>
-                {
-                    if (agg == null)
-                        agg = new HashSet<int>(cur);
-                    else
-                        agg.IntersectWith(cur);
+            {
+                if (agg == null)
+                    agg = new HashSet<int>(cur);
+                else
+                    agg.IntersectWith(cur);
 
-                    return agg;
-                });
+                return agg;
+            });
 
             query.Consume(_consumer);
         }

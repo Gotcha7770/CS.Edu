@@ -26,7 +26,7 @@ namespace CS.Edu.Tests.MathExt
                 .Select(c => Enumerable.Range(0, 1000).Select(r => r * Math.Pow(10, c)).ToArray())
                 .ToArray();
 
-            double[,] result = Matrix.To2D(mtrx);
+            double[,] result = mtrx.To2D();
 
             Assert.That(result.Rank, Is.EqualTo(2));
             Assert.That(result.GetLength(0), Is.EqualTo(4));

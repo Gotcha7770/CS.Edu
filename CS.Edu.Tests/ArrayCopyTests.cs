@@ -1,4 +1,4 @@
-﻿using System;
+﻿using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests
@@ -24,7 +24,7 @@ namespace CS.Edu.Tests
                 {4, 5}
             };
 
-            _source.CopyPart(target, 0, 0);
+            _source.CopyPart(target, 0, 0, 0);
 
             Assert.AreEqual(standard, target);
         }
@@ -39,7 +39,7 @@ namespace CS.Edu.Tests
                 {9, 10}
             };
 
-            _source.CopyPart(target, 1, 1);
+            _source.CopyPart(target, 1, 1, 0);
 
             Assert.AreEqual(standard, target);
         }
@@ -54,36 +54,9 @@ namespace CS.Edu.Tests
                 {14, 15}
             };
 
-            _source.CopyPart(target, 2, 2);
+            _source.CopyPart(target, 2, 2, 0);
 
             Assert.AreEqual(standard, target);
         }
-    }
-
-    public static class ArrayExtensions
-    {
-        public static void CopyPart<T>(this T[,] source, T[,] target, int row, int column)
-        {
-            Implementation1<T>(source, target, row, column);
-        }
-
-        private static void Implementation1<T>(T[,] source, T[,] target, int row, int column)
-        {
-            if(source.GetLength(0) < target.GetLength(0)
-               || source.GetLength(1) < target.GetLength(1))
-                throw new ArgumentException($"dimensions of {nameof(source)} should be grater then dimensions of {nameof(target)}");
-
-            for (int i = 0; i < target.GetLength(0); i++)
-            for (int j = 0; j < target.GetLength(1); j++)
-            {
-                target[i, j] = source[i + row, j + column];
-            }
-        }
-
-        //private static void Implementation2<T>(T[,] source, T[,] target, int row, int column){}
-        //Array.Copy()
-
-        //private static void Implementation3<T>(T[,] source, T[,] target, int row, int column){}
-        //Buffer.BlockCopy(source, 5, target, 0, 4 * sizeof(int));
     }
 }

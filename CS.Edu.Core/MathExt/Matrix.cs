@@ -5,13 +5,13 @@ namespace CS.Edu.Core.MathExt
 {
     public static class Matrix
     {
-        public static T[,] To2D<T>(T[][] source)
+        public static T[,] To2D<T>(this T[][] source)
         {
             try
             {
                 int FirstDim = source.Length;
                 // ↓ throws InvalidOperationException if source is not rectangular
-                int SecondDim = source.GroupBy(row => row.Length).Single().Key; 
+                int SecondDim = source.GroupBy(row => row.Length).Single().Key;
 
                 var result = new T[FirstDim, SecondDim];
                 for (int i = 0; i < FirstDim; ++i)
