@@ -29,7 +29,6 @@ namespace CS.Edu.Benchmarks
                 typeof(JaggedVsRectArrayBench),
                 typeof(DictionaryVsLookupBench),
                 typeof(DoubleEnumerationBench),
-                typeof(TestBench),
                 typeof(PullOutBench),
                 typeof(ExceptBench),
                 typeof(JoinBench),
