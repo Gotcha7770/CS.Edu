@@ -12,15 +12,15 @@ namespace CS.Edu.Core.Comparers
         {
             if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
 
-            _equalsFunction = new Func<TValue, TValue, bool>((x, y) =>
+            _equalsFunction = (x, y) =>
             {
                 TKey one = keySelector(x);
                 TKey other = keySelector(y);
 
                 return Equals(one, other);
-            });
+            };
 
-            _hashCodeFunction = new Func<TValue, int>(x => keySelector(x).GetHashCode());
+            _hashCodeFunction = x => keySelector(x).GetHashCode();
         }
 
         public bool Equals(TValue x, TValue y)
