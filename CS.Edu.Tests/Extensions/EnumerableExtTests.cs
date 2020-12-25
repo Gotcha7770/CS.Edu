@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using CS.Edu.Core.Extensions;
@@ -226,6 +227,32 @@ namespace CS.Edu.Tests.Extensions
             var result = points.ShrinkDuplicates(x => x.Y, -9999);
 
             CollectionAssert.AreEqual(result, standard);
+        }
+
+        [Test]
+        public void Enumerator_CreateTests()
+        {
+            IEnumerable<int> _0 = new [] {1, 2};
+
+            IEnumerable<int> _1 = EnumerableEx.Concat(
+                EnumerableEx.Return(1),
+                EnumerableEx.Return(2));
+
+            IEnumerable<int> _2 = EnumerableEx.Create<int>(async yield =>
+            {
+                await yield.Return(1);
+                await yield.Return(2);
+            });
+
+            IEnumerable<int> _3 = EnumerableEx.Create(() => Enumerator.Create(0, 1));
+
+            IEnumerable<int> _4 = _(); IEnumerable<int> _()
+            {
+                yield return 1;
+                yield return 2;
+            }
+
+            Assert.True(true);
         }
 
         [Test]
