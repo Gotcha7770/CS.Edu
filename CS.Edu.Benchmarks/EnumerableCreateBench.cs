@@ -14,6 +14,21 @@ namespace CS.Edu.Benchmarks
         private readonly Consumer _consumer = new Consumer();
 
         [Benchmark]
+        public void ListAsEnumerable()
+        {
+            IEnumerable<DateTime> enumerable = new List<DateTime>
+            {
+                DateTime.Now,
+                DateTime.Now,
+                DateTime.Now,
+                DateTime.Now,
+                DateTime.Now
+            };
+
+            _consumer.Consume(enumerable);
+        }
+
+        [Benchmark]
         public void ArrayAsEnumerable()
         {
             IEnumerable<DateTime> enumerable = new []
@@ -36,7 +51,6 @@ namespace CS.Edu.Benchmarks
                 EnumerableEx.Return(DateTime.Now),
                 EnumerableEx.Return(DateTime.Now),
                 EnumerableEx.Return(DateTime.Now),
-                EnumerableEx.Return(DateTime.Now),
                 EnumerableEx.Return(DateTime.Now));
 
             _consumer.Consume(enumerable);
@@ -47,7 +61,6 @@ namespace CS.Edu.Benchmarks
         {
             IEnumerable<DateTime> enumerable = EnumerableEx.Create<DateTime>(async yielder =>
             {
-                await yielder.Return(DateTime.Now);
                 await yielder.Return(DateTime.Now);
                 await yielder.Return(DateTime.Now);
                 await yielder.Return(DateTime.Now);
