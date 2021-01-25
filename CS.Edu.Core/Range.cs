@@ -63,19 +63,19 @@ namespace CS.Edu.Core
         public bool Contains(T value)
         {
             return Min.CompareTo(value) < 1
-                && Max.CompareTo(value) > -1;
+                   && Max.CompareTo(value) > -1;
         }
 
         public bool Contains(Range<T> other)
         {
             return Min.CompareTo(other.Min) < 1
-                && Max.CompareTo(other.Max) > -1;
+                   && Max.CompareTo(other.Max) > -1;
         }
 
         public bool Intersects(Range<T> other)
         {
             return Min.CompareTo(other.Max) < 1
-                && other.Min.CompareTo(Max) < 1;
+                   && other.Min.CompareTo(Max) < 1;
         }
 
         public Range<T> Intersection(Range<T> other)

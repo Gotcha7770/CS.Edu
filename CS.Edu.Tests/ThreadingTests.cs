@@ -1,10 +1,5 @@
-using System;
-using System.Collections;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using CS.Edu.Core;
-using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests
@@ -12,7 +7,7 @@ namespace CS.Edu.Tests
     [TestFixture]
     public class ThreadingTests
     {
-        private static int _doggosPetted;        
+        private static int _doggosPetted;
 
         [Test]
         public void IncremetFromDifferentThreads()
@@ -26,7 +21,7 @@ namespace CS.Edu.Tests
                 .Select(x => Task.Run(PetDoggo))
                 .ToArray();
 
-            Parallel.For(1, 50, (i, s) => 
+            Parallel.For(1, 50, (i, s) =>
             {
                 PetDoggo();
             });
