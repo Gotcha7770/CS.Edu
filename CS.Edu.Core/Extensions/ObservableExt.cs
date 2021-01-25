@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CS.Edu.Core.Comparers;
 using DynamicData;
+using DynamicData.Kernel;
 
 namespace CS.Edu.Core.Extensions
 {
@@ -127,6 +128,48 @@ namespace CS.Edu.Core.Extensions
                     right
                 };
             }, keySelector);
+        }
+
+        public static IObservable<IChangeSet<T>> OnLoaded<T>(this IObservable<IChangeSet<T>> source,
+            Action<IChangeSet<T>> action)
+        {
+            return Observable.Create<IChangeSet<T>>(observer =>
+            {
+                var pendingHandler = source
+                    .MonitorStatus()
+                    .Where(x => x == ConnectionStatus.Loaded);
+
+                var actionInvoker = source.SkipUntil(pendingHandler)
+                    .Do(action)
+                    .Subscribe();
+
+                var subscription = source.Subscribe(observer);
+
+                actionInvoker.Dispose();
+
+                return subscription;
+            });
+        }
+
+        public static IObservable<IChangeSet<T, TKey>> OnLoaded<T, TKey>(this IObservable<IChangeSet<T, TKey>> source,
+            Action<IChangeSet<T, TKey>> action)
+        {
+            return Observable.Create<IChangeSet<T, TKey>>(observer =>
+            {
+                var pendingHandler = source
+                    .MonitorStatus()
+                    .Where(x => x == ConnectionStatus.Loaded);
+
+                var actionInvoker = source.SkipUntil(pendingHandler)
+                    .Do(action)
+                    .Subscribe();
+
+                var subscription = source.Subscribe(observer);
+
+                actionInvoker.Dispose();
+
+                return subscription;
+            });
         }
 
         public static IObservable<IChangeSet<T>> Tail<T>(this IObservable<IChangeSet<T>> source,
