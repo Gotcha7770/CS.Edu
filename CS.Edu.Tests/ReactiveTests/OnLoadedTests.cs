@@ -62,7 +62,6 @@ namespace CS.Edu.Tests.ReactiveTests
                 .OnLoaded(x => list.Add(x))
                 .AsAggregator())
             {
-
                 _cache.AddOrUpdate(new Identity<Guid>(Guid.NewGuid()));
 
                 Assert.AreEqual(1, aggregator.Messages.Count);

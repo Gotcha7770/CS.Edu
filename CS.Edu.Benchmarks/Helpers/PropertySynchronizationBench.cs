@@ -4,9 +4,9 @@ using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using CS.Edu.Core.Extensions;
 using CS.Edu.Core.Helpers;
 using CS.Edu.Core.Interfaces;
+using DynamicData.Binding;
 
 namespace CS.Edu.Benchmarks.Helpers
 {
@@ -100,7 +100,7 @@ namespace CS.Edu.Benchmarks.Helpers
         [Benchmark]
         public string RxPropertySync()
         {
-            _disposable = ObservableExt.CreateFromProperty(_source, x => x.Value)
+            _disposable = _source.WhenValueChanged(x => x.Value)
                 .Subscribe(x => _target.Value = x);
 
             _source.Value = "newValue";

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CS.Edu.Core.Comparers;
@@ -13,38 +11,6 @@ namespace CS.Edu.Core.Extensions
 {
     public static class ObservableExt
     {
-        public static IObservable<TValue> CreateFromProperty<TSender, TValue>(TSender source,
-                                                                              Expression<Func<TSender, TValue>> expression,
-                                                                              bool notifyInitial = true)
-            where TSender : INotifyPropertyChanged
-        {
-            if (!(expression?.Body is MemberExpression memberExpression))
-                throw new ArgumentNullException(nameof(expression));
-
-
-            return Observable.Create<TValue>(observer =>
-            {
-                Func<TSender, TValue> getter = expression.Compile();
-                string propertyName = memberExpression.Member.Name;
-
-                var propertyChanged = Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
-                    x => source.PropertyChanged += x,
-                    x => source.PropertyChanged -= x)
-                    .Where(x => propertyName.Equals(x.EventArgs.PropertyName, StringComparison.InvariantCulture))
-                    .Select(x => getter(source));
-
-                if (notifyInitial)
-                {
-                    propertyChanged = Observable.Return(getter(source))
-                        .Concat(propertyChanged);
-                }
-
-                var subscription = propertyChanged.Subscribe(observer);
-
-                return new CompositeDisposable(subscription);
-            });
-        }
-
         private readonly struct ProductChangeReasons
         {
             public static readonly ListChangeReason[] ForList =
@@ -130,6 +96,11 @@ namespace CS.Edu.Core.Extensions
             }, keySelector);
         }
 
+        public static IObservable<IChangeSet<T, TKey>> TakeInitial<T, TKey>(this IObservable<IChangeSet<T, TKey>> source)
+        {
+            return source.DeferUntilLoaded().Take(1);
+        }
+
         public static IObservable<IChangeSet<T>> OnLoaded<T>(this IObservable<IChangeSet<T>> source,
             Action<IChangeSet<T>> action)
         {
@@ -140,6 +111,7 @@ namespace CS.Edu.Core.Extensions
                     .Where(x => x == ConnectionStatus.Loaded);
 
                 var actionInvoker = source.SkipUntil(pendingHandler)
+                    .Take(1)
                     .Do(action)
                     .Subscribe();
 
@@ -161,6 +133,7 @@ namespace CS.Edu.Core.Extensions
                     .Where(x => x == ConnectionStatus.Loaded);
 
                 var actionInvoker = source.SkipUntil(pendingHandler)
+                    .Take(1)
                     .Do(action)
                     .Subscribe();
 
