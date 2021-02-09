@@ -2,7 +2,9 @@
 using System.Linq;
 using CS.Edu.Core;
 using CS.Edu.Core.Iterators;
+using DynamicData.Kernel;
 using NUnit.Framework;
+using EnumerableEx = System.Linq.EnumerableEx;
 
 namespace CS.Edu.Tests.IteratorsTests
 {
@@ -23,7 +25,7 @@ namespace CS.Edu.Tests.IteratorsTests
         public void SourceWithSingleValue_ReturnsJustCurrent()
         {
             var iterator = EnumerableEx.Return(0).ToPrevNextIterator();
-            var standard = new[] {new PrevNextValue<int>(Option.None, 0, Option.None)};
+            var standard = new[] {new PrevNextValue<int>(Optional<int>.None, 0, Optional<int>.None)};
 
             CollectionAssert.AreEqual(iterator, standard);
         }
@@ -32,7 +34,7 @@ namespace CS.Edu.Tests.IteratorsTests
         public void SourceWithManyValues_ReturnsFirstItemWithNextValue()
         {
             var first = _items.ToPrevNextIterator().First();
-            var standard = new PrevNextValue<int>(Option.None, 0, 1);
+            var standard = new PrevNextValue<int>(Optional<int>.None, 0, 1);
 
             Assert.AreEqual(standard, first);
         }
@@ -55,7 +57,7 @@ namespace CS.Edu.Tests.IteratorsTests
         public void LastItemWithNoneNextValue()
         {
             var first = _items.ToPrevNextIterator().Last();
-            var standard = new PrevNextValue<int>(3, 4, Option.None);
+            var standard = new PrevNextValue<int>(3, 4, Optional<int>.None);
 
             Assert.AreEqual(standard, first);
         }

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using CS.Edu.Core;
 using CS.Edu.Core.Iterators;
+using DynamicData.Kernel;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
@@ -73,15 +74,15 @@ namespace CS.Edu.Benchmarks.Extensions
             static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source,
                 Relation<T> relation)
             {
-                foreach (PrevNextValue<T> value in source.ToPrevNextIterator())
+                foreach (PrevNextValue<T> item in source.ToPrevNextIterator())
                 {
-                    if (value.Next == Option.None || !relation(value.Current, (T)value.Next))
+                    if (item.Next == Optional<T>.None || !relation(item.Current, (T)item.Next))
                     {
-                        yield return value.Current;
+                        yield return item.Current;
                         break;
                     }
 
-                    yield return value.Current;
+                    yield return item.Current;
                 }
             }
 

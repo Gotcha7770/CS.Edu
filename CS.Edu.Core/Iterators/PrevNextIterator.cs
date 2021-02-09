@@ -1,21 +1,22 @@
 ﻿using System.Collections.Generic;
+using DynamicData.Kernel;
 
 namespace CS.Edu.Core.Iterators
 {
     public readonly struct PrevNextValue<T>
     {
-        public PrevNextValue(Option<T> previous, T current, Option<T> next)
+        public PrevNextValue(Optional<T> previous, T current, Optional<T> next)
         {
             Previous = previous;
             Current = current;
             Next = next;
         }
 
-        public Option<T> Previous { get; }
+        public Optional<T> Previous { get; }
 
         public T Current { get; }
 
-        public Option<T> Next { get; }
+        public Optional<T> Next { get; }
     }
 
     public static class PrevNextIteratorExtensions
@@ -27,7 +28,7 @@ namespace CS.Edu.Core.Iterators
                 if (!enumerator.MoveNext())
                     yield break;
 
-                Option<T> previous = Option.None;
+                Optional<T> previous = Optional<T>.None;
                 T current = enumerator.Current;
 
                 while (enumerator.MoveNext())
@@ -38,7 +39,7 @@ namespace CS.Edu.Core.Iterators
                     current = next;
                 }
 
-                yield return new PrevNextValue<T>(previous, current, Option.None);
+                yield return new PrevNextValue<T>(previous, current, Optional<T>.None);
             }
         }
     }
