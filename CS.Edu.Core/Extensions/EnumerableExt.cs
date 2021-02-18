@@ -472,5 +472,15 @@ namespace CS.Edu.Core.Extensions
                     yield return prev;
             }
         }
+
+        public static IEnumerable<T> Generate<T>(T state, Func<T, T> iterate)
+        {
+            return Generate(state, Predicates.True<T>(), iterate);
+        }
+
+        public static IEnumerable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
+        {
+            return EnumerableEx.Generate(state, x => condition(x), iterate, Function.Identity<T>());
+        }
     }
 }
