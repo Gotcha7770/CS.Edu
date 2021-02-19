@@ -85,7 +85,8 @@ namespace CS.Edu.Tests.ReactiveTests
                 return Observable.Create<int>(observer => new CompositeDisposable
                 {
                     source.Subscribe(observer),
-                    transfer.Subscribe(source)
+                    transfer.Subscribe(source),
+                    source
                 });
             }
 

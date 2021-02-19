@@ -18,7 +18,7 @@ namespace CS.Edu.Core.MathExt
         {
             for (int x = 0, y = 1 ;; y = x + y, x = y - x)
             {
-                yield return y;
+                yield return x;
             }
         }
     }
