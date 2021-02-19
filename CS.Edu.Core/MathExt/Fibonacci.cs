@@ -11,7 +11,7 @@ namespace CS.Edu.Core.MathExt
 
         static int GetNthFibonacci(int a, int b, int n)
         {
-            return n > 1 ? GetNthFibonacci(b, b + a, --n) : b;
+            return n > 1 ? GetNthFibonacci(b, b + a, --n) : a;
         }
 
         public static IEnumerable<int> Iterator()

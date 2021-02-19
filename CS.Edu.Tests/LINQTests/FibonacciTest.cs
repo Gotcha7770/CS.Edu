@@ -19,8 +19,9 @@ namespace CS.Edu.Tests.LINQTests
         public void Test2()
         {
             int tenth1 = Fibonacci.Recursive(10);
-            int tenth2 = Fibonacci.Iterator().ElementAt(10);
-            int tenth3 = EnumerableExt.Generate((X: 0, Y: 1), tuple => (tuple.Y, tuple.X + tuple.Y)).ElementAt(10).X;
+            int tenth2 = Fibonacci.Iterator().ElementAt(9);
+            int tenth3 = EnumerableExt.Generate((X: 0, Y: 1), t => (t.Y, t.X + t.Y)).ElementAt(9).X;
+            int tenth4 = GetObservableFibonacci(10).Last();
 
             //Expand
             //Zip
@@ -30,20 +31,21 @@ namespace CS.Edu.Tests.LINQTests
             //Defer
             //Observable
 
-            Assert.That(tenth1, Is.EqualTo(55));
-            Assert.That(tenth2, Is.EqualTo(55));
-            Assert.That(tenth3, Is.EqualTo(55));
+            Assert.That(tenth1, Is.EqualTo(34));
+            Assert.That(tenth2, Is.EqualTo(34));
+            Assert.That(tenth3, Is.EqualTo(34));
+            Assert.That(tenth3, Is.EqualTo(34));
         }
 
         [Test]
         public void Method1()
         {
-            var res = Get3(9).ToEnumerable();
+            var res = GetObservableFibonacci(10).ToEnumerable();
 
-            CollectionAssert.AreEqual(new [] {0, 1, 1, 2, 3, 5, 8, 13, 21}, res);
+            CollectionAssert.AreEqual(new [] {0, 1, 1, 2, 3, 5, 8, 13, 21, 34}, res);
         }
 
-        private IObservable<int> Get3(int count)
+        private IObservable<int> GetObservableFibonacci(int count)
         {
             return Observable.Create<int>(observer =>
             {

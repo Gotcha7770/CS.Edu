@@ -145,6 +145,16 @@ namespace CS.Edu.Core.Extensions
             });
         }
 
+        public static IObservable<T> Generate<T>(T state, Func<T, T> iterate)
+        {
+            return Generate(state, Predicates.True<T>(), iterate);
+        }
+
+        public static IObservable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
+        {
+            return Observable.Generate(state, x => condition(x), iterate, Function.Identity<T>());
+        }
+
         public static IObservable<IChangeSet<T>> Tail<T>(this IObservable<IChangeSet<T>> source,
                                                          int numberOfItems)
         {
