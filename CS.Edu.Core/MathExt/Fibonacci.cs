@@ -1,7 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 namespace CS.Edu.Core.MathExt
 {
+    using RX = System.Reactive.Linq.Observable;
+
     public static class Fibonacci
     {
         public static int Recursive(int n)
@@ -20,6 +26,23 @@ namespace CS.Edu.Core.MathExt
             {
                 yield return x;
             }
+        }
+
+        public static IObservable<int> Observable(int count)
+        {
+            return RX.Create<int>(observer =>
+            {
+                var storage = new BehaviorSubject<int>(1);
+                var output = RX.Return(0).Concat(storage).Take(count);
+                var transfer = output.Zip(storage, (x, y) => x + y);
+
+                return new CompositeDisposable
+                {
+                    output.Subscribe(observer),
+                    transfer.Subscribe(storage),
+                    storage
+                };
+            });
         }
     }
 }
