@@ -7,7 +7,7 @@ using DynamicData.Kernel;
 namespace CS.Edu.Core.Helpers
 {
     /// <summary>Текучий интерфейс для поиска по перечислению</summary>
-    public static class FluentFindInterface
+    static class FluentFindInterface
     {
         /// <summary>
         /// Ищет значение в перечислении, удовлетворяющее переданному предикату

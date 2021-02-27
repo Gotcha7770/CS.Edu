@@ -1,7 +1,6 @@
 using System;
 using BenchmarkDotNet.Running;
 using CS.Edu.Benchmarks.Extensions;
-using CS.Edu.Benchmarks.Helpers;
 
 namespace CS.Edu.Benchmarks
 {
@@ -17,7 +16,6 @@ namespace CS.Edu.Benchmarks
                 typeof(PaginateBench),
                 typeof(BinarySplitBench),
                 typeof(TernarySplitBench),
-                typeof(PropertySynchronizationBench),
                 typeof(ListBench),
                 typeof(FactorialBench),
                 typeof(FibonacciBench),
@@ -33,7 +31,6 @@ namespace CS.Edu.Benchmarks
                 typeof(ExceptBench),
                 typeof(JoinBench),
                 typeof(AggregateBench),
-                typeof(FluentFindBench),
                 typeof(EnumerableCreateBench),
                 typeof(MemberAccessBench)
             });

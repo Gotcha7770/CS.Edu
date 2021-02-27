@@ -14,10 +14,7 @@ namespace CS.Edu.Core.Monads
             _isLeft = true;
         }
 
-        public Either(TR right)
-        {
-            _right = right;
-        }
+        public Either(TR right) => _right = right;
 
         public T Match<T>(Func<TL, T> leftFunc, Func<TR, T> rightFunc) => _isLeft
             ? leftFunc(_left)

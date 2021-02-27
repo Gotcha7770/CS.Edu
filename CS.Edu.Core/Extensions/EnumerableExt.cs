@@ -2,7 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CS.Edu.Core.Monads;
+using DynamicData.Kernel;
+using EnumerableEx = System.Linq.EnumerableEx;
 
 namespace CS.Edu.Core.Extensions
 {
@@ -21,7 +22,7 @@ namespace CS.Edu.Core.Extensions
         IncludeBorders = 0x1
     }
 
-    public static class EnumerableExt
+    public static partial class EnumerableExt
     {
         public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item)
         {
@@ -479,26 +480,18 @@ namespace CS.Edu.Core.Extensions
             return EnumerableEx.Generate(state, x => condition(x), iterate, Function.Identity<T>());
         }
 
-        public static Group<TKey, T> ToGroup<TKey, T>(this IGrouping<TKey, T> grouping)
+        public static Optional<T> FirstOrOptional<T>(this IEnumerable<T> source, Func<T, bool> selector)
         {
-            return new Group<TKey, T>(grouping.Key, grouping);
-        }
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
 
-        public static Group<TKey, T> ToGroup<TKey, T>(this IGrouping<TKey, T> grouping, Func<T, TKey> keySelector)
-        {
-            return new Group<TKey, T>(grouping.Key, grouping.GroupBy(keySelector).Select(x => x.ToGroup()));
-        }
+            foreach (T item in source)
+            {
+                if(selector(item))
+                    return Optional<T>.Create(item);
+            }
 
-        public static IEnumerable<Group<TKey, T>> ThenBy<TKey, T>(this IEnumerable<IGrouping<TKey, T>> source, Func<T, TKey> keySelector)
-        {
-            return source.Select(x => x.ToGroup(keySelector));
-        }
-
-        public static IEnumerable<Group<TKey, T>> ThenBy<TKey, T>(this IEnumerable<Group<TKey, T>> source, Func<T, TKey> keySelector)
-        {
-            return source.Select(x => x.Match(
-                l => new Group<TKey, T>(x.Key, l.ThenBy(keySelector)),
-                r => new Group<TKey, T>(x.Key, r.GroupBy(keySelector).Select(y => y.ToGroup()))));
+            return Optional.None<T>();
         }
     }
 }

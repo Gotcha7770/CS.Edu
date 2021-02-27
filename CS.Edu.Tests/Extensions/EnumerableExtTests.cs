@@ -3,11 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
-using CS.Edu.Core.Helpers;
-using DynamicData.Kernel;
 using EnumerableEx = System.Linq.EnumerableEx;
 
 namespace CS.Edu.Tests.Extensions
@@ -220,101 +217,51 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Enumerator_CreateTests()
+        public void ToTreeTest()
         {
-            IEnumerable<int> _0 = new [] {1, 2};
+            // IEnumerable<Parameter> source = new[]
+            // {
+            //     new Parameter("Param1", new[] {"Cat1", "Cat4"}),
+            //     new Parameter("Param2", new[] {"Cat1", "Cat5"}),
+            //     new Parameter("Param3", new[] {"Cat2", "Cat4"}),
+            //     new Parameter("Param4", new[] {"Cat2"}),
+            //     new Parameter("Param5", new[] {"Cat3"}),
+            //     new Parameter("Param6", Array.Empty<string>())
+            // };
+            //
+            // string KeySelector(Parameter p, int i) => p.Categories.Skip(i).DefaultIfEmpty(string.Empty).First();
+            //
+            // Group<string, Parameter> ResultSelector(IGrouping<string, Parameter> grouping, int depth)
+            // {
+            //     return grouping.Skip(1).IsEmpty()
+            //         ? new Group<string, Parameter>(grouping.Key, grouping.Take(1))
+            //         : new Group<string, Parameter>(grouping.Key, grouping.GroupBy(x => KeySelector(x, depth + 1)).Select(x => ResultSelector(x, depth + 1)));
+            // }
+            //
+            // var result = source.GroupBy(x => KeySelector(x, 0)).Select(x => ResultSelector(x, 0)).ToArray();
 
-            IEnumerable<int> _1 = EnumerableEx.Concat(
-                EnumerableEx.Return(1),
-                EnumerableEx.Return(2));
+            //IEnumerable<Group<TKey, T>> ToTree<TKey, T>(IEnumerable<T> source, Func<T, TKey> keySelector)
+            // IEnumerable<Group<TKey, T>> ToTree<TKey, T>(IEnumerable<T> source)
+            // {
+            //     //var tmp = source.GroupBy(keySelector, (k, e) => ToTree(e, keySelector, keyModifier));
+            //     source.GroupBy(x => x).ForEach(x => x.);
+            //
+            //     return Enumerable.Empty<Group<TKey, T>>();
+            // }
+            //
+            // IEnumerable<Group<string, Parameter>> ToTree(IEnumerable<Parameter> source)
+            // {
+            //     //var tmp = source.GroupBy(keySelector, (k, e) => ToTree(e, keySelector, keyModifier));
+            //     int index = 0;
+            //     string KeySelector(Parameter p, int i) => p.Categories.Skip(i).DefaultIfEmpty(string.Empty).First();
+            //
+            //     Group<string, Parameter> resultSelector(IGrouping<string, Parameter> grouping) => new Group<string, Parameter>(grouping.Key, grouping);
+            //
+            //     return source.GroupBy(x => KeySelector(x, index)).Select(x => x.ToGroup())
+            // }
 
-            IEnumerable<int> _2 = EnumerableEx.Create<int>(async yield =>
-            {
-                await yield.Return(1);
-                await yield.Return(2);
-            });
-
-            IEnumerable<int> _3 = EnumerableEx.Create(() => Enumerator.Create(0, 1));
-
-            IEnumerable<int> _4 = _(); IEnumerable<int> _()
-            {
-                yield return 1;
-                yield return 2;
-            }
-
-            Assert.True(true);
-        }
-
-        [Test]
-        public void ThenGroupByTest()
-        {
-            var source = new[]
-            {
-                "aaa",
-                "aab",
-                "aac",
-                "aba",
-                "abc",
-                "bba",
-                "bbb",
-                "bbc",
-            };
-
-            var tmp = source.OrderBy(x => x[0]).ThenBy(x => x[1]);
-            var result1 = source.GroupBy(x => x[0]).ThenBy(x => x[1]).ToArray();
-            var result2 = result1.ThenBy(x => x[2]).ToArray();
-        }
-
-        [Test]
-        public void FluentFindTest()
-        {
-            IEnumerable<int> source = Enumerable.Range(1, 99);
-
-            int result = source.Find(x => x.IsEven(), true).Result.Value;
-            Assert.AreEqual(2, result);
-
-            result = source.Find(x => x == 101, true).ThenFind(x => x % 3 == 0).Result.Value;
-            Assert.AreEqual(3, result);
-        }
-
-        [Test]
-        public void ParallelFindTest()
-        {
-            IEnumerable<int> source = Enumerable.Range(1, 99);
-
-            int result = FindMethod(source, x => x.IsEven()).Value;
-            Assert.AreEqual(2, result);
-
-            result = FindMethod(source, x => x == 101, x => x % 3 == 0).Value;
-            Assert.AreEqual(3, result);
-        }
-
-        private Optional<T> FindMethod<T>(IEnumerable<T> items, params Predicate<T>[] predicates)
-        {
-            var results = new Optional<T>[predicates.Length];
-            Parallel.ForEach(predicates, (cur, state, index) =>
-            {
-                using (var enumerator = items.GetEnumerator())
-                {
-                    while (enumerator.MoveNext())
-                    {
-                        if (cur(enumerator.Current))
-                        {
-                            results[index] = enumerator.Current;
-
-                            if (index == 0)
-                                state.Stop();
-
-                            break;
-                        }
-
-                        if (state.IsStopped)
-                            break;
-                    }
-                }
-            });
-
-            return results.FirstOrDefault(x => x.HasValue);
+            //var result1 = source.GroupBy(x => x.Categories.IsEmpty() ? string.Empty : x.Categories.First(), x => x.Categories.Skip(1));
+            //var result2 = ToTree(source, x => x.Categories.IsEmpty() ? string.Empty : x.Categories.First(), x => x.Categories.Skip(1));
         }
 
         [TestCaseSource(typeof(ExceptIfLastTestsDataSource), nameof(ExceptIfLastTestsDataSource.TestCases))]
