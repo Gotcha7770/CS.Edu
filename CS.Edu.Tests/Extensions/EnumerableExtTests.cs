@@ -246,6 +246,26 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
+        public void ThenGroupByTest()
+        {
+            var source = new[]
+            {
+                "aaa",
+                "aab",
+                "aac",
+                "aba",
+                "abc",
+                "bba",
+                "bbb",
+                "bbc",
+            };
+
+            var tmp = source.OrderBy(x => x[0]).ThenBy(x => x[1]);
+            var result1 = source.GroupBy(x => x[0]).ThenBy(x => x[1]).ToArray();
+            var result2 = result1.ThenBy(x => x[2]).ToArray();
+        }
+
+        [Test]
         public void FluentFindTest()
         {
             IEnumerable<int> source = Enumerable.Range(1, 99);
