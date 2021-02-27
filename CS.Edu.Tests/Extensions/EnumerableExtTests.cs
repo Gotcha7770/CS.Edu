@@ -2,13 +2,11 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
 using CS.Edu.Core.Helpers;
-using CS.Edu.Tests.Utils;
 using DynamicData.Kernel;
 using EnumerableEx = System.Linq.EnumerableEx;
 
@@ -190,17 +188,30 @@ namespace CS.Edu.Tests.Extensions
         {
             var points = new[]
             {
-                new Point {X = 0, Y = -9999}, new Point {X = 5, Y = -9999}, new Point {X = 10, Y = 0},
-                new Point {X = 20, Y = 1}, new Point {X = 30, Y = -9999}, new Point {X = 40, Y = 4},
-                new Point {X = 60, Y = -9999}, new Point {X = 70, Y = -9999}, new Point {X = 80, Y = -9999},
-                new Point {X = 90, Y = 0}, new Point {X = 100, Y = 0},
+                (X: 0, Y: -9999),
+                (X: 5, Y: -9999),
+                (X: 10, Y: 0),
+                (X: 20, Y: 1),
+                (X: 30, Y: -9999),
+                (X: 40, Y: 4),
+                (X: 50, Y: -9999),
+                (X: 60, Y: -9999),
+                (X: 70, Y: -9999),
+                (X: 80, Y: -9999),
+                (X: 90, Y: 0),
+                (X: 100, Y: 0)
             };
 
             var standard = new[]
             {
-                new Point {X = 0, Y = -9999}, new Point {X = 10, Y = 0}, new Point {X = 20, Y = 1},
-                new Point {X = 30, Y = -9999}, new Point {X = 40, Y = 4}, new Point {X = 60, Y = -9999},
-                new Point {X = 90, Y = 0}, new Point {X = 100, Y = 0},
+                (X: 0, Y: -9999),
+                (X: 10, Y: 0),
+                (X: 20, Y: 1),
+                (X: 30, Y: -9999),
+                (X: 40, Y: 4),
+                (X: 50, Y: -9999),
+                (X: 90, Y: 0),
+                (X: 100, Y: 0)
             };
 
             var result = points.ShrinkDuplicates(x => x.Y, -9999);
