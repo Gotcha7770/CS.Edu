@@ -55,7 +55,7 @@ namespace CS.Edu.Benchmarks
         [Benchmark]
         public void Aggragate3()
         {
-            var query = _source.Aggregate(Enumerable.Empty<int>(), (agg, cur) => agg.IsNullOrEmpty()
+            var query = _source.Aggregate(Enumerable.Empty<int>(), (agg, cur) => agg.IsEmpty()
                 ? cur
                 : agg.Intersect(cur));
 

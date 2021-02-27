@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace CS.Edu.Core.Extensions
 {
@@ -18,7 +19,7 @@ namespace CS.Edu.Core.Extensions
             if(!CanConvertFrom(type))
                 throw new InvalidOperationException("The definition needs to be a GenericType or GenericTypeDefinition");
 
-            if(parameterTypes.IsNullOrEmpty())
+            if(parameterTypes is null || parameterTypes.IsEmpty())
                 throw new InvalidOperationException("You should pass one or more generic parameter types");
 
             GenericTypeDefinition = type;

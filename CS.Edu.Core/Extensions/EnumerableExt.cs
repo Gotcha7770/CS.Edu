@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace CS.Edu.Core.Extensions
 {
@@ -22,11 +23,6 @@ namespace CS.Edu.Core.Extensions
 
     public static class EnumerableExt
     {
-        public static bool IsNullOrEmpty<T>(this IEnumerable<T> source)
-        {
-            return source == null || !source.Any();
-        }
-
         public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item)
         {
             return source.Where(x => !Equals(x, item));

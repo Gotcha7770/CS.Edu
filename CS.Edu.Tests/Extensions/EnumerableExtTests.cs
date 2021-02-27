@@ -18,27 +18,6 @@ namespace CS.Edu.Tests.Extensions
     public class EnumerableExtTests
     {
         [Test]
-        public void NullOrEmpty_Null_ReturnsTrue()
-        {
-            IEnumerable<int> empty = null;
-            Assert.IsTrue(empty.IsNullOrEmpty());
-        }
-
-        [Test]
-        public void NullOrEmpty_Empty_ReturnsTrue()
-        {
-            var empty = Enumerable.Empty<int>();
-            Assert.IsTrue(empty.IsNullOrEmpty());
-        }
-
-        [Test]
-        public void NullOrEmpty_NotEmpty_ReturnsFalse()
-        {
-            var items = Enumerable.Range(0, 85);
-            Assert.False(items.IsNullOrEmpty());
-        }
-
-        [Test]
         public void Except_Null_ThrowsArgumentNullException()
         {
             IEnumerable<int> empty = null;
