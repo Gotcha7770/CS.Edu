@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CS.Edu.Core.Monads;
+using DynamicData.Kernel;
 
 namespace CS.Edu.Core.Extensions.EnumerableExtensions
 {
@@ -14,9 +15,12 @@ namespace CS.Edu.Core.Extensions.EnumerableExtensions
 
         public static FindResult<T> ThenFind<T>(this FindResult<T> result, Predicate<T> predicate)
         {
-            return result.Match(
-                l => l.Find(predicate),
-                r => result);
+            return result.Match(l => l.Find(predicate), r => result);
+        }
+
+        public static Optional<T> Result<T>(this FindResult<T> result)
+        {
+            return result.Match(l => Optional<T>.None, r => Optional<T>.Create(r));
         }
     }
 }
