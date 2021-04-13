@@ -3,6 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using CS.Edu.Core;
+using CS.Edu.Core.Extensions.EnumerableExtensions;
 using CS.Edu.Core.Iterators;
 using DynamicData.Kernel;
 

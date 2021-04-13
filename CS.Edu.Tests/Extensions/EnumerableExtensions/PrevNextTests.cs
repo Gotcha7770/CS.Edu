@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CS.Edu.Core;
+using CS.Edu.Core.Extensions.EnumerableExtensions;
 using CS.Edu.Core.Iterators;
 using DynamicData.Kernel;
 using NUnit.Framework;
 using EnumerableEx = System.Linq.EnumerableEx;
 
-namespace CS.Edu.Tests.IteratorsTests
+namespace CS.Edu.Tests.Extensions.EnumerableExtensions
 {
     [TestFixture]
-    public class PrevNextIteratorTests
+    public class PrevNextTests
     {
         private readonly IEnumerable<int> _items = Enumerable.Range(0, 5);
 

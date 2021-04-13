@@ -13,8 +13,7 @@ namespace CS.Edu.Tests
         public void MemberAccessWithReflection()
         {
             var obj = new PropsOnClass { A = 123, B = "abc", C = _now, D = null };
-            DateTime value = (DateTime)typeof(PropsOnClass).GetProperty("C")
-                .GetValue(obj);
+            DateTime value = (DateTime)typeof(PropsOnClass).GetProperty("C").GetValue(obj);
 
             Assert.AreEqual(_now, value);
         }
@@ -38,10 +37,27 @@ namespace CS.Edu.Tests
 
             Assert.AreEqual(_now, value);
         }
+
+        [Test]
+        public void StaticMemberAccessWithFastMember_ObjectAccessor()
+        {
+            var obj = new PropsOnClass { A = 123, B = "abc", C = _now, D = null };
+            var accessor = TypeAccessor.Create(typeof(PropsOnClass));
+            int value = (int)accessor[obj, "Count"];
+
+            Assert.AreEqual(1, value);
+        }
     }
 
     public class PropsOnClass
     {
+        public PropsOnClass()
+        {
+            Count++;
+        }
+
+        public static int Count { get; private set; }
+
         public int A { get; set; }
         public string B { get; set; }
         public DateTime C { get; set; }

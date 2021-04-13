@@ -51,38 +51,7 @@ namespace CS.Edu.Tests.Extensions
             CollectionAssert.AreEqual(result, new[] {0, 1, 2, 3, 4});
         }
 
-        [Test]
-        public void TakeWhile_PrevLessThenNext_ReturnsFirst3Elements()
-        {
-            var items = new[] {1, 2, 3, 2, 1};
-            Relation<int> lessThan = (x, y) => x < y;
 
-            var result = items.TakeWhile(lessThan);
-
-            CollectionAssert.AreEqual(result, new[] {1, 2, 3});
-        }
-
-        [Test]
-        public void TakeWhile_OneElement_ReturnsThatElement()
-        {
-            var items = EnumerableEx.Return(1);
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.TakeWhile(lessThan);
-
-            CollectionAssert.AreEqual(result, new[] {1});
-        }
-
-        [Test]
-        public void TakeWhile_Empty_ReturnsEmpty()
-        {
-            var items = Enumerable.Empty<int>();
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.TakeWhile(lessThan);
-
-            CollectionAssert.AreEqual(result, Array.Empty<int>());
-        }
 
         [Test]
         public void SkipWhile_PrevLessThenNext_SkipFirst2Elements()
