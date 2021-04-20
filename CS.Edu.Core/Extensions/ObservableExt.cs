@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CS.Edu.Core.Comparers;
@@ -153,6 +154,46 @@ namespace CS.Edu.Core.Extensions
         public static IObservable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
         {
             return Observable.Generate(state, x => condition(x), iterate, Function.Identity<T>());
+        }
+
+        public static IObservable<IChangeSet<TObject, TKey>> Filter<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source,
+            IObservable<Predicate<TObject>> predicateChanged)
+        {
+            return source.Filter(predicateChanged.Select(x => x.ToFunc()));
+        }
+
+        public static IObservable<IChangeSet<TObject, TKey>> ExpireOn<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, IObservable<Unit> evaluator)
+        {
+            return Observable.Create<IChangeSet<TObject, TKey>>(observer =>
+            {
+                var cache = new IntermediateCache<TObject, TKey>(source);
+
+                var published = cache.Connect().Publish();
+                var subscriber = published.SubscribeSafe(observer);
+
+                var remover = evaluator.Finally(observer.OnCompleted)
+                    .Subscribe(_ =>
+                    {
+                        try
+                        {
+                            cache.Clear();
+                        }
+                        catch (Exception ex)
+                        {
+                            observer.OnError(ex);
+                        }
+                    });
+
+                var connected = published.Connect();
+
+                return new CompositeDisposable
+                {
+                    connected,
+                    subscriber,
+                    remover,
+                    cache
+                };
+            });
         }
 
         public static IObservable<IChangeSet<T>> Tail<T>(this IObservable<IChangeSet<T>> source,
