@@ -6,11 +6,10 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CS.Edu.Core.Comparers;
 using DynamicData;
-using DynamicData.Kernel;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static class ObservableExt
+    public static partial class ObservableExt
     {
         private readonly struct ProductChangeReasons
         {
@@ -97,103 +96,10 @@ namespace CS.Edu.Core.Extensions
             }, keySelector);
         }
 
-        public static IObservable<IChangeSet<T, TKey>> TakeInitial<T, TKey>(this IObservable<IChangeSet<T, TKey>> source)
-        {
-            return source.DeferUntilLoaded().Take(1);
-        }
-
-        public static IObservable<IChangeSet<T>> OnLoaded<T>(this IObservable<IChangeSet<T>> source,
-            Action<IChangeSet<T>> action)
-        {
-            return Observable.Create<IChangeSet<T>>(observer =>
-            {
-                var pendingHandler = source
-                    .MonitorStatus()
-                    .Where(x => x == ConnectionStatus.Loaded);
-
-                var actionInvoker = source.SkipUntil(pendingHandler)
-                    .Take(1)
-                    .Do(action)
-                    .Subscribe();
-
-                var subscription = source.Subscribe(observer);
-
-                actionInvoker.Dispose();
-
-                return subscription;
-            });
-        }
-
-        public static IObservable<IChangeSet<T, TKey>> OnLoaded<T, TKey>(this IObservable<IChangeSet<T, TKey>> source,
-            Action<IChangeSet<T, TKey>> action)
-        {
-            return Observable.Create<IChangeSet<T, TKey>>(observer =>
-            {
-                var pendingHandler = source
-                    .MonitorStatus()
-                    .Where(x => x == ConnectionStatus.Loaded);
-
-                var actionInvoker = source.SkipUntil(pendingHandler)
-                    .Take(1)
-                    .Do(action)
-                    .Subscribe();
-
-                var subscription = source.Subscribe(observer);
-
-                actionInvoker.Dispose();
-
-                return subscription;
-            });
-        }
-
-        public static IObservable<T> Generate<T>(T state, Func<T, T> iterate)
-        {
-            return Generate(state, Predicates.True<T>(), iterate);
-        }
-
-        public static IObservable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
-        {
-            return Observable.Generate(state, x => condition(x), iterate, Function.Identity<T>());
-        }
-
         public static IObservable<IChangeSet<TObject, TKey>> Filter<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source,
             IObservable<Predicate<TObject>> predicateChanged)
         {
             return source.Filter(predicateChanged.Select(x => x.ToFunc()));
-        }
-
-        public static IObservable<IChangeSet<TObject, TKey>> ExpireOn<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source, IObservable<Unit> evaluator)
-        {
-            return Observable.Create<IChangeSet<TObject, TKey>>(observer =>
-            {
-                var cache = new IntermediateCache<TObject, TKey>(source);
-
-                var published = cache.Connect().Publish();
-                var subscriber = published.SubscribeSafe(observer);
-
-                var remover = evaluator.Finally(observer.OnCompleted)
-                    .Subscribe(_ =>
-                    {
-                        try
-                        {
-                            cache.Clear();
-                        }
-                        catch (Exception ex)
-                        {
-                            observer.OnError(ex);
-                        }
-                    });
-
-                var connected = published.Connect();
-
-                return new CompositeDisposable
-                {
-                    connected,
-                    subscriber,
-                    remover,
-                    cache
-                };
-            });
         }
 
         public static IObservable<IChangeSet<T>> Tail<T>(this IObservable<IChangeSet<T>> source,
