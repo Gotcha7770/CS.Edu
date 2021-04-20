@@ -4,6 +4,11 @@ namespace CS.Edu.Core.Extensions
 {
     public static class Function
     {
+        public static Func<T, bool> ToFunc<T>(this Predicate<T> predicate)
+        {
+            return x => predicate(x);
+        }
+
         public static Func<T, T, bool> ToFunc<T>(this Relation<T> relation)
         {
             return (x, y) => relation(x, y);
