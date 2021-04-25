@@ -31,8 +31,7 @@ namespace CS.Edu.Core.Extensions.ObservableExtensions
             {
                 var cache = new IntermediateCache<T, TKey>(_source);
 
-                var published = cache.Connect()
-                    .Publish();
+                var published = cache.Connect().Publish();
                 var subscriber = published.SubscribeSafe(observer);
 
                 var remover = _evaluator.Finally(observer.OnCompleted)

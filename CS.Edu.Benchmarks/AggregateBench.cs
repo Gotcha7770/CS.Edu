@@ -2,7 +2,6 @@
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks
 {
