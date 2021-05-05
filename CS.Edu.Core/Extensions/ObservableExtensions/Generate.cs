@@ -12,7 +12,7 @@ namespace CS.Edu.Core.Extensions.ObservableExtensions
 
         public static IObservable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
         {
-            return Observable.Generate(state, x => condition(x), iterate, Function.Identity<T>());
+            return Observable.Generate(state, x => condition(x), iterate, Functions.Identity<T>());
         }
     }
 }

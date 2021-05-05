@@ -16,7 +16,7 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void GetValuesTest()
         {
-            var values = EnumExt.GetValues<TestEnum>();
+            var values = Enums.GetValues<TestEnum>();
 
             CollectionAssert.AreEqual(values, new [] {TestEnum.One, TestEnum.Two, TestEnum.Three});
         }

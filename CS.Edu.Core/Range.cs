@@ -82,8 +82,8 @@ namespace CS.Edu.Core
         {
             if (Intersects(other))
             {
-                T min = Operators.Max<T>(Min, other.Min);
-                T max = Operators.Min<T>(Max, other.Max);
+                T min = Operators.Max(Min, other.Min);
+                T max = Operators.Min(Max, other.Max);
                 return new Range<T>(min, max);
             }
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CS.Edu.Core.Comparers;
@@ -9,7 +8,7 @@ using DynamicData;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static partial class ObservableExt
+    public static partial class Observables
     {
         private readonly struct ProductChangeReasons
         {

@@ -404,7 +404,7 @@ namespace CS.Edu.Core.Extensions
 
         public static IEnumerable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
         {
-            return EnumerableEx.Generate(state, x => condition(x), iterate, Function.Identity<T>());
+            return EnumerableEx.Generate(state, x => condition(x), iterate, Functions.Identity<T>());
         }
 
         public static Optional<T> FirstOrOptional<T>(this IEnumerable<T> source, Func<T, bool> selector)

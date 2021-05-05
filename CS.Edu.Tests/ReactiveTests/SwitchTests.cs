@@ -13,7 +13,7 @@ namespace CS.Edu.Tests.ReactiveTests
     public class SwitchTests
     {
         [Test]
-        public void Test1()
+        public void SelectManyTest()
         {
             //SelectMany is just: source.Select(selector).Merge();
 
@@ -53,7 +53,7 @@ namespace CS.Edu.Tests.ReactiveTests
         }
 
         [Test]
-        public void Test2()
+        public void SwitchTest()
         {
             var scheduler = new TestScheduler();
             var one = scheduler.CreateHotObservable(ReactiveTest.OnNext(10, 0),
@@ -85,7 +85,7 @@ namespace CS.Edu.Tests.ReactiveTests
         }
 
         [Test]
-        public void Test3()
+        public void SwitchOnTest()
         {
             SourceList<int> one = new SourceList<int>();
             SourceList<int> other = new SourceList<int>();

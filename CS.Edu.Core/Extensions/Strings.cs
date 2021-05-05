@@ -2,7 +2,7 @@ using System.Linq;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static class StringExt
+    public static class Strings
     {
         public static bool IsNullOrEmpty(this string value)
         {

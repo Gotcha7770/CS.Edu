@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static class CollectionExt
+    public static class Collections
     {
         public static void Invalidate<TKey, TValue>(this IList<TValue> source,
                                                     IEnumerable<TValue> patch,

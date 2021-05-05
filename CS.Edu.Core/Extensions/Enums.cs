@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static class EnumExt
+    public static class Enums
     {
         public static IEnumerable<T> GetValues<T>() where T : Enum
         {

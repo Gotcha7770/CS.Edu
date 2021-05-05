@@ -78,8 +78,8 @@ namespace CS.Edu.Tests
             var comparer = Comparer<string>.Create(comparsion);
             string[] result = _input.Copy();
 
-            CollectionExt.PartialSort(result, Comparer<string>.Default, x => !x.IsNumber());
-            CollectionExt.PartialSort(result, comparer, x => x.IsNumber());
+            Collections.PartialSort(result, Comparer<string>.Default, x => !x.IsNumber());
+            Collections.PartialSort(result, comparer, x => x.IsNumber());
 
             Assert.AreEqual(_output, result);
         }

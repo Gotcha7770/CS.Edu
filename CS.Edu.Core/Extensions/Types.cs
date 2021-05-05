@@ -45,7 +45,7 @@ namespace CS.Edu.Core.Extensions
         }
     }
 
-    public static class TypeExt
+    public static class Types
     {
         public static readonly Type CLRRootType = typeof(object);
 

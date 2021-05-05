@@ -37,8 +37,8 @@ namespace CS.Edu.Tests
         [Test]
         public void TwoIdentityFunc_Equals()
         {
-            var func1 = Function.Identity<int>();
-            var func2 = Function.Identity<int>();
+            var func1 = Functions.Identity<int>();
+            var func2 = Functions.Identity<int>();
 
             Assert.AreEqual(func1, func2);
         }
