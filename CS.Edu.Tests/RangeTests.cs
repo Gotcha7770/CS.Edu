@@ -49,6 +49,42 @@ namespace CS.Edu.Tests
             return range.Contains(value);
         }
 
+        [TestCase(4, ExpectedResult = false)]
+        [TestCase(5, ExpectedResult = false)]
+        [TestCase(7, ExpectedResult = true)]
+        [TestCase(9, ExpectedResult = false)]
+        [TestCase(10, ExpectedResult = false)]
+        public bool ContainsValueExcludeBordersTests(int value)
+        {
+            var range = new Range<int>(5, 9);
+
+            return range.Contains(value, RangeParameters.None);
+        }
+
+        [TestCase(4, ExpectedResult = false)]
+        [TestCase(5, ExpectedResult = false)]
+        [TestCase(7, ExpectedResult = true)]
+        [TestCase(9, ExpectedResult = true)]
+        [TestCase(10, ExpectedResult = false)]
+        public bool ContainsValueExcludeMinTests(int value)
+        {
+            var range = new Range<int>(5, 9);
+
+            return range.Contains(value, RangeParameters.IncludeMaximum);
+        }
+
+        [TestCase(4, ExpectedResult = false)]
+        [TestCase(5, ExpectedResult = true)]
+        [TestCase(7, ExpectedResult = true)]
+        [TestCase(9, ExpectedResult = false)]
+        [TestCase(10, ExpectedResult = false)]
+        public bool ContainsValueExcludeMaxTests(int value)
+        {
+            var range = new Range<int>(5, 9);
+
+            return range.Contains(value, RangeParameters.IncludeMinimum);
+        }
+
         [TestCaseSource(typeof(ContainsTestsDataSource), nameof(ContainsTestsDataSource.TestCases))]
         public bool ContainsRangeTests(Range<int> one, Range<int> other)
         {

@@ -5,6 +5,15 @@ using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Core
 {
+    [Flags]
+    public enum RangeParameters
+    {
+        None,
+        IncludeMinimum = 1,
+        IncludeMaximum = 2,
+        IncludeBoth = IncludeMinimum | IncludeMaximum
+    }
+
     public readonly struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>, IEquatable<T>
     {
         public static Range<T> Default { get; } = new Range<T>();
@@ -60,16 +69,20 @@ namespace CS.Edu.Core
             return one.Subtract(other).Concat(other.Subtract(one));
         }
 
-        public bool Contains(T value)
+        public bool Contains(T value, RangeParameters parameters = RangeParameters.IncludeBoth)
         {
-            return Min.CompareTo(value) < 1
-                   && Max.CompareTo(value) > -1;
+            return (parameters.HasFlag(RangeParameters.IncludeMinimum)
+                ? Min.CompareTo(value) <= 0
+                : Min.CompareTo(value) < 0)
+                    && (parameters.HasFlag(RangeParameters.IncludeMaximum)
+                        ? value.CompareTo(Max) <= 0
+                        : value.CompareTo(Max) < 0);
         }
 
         public bool Contains(Range<T> other)
         {
-            return Min.CompareTo(other.Min) < 1
-                   && Max.CompareTo(other.Max) > -1;
+            return Min.CompareTo(other.Min) <= 0
+                   && other.Max.CompareTo(Max) <= 0;
         }
 
         public bool Intersects(Range<T> other)
