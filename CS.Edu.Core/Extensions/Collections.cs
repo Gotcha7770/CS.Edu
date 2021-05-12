@@ -88,13 +88,12 @@ namespace CS.Edu.Core.Extensions
 
         private static void Sort<T>(T[] input, IComparer<T> comparer, Predicate<T> predicate)
         {
-            int count = input.Length;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < input.Length; i++)
             {
                 if (!predicate(input[i]))
                     continue;
 
-                for (int j = i; j < count; j++)
+                for (int j = i; j < input.Length; j++)
                 {
                     if (!predicate(input[j]))
                         continue;

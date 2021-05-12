@@ -3,7 +3,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CS.Edu.Core.Extensions;
-using CS.Edu.Core.Extensions.ObservableExtensions;
 using CS.Edu.Tests.Utils;
 using DynamicData;
 using DynamicData.Tests;

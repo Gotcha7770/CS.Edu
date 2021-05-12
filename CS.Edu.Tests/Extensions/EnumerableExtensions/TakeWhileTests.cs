@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CS.Edu.Core;
-using CS.Edu.Core.Extensions.EnumerableExtensions;
+using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests.Extensions.EnumerableExtensions

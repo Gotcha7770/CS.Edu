@@ -16,13 +16,15 @@ namespace CS.Edu.Core.Extensions
         /// и в последующую подпоследовательность
         /// </summary>
         /// <example>
-        /// (x, y, z) => x < y ? y < z : y > z
+        /// <code>
+        /// (x, y, z) => x &lt; y ? y &lt; z : y &gt; z
+        /// </code>
         /// [1, 2, 3, 2, 1] -> [1, 2, 3], [3, 2, 1]
         /// </example>
         IncludeBorders = 0x1
     }
 
-    public static partial class EnumerableExt
+    public static partial class Enumerables
     {
         public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item)
         {

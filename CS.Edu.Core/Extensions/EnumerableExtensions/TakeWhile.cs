@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CS.Edu.Core.Extensions.EnumerableExtensions
+// ReSharper disable once CheckNamespace
+namespace CS.Edu.Core.Extensions
 {
-    public static partial class EnumerableExt
+    public static partial class Enumerables
     {
         public static IEnumerable<T> TakeWhile<T>(this IEnumerable<T> source, Relation<T> relation)
         {

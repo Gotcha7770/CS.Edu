@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CS.Edu.Core.Extensions
 {
@@ -8,6 +9,7 @@ namespace CS.Edu.Core.Extensions
 
         public static Action<T> Empty<T>() => EmptyAction<T>.Value;
 
+        [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
         private static class EmptyAction
         {
             internal static readonly Action Value = Empty;

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Core.Monads;
 
-namespace CS.Edu.Core.Extensions.EnumerableExtensions
+// ReSharper disable once CheckNamespace
+namespace CS.Edu.Core.Extensions
 {
-    public static partial class EnumerableExt
+    public static partial class Enumerables
     {
         public static Group<TKey, T> ToGroup<TKey, T>(this IGrouping<TKey, T> grouping)
         {

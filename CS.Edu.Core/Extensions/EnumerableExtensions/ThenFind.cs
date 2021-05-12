@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using CS.Edu.Core.Monads;
 using DynamicData.Kernel;
 
-namespace CS.Edu.Core.Extensions.EnumerableExtensions
+// ReSharper disable once CheckNamespace
+namespace CS.Edu.Core.Extensions
 {
-    public static partial class EnumerableExt
+    public static partial class Enumerables
     {
         public static FindResult<T> Find<T>(this IEnumerable<T> source, Predicate<T> predicate)
         {

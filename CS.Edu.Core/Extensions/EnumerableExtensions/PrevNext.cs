@@ -2,9 +2,10 @@
 using CS.Edu.Core.Iterators;
 using DynamicData.Kernel;
 
-namespace CS.Edu.Core.Extensions.EnumerableExtensions
+// ReSharper disable once CheckNamespace
+namespace CS.Edu.Core.Extensions
 {
-    public static partial class EnumerableExt
+    public static partial class Enumerables
     {
         public static IEnumerable<PrevNextValue<T>> ToPrevNextIterator<T>(this IEnumerable<T> source)
         {

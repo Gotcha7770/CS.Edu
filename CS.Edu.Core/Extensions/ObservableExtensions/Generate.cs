@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Reactive.Linq;
 
-namespace CS.Edu.Core.Extensions.ObservableExtensions
+// ReSharper disable once CheckNamespace
+namespace CS.Edu.Core.Extensions
 {
-    public static partial class ObservableExt
+    public static partial class Observables
     {
         public static IObservable<T> Generate<T>(T state, Func<T, T> iterate)
         {

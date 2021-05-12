@@ -2,9 +2,10 @@
 using System.Reactive.Linq;
 using DynamicData;
 
-namespace CS.Edu.Core.Extensions.ObservableExtensions
+// ReSharper disable once CheckNamespace
+namespace CS.Edu.Core.Extensions
 {
-    public static partial class ObservableExt
+    public static partial class Observables
     {
         public static IObservable<IChangeSet<T>> TakeInitial<T>(this IObservable<IChangeSet<T>> source)
         {
