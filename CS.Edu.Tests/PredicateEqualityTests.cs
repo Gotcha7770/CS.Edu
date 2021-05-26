@@ -74,8 +74,8 @@ namespace CS.Edu.Tests
         [Test]
         public void TwoOrRelations_Equals()
         {
-            var r1 = Realtions.Or();
-            var r2 = Realtions.Or();
+            var r1 = Relations.Or();
+            var r2 = Relations.Or();
 
             Assert.AreEqual(r1, r2);
         }

@@ -1,6 +1,6 @@
 ﻿namespace CS.Edu.Core.Extensions
 {
-    public static class Realtions
+    public static class Relations
     {
         public static Relation<bool> Or() => OrRelation.Value;
 
