@@ -5,7 +5,7 @@ using CS.Edu.Core.Extensions;
 namespace CS.Edu.Tests.Extensions
 {
     [TestFixture]
-    public class FuncExtTests
+    public class FunctionsTests
     {
         [Test]
         public void ApplyPartial()

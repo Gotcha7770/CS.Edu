@@ -1,4 +1,5 @@
 using System;
+using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
@@ -59,6 +60,24 @@ namespace CS.Edu.Tests
             var act2 = Actions.Empty<int>();
 
             Assert.AreEqual(act1, act2);
+        }
+
+        [Test]
+        public void TwoRelations_NotEquals()
+        {
+            var r1 = new Relation<bool>((x, y) => x || y);
+            var r2 = new Relation<bool>((x, y) => x || y);
+
+            Assert.AreNotEqual(r1, r2);
+        }
+
+        [Test]
+        public void TwoOrRelations_Equals()
+        {
+            var r1 = Realtions.Or();
+            var r2 = Realtions.Or();
+
+            Assert.AreEqual(r1, r2);
         }
     }
 }
