@@ -25,9 +25,9 @@ namespace CS.Edu.Tests.ReactiveTests
                 ReactiveTest.OnNext(90, 9),
                 ReactiveTest.OnCompleted<int>(100));
 
-            var res = scheduler.Start(() => source.Buffer(2), 0, 0, ReactiveTest.Disposed);
+            var result = scheduler.Start(() => source.Buffer(2), 0, 0, ReactiveTest.Disposed);
 
-            res.Messages.AssertEqual(
+            result.Messages.AssertEqual(
                 ReactiveTest.OnNext<IList<int>>(20, x => x.SequenceEqual(new []{1, 2})),
                 ReactiveTest.OnNext<IList<int>>(40, x => x.SequenceEqual(new []{3, 4})),
                 ReactiveTest.OnNext<IList<int>>(60, x => x.SequenceEqual(new []{5, 6})),
@@ -51,9 +51,9 @@ namespace CS.Edu.Tests.ReactiveTests
                 ReactiveTest.OnNext(90, 9),
                 ReactiveTest.OnCompleted<int>(100));
 
-            var res = scheduler.Start(() => source.Buffer(TimeSpan.FromTicks(20), scheduler), 0, 0, ReactiveTest.Disposed);
+            var result = scheduler.Start(() => source.Buffer(TimeSpan.FromTicks(20), scheduler), 0, 0, ReactiveTest.Disposed);
 
-            res.Messages.AssertEqual(
+            result.Messages.AssertEqual(
                 ReactiveTest.OnNext<IList<int>>(21, x => x.SequenceEqual(new []{1, 2})),
                 ReactiveTest.OnNext<IList<int>>(41, x => x.SequenceEqual(new []{3, 4})),
                 ReactiveTest.OnNext<IList<int>>(61, x => x.SequenceEqual(new []{5, 6})),
