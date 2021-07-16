@@ -94,7 +94,7 @@ namespace CS.Edu.Tests.ReactiveTests
             other.AddRange(new[] {2, 4});
 
             using (var switcher = new BehaviorSubject<Unit>(Unit.Default))
-            using(var aggregate = switcher.Scan(other, (agg, cur) => agg == one ? other : one).Switch().AsAggregator())
+            using(var aggregate = switcher.Scan(other, (agg, _) => agg == one ? other : one).Switch().AsAggregator())
             {
                 CollectionAssert.AreEqual(new [] {1, 3}, aggregate.Data.Items);
 
