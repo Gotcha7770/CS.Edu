@@ -51,8 +51,6 @@ namespace CS.Edu.Tests.Extensions
             CollectionAssert.AreEqual(result, new[] {0, 1, 2, 3, 4});
         }
 
-
-
         [Test]
         public void SkipWhile_PrevLessThenNext_SkipFirst2Elements()
         {
