@@ -1,54 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CS.Edu.Core.Extensions;
+using CS.Edu.Tests.Utils;
+using DynamicData.Kernel;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests.TaskTests
 {
     public class ContinueWidth
     {
-        private readonly IObservable<long> _observable = Observable.Interval(TimeSpan.FromSeconds(0.5))
-            .Take(100);
-
         [Test]
-        public void ContinueWidthTest()
+        public void ContinueWidth_CanceledTask()
         {
-            Task<(long, bool)> current = Task.FromResult((0L, false));
-            ManualResetEvent mre = new ManualResetEvent(false);
-            List<long> output = new List<long>();
-
-            _observable.Subscribe(
-                x => current = current.ContinueWith(t => { output.Add(x); return (x, x.IsEven()); }),
-                x => {},
-                () => mre.Set());
-
-            mre.WaitOne();
-
-            Assert.That(output, Is.EqualTo(Enumerable.Range(0, 100)));
-        }
-
-        [Test]
-        public void ContinueWidthTest_CanceledTask()
-        {
-            int result = 0;
-            Task<int> current = Task.FromCanceled<int>(new CancellationToken(true));
+            Optional<int> result = default;
+            Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
 
             Assert.DoesNotThrowAsync(async () =>
             {
-                var continuation = current.ContinueWith(t =>
-                {
-                    if (!t.IsCanceled)
-                        result = 42;
-                });
-
-                await continuation;
+                result = await current.ContinueWith(t => !t.IsCanceled ? 42 : Optional<int>.None);
             });
 
-            Assert.AreEqual(0, result);
+            OptionalAssert.None(result);
+        }
+
+        [Test]
+        public async Task Await_CanceledTask()
+        {
+            //Prefer await over continuation???
+
+            Optional<int> result = default;
+            Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
+
+            Assert.ThrowsAsync<TaskCanceledException>(async () => result = await current);
+
+            OptionalAssert.None(result);
         }
     }
 }

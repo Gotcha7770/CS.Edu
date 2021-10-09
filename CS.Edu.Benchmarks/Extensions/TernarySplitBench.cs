@@ -18,14 +18,14 @@ namespace CS.Edu.Benchmarks.Extensions
     public class TernarySplitBench
     {
         //Задача разделить последовательность чисел на подпоследовательности,
-        //в которых числа частично упорядочены, 
+        //в которых числа частично упорядочены,
         //вернуть интервал - первый и последний индекс каждой последовательности
         //границы интервалов включены -> [0;5] [10;5] и т. д.
 
         public IEnumerable<int> items = Enumerable.Range(0, 1000)
-            .Paginate(50)
+            .Buffer(50)
             .Select((x, i) => i.IsEven() ? x : x.Reverse())
-            .SelectMany(x => x);            
+            .SelectMany(x => x);
 
         Relation<int, int, int> isMonotone = (x, y, z) => x <= y ? y <= z : y > z;
 

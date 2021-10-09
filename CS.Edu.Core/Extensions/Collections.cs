@@ -49,60 +49,10 @@ namespace CS.Edu.Core.Extensions
                                                               Merge<TValue> mergeFunc,
                                                               Func<TValue, TKey> keySelector)
         {
-            foreach (TValue p in patch)
-            {
-                yield return source.TryGetValue(keySelector(p), out TValue value)
-                    ? mergeFunc(value, p)
-                    : p;
-            }
+            return patch.Select(x => source.TryGetValue(keySelector(x), out TValue value) ? mergeFunc(value, x) : x);
         }
 
-        public static void Swap<T>(ref T first, ref T second)
-        {
-            T tmp = first;
-            first = second;
-            second = tmp;
-        }
-
-        public static void Swap<T>(this IList<T> list, int first, int second)
-        {
-            T tmp = list[first];
-            list[first] = list[second];
-            list[second] = tmp;
-        }
-
-        public static void PartialSort<T>(T[] input, IComparer<T> comparer, Predicate<T> predicate)
-        {
-            int count = input.Length;
-
-            switch (count)
-            {
-                case 0:
-                case 1:
-                    break;
-                default:
-                    Sort(input, comparer, predicate);
-                    break;
-            }
-        }
-
-        private static void Sort<T>(T[] input, IComparer<T> comparer, Predicate<T> predicate)
-        {
-            for (int i = 0; i < input.Length; i++)
-            {
-                if (!predicate(input[i]))
-                    continue;
-
-                for (int j = i; j < input.Length; j++)
-                {
-                    if (!predicate(input[j]))
-                        continue;
-
-                    if (comparer.Compare(input[i], input[j]) > 0)
-                        Swap(ref input[i], ref input[j]);
-                }
-            }
-        }
+        public static void Swap<T>(ref T first, ref T second) => (first, second) = (second, first);
 
         public static T[] Copy<T>(this T[] source)
         {

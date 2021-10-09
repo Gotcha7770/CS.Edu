@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks.Extensions
 {
@@ -13,32 +12,6 @@ namespace CS.Edu.Benchmarks.Extensions
         public IEnumerable<int> items = Enumerable.Range(0, 1000000);
 
         private readonly Consumer _consumer = new Consumer();
-
-        [Benchmark]
-        public IEnumerable<int>[] Paginate()
-        {
-            return items.Paginate(25).ToArray();
-        }
-
-        [Benchmark]
-        public int[][] PaginateToArray()
-        {
-            return items.Paginate(25).Select(x => x.ToArray()).ToArray();
-        }
-
-        [Benchmark]
-        public int[][] LastPage()
-        {
-            return Enumerable.Repeat(items.Paginate(25).Last(), 25)
-                .Select(x => x.ToArray())
-                .ToArray();
-        }
-
-        [Benchmark]
-        public void PaginateConsume()
-        {
-            items.Paginate(25).Consume(_consumer);
-        }
 
         [Benchmark]
         public IEnumerable<int>[] Buffer()
@@ -58,7 +31,7 @@ namespace CS.Edu.Benchmarks.Extensions
             return Enumerable.Repeat(items.Buffer(25).Last(), 25)
                 .Select(x => x.ToArray())
                 .ToArray();
-        }        
+        }
 
         [Benchmark]
         public void BufferConsume()

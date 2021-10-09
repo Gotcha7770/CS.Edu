@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace CS.Edu.Core.Extensions
 {
-    public static class IntExt
+    public static class Numbers
     {
         public static long Power(this int x, int y)
         {
             return (long)Math.Pow(x, y);
-        }        
+        }
 
         public static bool IsEven(this int number)
         {
@@ -58,7 +58,7 @@ namespace CS.Edu.Core.Extensions
 
             return number switch
             {
-                0 | 1 => false,
+                0 or 1 => false,
                 2 => true,
                 _ => !(number.IsEven() || number.Factorize().Skip(2).Any())
             };

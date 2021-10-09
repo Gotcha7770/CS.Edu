@@ -85,59 +85,6 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void Paginate_Enumerable_ReturnsEnumerableOfEnumerable()
-        {
-            int pageSize = 20;
-            var items = Enumerable.Range(0, 85);
-
-            var paginated = items.Paginate(pageSize).ToArray();
-
-            CollectionAssert.IsNotEmpty(paginated);
-            Assert.AreEqual(paginated.Length, 5);
-            Assert.AreEqual(paginated.First().Count(), pageSize);
-        }
-
-        [Test]
-        public void Paginate_EmptyEnumerable_ReturnsEmptyEnumerable()
-        {
-            var items = Enumerable.Empty<int>();
-
-            var paginated = items.Paginate(5);
-
-            Assert.IsNotNull(paginated);
-            CollectionAssert.IsEmpty(paginated);
-        }
-
-        [Test]
-        public void Paginate_Null_ThrowsArgumentNullException()
-        {
-            IEnumerable<int> empty = null;
-            Assert.Throws<ArgumentNullException>(() => empty.Paginate(2));
-        }
-
-        [Test]
-        public void Paginate_PageSizeIs0_ThrowsArgumentOutOfRangeException()
-        {
-            var items = Enumerable.Range(0, 10);
-            Assert.Throws<ArgumentOutOfRangeException>(() => items.Paginate(0));
-        }
-
-        [Test]
-        public void Paginate_MaterializePartsOfEnumeration_ReturnsCorrectValues()
-        {
-            var items = Enumerable.Range(0, 1000);
-
-            var paginated = items.Paginate(25);
-            var first = paginated.Skip(5).First().ToArray();
-            var second = paginated.Skip(10).First().ToArray();
-            var third = paginated.Skip(1).First().First();
-
-            CollectionAssert.AreEqual(first, Enumerable.Range(125, 25));
-            CollectionAssert.AreEqual(second, Enumerable.Range(250, 25));
-            Assert.AreEqual(third, 25);
-        }
-
-        [Test]
         public void ShrinkDuplicatesTest()
         {
             var points = new[] {0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0};

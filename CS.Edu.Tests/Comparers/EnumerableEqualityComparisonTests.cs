@@ -12,7 +12,7 @@ namespace CS.Edu.Tests.Comparers
         public void BothEnumerableAreNull()
         {
             CollectionAssert.AreEqual(null, null);
-            //Assert.IsTrue(one.SequenceEqual(other));
+            //Assert.IsTrue(one.SequenceEqual(other)); //throws exception if one is null
             Assert.IsTrue(EnumerableEqualityComparer<int>.Instance.Equals(null, null));
             Assert.IsTrue(StructuralComparisons.StructuralEqualityComparer.Equals(null, null));
         }
@@ -20,10 +20,10 @@ namespace CS.Edu.Tests.Comparers
         [Test]
         public void OneOfEnumerableIsNull()
         {
-            var one = new[] { 0, 1, 2 };
+            var one = Enumerable.Range(0, 3);
 
             CollectionAssert.AreNotEqual(one, null);
-            //Assert.IsFalse(one.SequenceEqual(null));
+            //Assert.IsFalse(one.SequenceEqual(null)); //throws exception if other is null
             Assert.IsFalse(EnumerableEqualityComparer<int>.Instance.Equals(one, null));
             Assert.IsFalse(StructuralComparisons.StructuralEqualityComparer.Equals(one, null));
         }
@@ -31,20 +31,20 @@ namespace CS.Edu.Tests.Comparers
         [Test]
         public void TwoEqualEnumerables_ReturnsTrue()
         {
-            var one = new[] { 0, 1, 2 };
-            var other = new[] { 0, 1, 2 };
+            var one = Enumerable.Range(0, 3);
+            var other = Enumerable.Range(0, 3);
 
             CollectionAssert.AreEqual(one, other);
             Assert.IsTrue(one.SequenceEqual(other));
             Assert.IsTrue(EnumerableEqualityComparer<int>.Instance.Equals(one, other));
-            Assert.IsTrue(StructuralComparisons.StructuralEqualityComparer.Equals(one, other));
+            //Assert.IsTrue(StructuralComparisons.StructuralEqualityComparer.Equals(one, other)); //doesn't handle IEnumerable<T>
         }
 
         [Test]
         public void TwoNotEqualEnumerables_ReturnsFalse()
         {
-            var one = new[] { 0, 1, 2 };
-            var other = new[] { 0, 1 };
+            var one = Enumerable.Range(0, 3);
+            var other = Enumerable.Range(0, 2);
 
             CollectionAssert.AreNotEqual(one, other);
             Assert.IsFalse(one.SequenceEqual(other));

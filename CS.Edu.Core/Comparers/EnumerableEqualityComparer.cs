@@ -9,7 +9,7 @@ namespace CS.Edu.Core.Comparers
         private static readonly Lazy<EnumerableEqualityComparer<T>> Lazy = new Lazy<EnumerableEqualityComparer<T>>();
 
         public static EnumerableEqualityComparer<T> Instance => Lazy.Value;
-        
+
         public bool Equals(IEnumerable<T> one, IEnumerable<T> other)
         {
             return ReferenceEquals(one, other) || (one != null && other != null && one.SequenceEqual(other));

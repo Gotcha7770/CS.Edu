@@ -26,7 +26,7 @@ namespace CS.Edu.Core.Extensions
             return TakeWhileIterator(source, relation);
         }
 
-        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, Relation<T> relation)
+        private static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, Relation<T> relation)
         {
             using (var enumerator = source.GetEnumerator())
             {
@@ -49,7 +49,7 @@ namespace CS.Edu.Core.Extensions
             }
         }
 
-        static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, Relation<T, T, T> relation)
+        private static IEnumerable<T> TakeWhileIterator<T>(IEnumerable<T> source, Relation<T, T, T> relation)
         {
             using (var enumerator = source.GetEnumerator())
             {

@@ -20,8 +20,8 @@ namespace CS.Edu.Tests
         [Test]
         public void TwoPredicatesWithMethods_Equals()
         {
-            var predicate1 = new Predicate<long>(IntExt.IsPrime);
-            var predicate2 = new Predicate<long>(IntExt.IsPrime);
+            var predicate1 = new Predicate<long>(Numbers.IsPrime);
+            var predicate2 = new Predicate<long>(Numbers.IsPrime);
 
             Assert.AreEqual(predicate1, predicate2);
         }
