@@ -11,7 +11,7 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void LongRange_Empty()
         {
-            IEnumerable<long> items = LongExt.Range(0, 0);
+            IEnumerable<long> items = Numbers.Range(0, 0);
 
             CollectionAssert.IsEmpty(items);
         }
@@ -19,7 +19,7 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void LongRange_Single()
         {
-            IEnumerable<long> items = LongExt.Range(0, 1);
+            IEnumerable<long> items = Numbers.Range(0, 1);
 
             Assert.AreEqual(items.Single(), 0);
         }
@@ -27,7 +27,7 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void LongRange_Several()
         {
-            IEnumerable<long> items = LongExt.Range(0, 10);
+            IEnumerable<long> items = Numbers.Range(0, 10);
 
             CollectionAssert.AreEqual(items, new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         }
@@ -35,7 +35,7 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void LongRange_SeveralWithStep()
         {
-            IEnumerable<long> items = LongExt.Range(0, 10, 10);
+            IEnumerable<long> items = Numbers.Range(0, 10, 10);
 
             CollectionAssert.AreEqual(items, new[] { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90 });
         }
@@ -43,7 +43,7 @@ namespace CS.Edu.Tests.Extensions
         [Test]
         public void LongRange_OutOfRange()
         {
-            IEnumerable<long> items = LongExt.Range(long.MaxValue - 1, 1);
+            IEnumerable<long> items = Numbers.Range(long.MaxValue - 1, 1);
 
             Assert.AreEqual(items.Last(), long.MaxValue - 1);
         }

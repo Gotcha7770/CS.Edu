@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DynamicData.Kernel;
 using EnumerableEx = System.Linq.EnumerableEx;
 
 namespace CS.Edu.Core.Extensions
@@ -341,20 +340,6 @@ namespace CS.Edu.Core.Extensions
         public static IEnumerable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
         {
             return EnumerableEx.Generate(state, x => condition(x), iterate, Functions.Identity<T>());
-        }
-
-        public static Optional<T> FirstOrOptional<T>(this IEnumerable<T> source, Func<T, bool> selector)
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-
-            foreach (T item in source)
-            {
-                if(selector(item))
-                    return Optional<T>.Create(item);
-            }
-
-            return Optional.None<T>();
         }
     }
 }

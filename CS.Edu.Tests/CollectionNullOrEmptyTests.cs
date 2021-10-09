@@ -15,6 +15,7 @@ namespace CS.Edu.Tests
             return enumerable is null || enumerable.IsEmpty();
 
             //return enumerable is null or [];
+            //return enumerable is null or empty;
         }
 
         [TestCase(null, ExpectedResult = false)]

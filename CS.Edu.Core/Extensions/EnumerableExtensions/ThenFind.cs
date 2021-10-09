@@ -8,20 +8,20 @@ namespace CS.Edu.Core.Extensions
 {
     public static partial class Enumerables
     {
-        public static FindResult<T> Find<T>(this IEnumerable<T> source, Predicate<T> predicate)
+        public static OneFrom<T> Find<T>(this IEnumerable<T> source, Predicate<T> predicate)
         {
             var lookup = source.FirstOrOptional(x => predicate(x));
-            return lookup.HasValue ? new FindResult<T>(lookup.Value) : new FindResult<T>(source);
+            return lookup.HasValue ? new OneFrom<T>(lookup.Value) : new OneFrom<T>(source);
         }
 
-        public static FindResult<T> ThenFind<T>(this FindResult<T> result, Predicate<T> predicate)
+        public static OneFrom<T> ThenFind<T>(this OneFrom<T> result, Predicate<T> predicate)
         {
             return result.Match(l => l.Find(predicate), r => result);
         }
 
-        public static Optional<T> Result<T>(this FindResult<T> result)
+        public static Optional<T> Result<T>(this OneFrom<T> result)
         {
-            return result.Match(l => Optional<T>.None, r => Optional<T>.Create(r));
+            return result.Match(l => Optional<T>.None, Optional<T>.Create);
         }
     }
 }
