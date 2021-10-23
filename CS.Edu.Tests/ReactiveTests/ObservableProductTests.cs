@@ -59,8 +59,8 @@ namespace CS.Edu.Tests.ReactiveTests
         [Test]
         public void ObservableCartesianHot()
         {
-            Subject<int> left = new Subject<int>(); //IObservable<int>
-            Subject<int> right = new Subject<int>();
+            ISubject<int> left = new Subject<int>();
+            ISubject<int> right = new Subject<int>();
 
             var cartesian = new List<(int, int)>();
 
@@ -68,23 +68,24 @@ namespace CS.Edu.Tests.ReactiveTests
                           from y in right
                           select (x, y);
 
-            var subscription = product
-                .Subscribe(x => cartesian.Add(x));
+            using (var subscription = product.Subscribe(x => cartesian.Add(x)))
+            {
 
-            CollectionAssert.IsEmpty(cartesian);
+                CollectionAssert.IsEmpty(cartesian);
 
-            left.OnNext(0);
-            left.OnNext(1);
+                left.OnNext(0);
+                left.OnNext(1);
 
-            CollectionAssert.IsEmpty(cartesian);
+                CollectionAssert.IsEmpty(cartesian);
 
-            right.OnNext(0);
+                right.OnNext(0);
 
-            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
+                CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
 
-            right.OnNext(1);
+                right.OnNext(1);
 
-            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+                CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+            }
         }
 
         [Test]
@@ -113,8 +114,8 @@ namespace CS.Edu.Tests.ReactiveTests
         [Test]
         public void ObservableChangeSetCartesianHot()
         {
-            SourceList<int> left = new SourceList<int>();
-            SourceList<int> right = new SourceList<int>();
+            ISourceList<int> left = new SourceList<int>();
+            ISourceList<int> right = new SourceList<int>();
 
             var subscription = left.Connect()
                 .Product(right.Connect(), (l, r) => (l, r))
