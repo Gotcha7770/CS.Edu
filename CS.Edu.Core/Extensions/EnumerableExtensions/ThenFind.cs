@@ -10,13 +10,13 @@ namespace CS.Edu.Core.Extensions
     {
         public static OneFrom<T> Find<T>(this IEnumerable<T> source, Predicate<T> predicate)
         {
-            var lookup = source.FirstOrOptional(x => predicate(x));
-            return lookup.HasValue ? new OneFrom<T>(lookup.Value) : new OneFrom<T>(source);
+            return source.FirstOrOptional(x => predicate(x))
+                .ConvertOr(x => new OneFrom<T>(x), () => new OneFrom<T>(source));
         }
 
         public static OneFrom<T> ThenFind<T>(this OneFrom<T> result, Predicate<T> predicate)
         {
-            return result.Match(l => l.Find(predicate), r => result);
+            return result.Match(l => l.Find(predicate), _ => result);
         }
 
         public static Optional<T> Result<T>(this OneFrom<T> result)
