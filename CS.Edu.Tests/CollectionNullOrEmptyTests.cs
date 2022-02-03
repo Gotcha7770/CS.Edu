@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -16,6 +17,7 @@ namespace CS.Edu.Tests
 
             //return enumerable is null or [];
             //return enumerable is null or empty;
+            //return enumerable is not (null or empty);
         }
 
         [TestCase(null, ExpectedResult = false)]

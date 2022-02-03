@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using CS.Edu.Tests.Utils;
-using DynamicData;
 using NUnit.Framework;
 
 namespace CS.Edu.Tests.ReactiveTests
@@ -27,23 +23,24 @@ namespace CS.Edu.Tests.ReactiveTests
         [Test]
         public void OneToMany()
         {
-            ISubject<int> source = new BehaviorSubject<int>(0);
+            IObservable<string> result = null;
+            IObservable<int> source = Observable.Return(1);
+            IObservable<IObservable<string>> selector = source.Select(x => Observable.Return(x.ToString()));
 
-            // using (_ = source.Merge().Subscribe(x => result = x))
-            // {
-            //     Assert.AreEqual("1", result);
-            // }
+            using (_ = selector.Subscribe(x => result = x))
+            {
+                Assert.AreEqual("1", result.First());
+            }
         }
 
         [Test]
         public void ManyToOne()
         {
-            var result = new List<int>();
-            ISubject<IObservable<int>> source = new Subject<IObservable<int>>();
-            ISubject<int> even = new BehaviorSubject<int>(0);
-            ISubject<int> odd = new BehaviorSubject<int>(1);
+            string result = null;
+            IObservable<IObservable<string>> source = Observable.Return(1).Select(x => Observable.Return(x.ToString()));
+            IObservable<string> selector = source.Merge(); //SelectMany, Switch
 
-            using (_ = source.Merge().Subscribe(result.Add))
+            using (_ = selector.Subscribe(x => result = x))
             {
                 Assert.AreEqual("1", result);
             }

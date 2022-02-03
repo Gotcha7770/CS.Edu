@@ -15,6 +15,11 @@ namespace CS.Edu.Tests.Utils
         }
     }
 
+    static class Valuable
+    {
+        public static Valuable<T> From<T>(T value) => new Valuable<T>(value);
+    }
+
     class Valuable<T> : Valuable<T, Guid>
     {
         public Valuable(T value) : base(Guid.NewGuid(), value) { }
