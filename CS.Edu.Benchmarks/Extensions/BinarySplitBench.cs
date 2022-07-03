@@ -17,18 +17,17 @@ namespace CS.Edu.Benchmarks.Extensions
         // то есть редуцировать все группы нулей до одного
 
         private readonly Random _random = new Random((int)DateTime.Now.Ticks);
-
         private readonly Consumer _consumer = new Consumer();
+        private readonly Relation<int> _bothAreZeroOrNot = (x, y) => x == 0 ? y == 0 : y != 0;
 
         public IEnumerable<int> Items;
 
-        Relation<int> bothAreZeroOrNot = new Relation<int>((x, y) => x == 0 ? y == 0 : y != 0);
 
         [GlobalSetup]
         public void GlobalSetup()
         {
             Items = Enumerable.Range(0, 10000)
-                .Select(x => _random.Next(0, 2) == 0 ? _random.Next(1, 10) : 0)
+                .Select(_ => _random.Next(0, 2) == 0 ? _random.Next(1, 10) : 0)
                 .ToArray();
         }
 
@@ -59,14 +58,14 @@ namespace CS.Edu.Benchmarks.Extensions
         public void SplitWithShrinkDuplicates()
         {
             var result = Items.ShrinkDuplicates(0);
-            
+
             result.Consume(_consumer);
         }
 
         [Benchmark]
         public void Split()
         {
-            var result = Items.Split(bothAreZeroOrNot)
+            var result = Items.Split(_bothAreZeroOrNot)
                 .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
 
             result.Consume(_consumer);
@@ -80,7 +79,7 @@ namespace CS.Edu.Benchmarks.Extensions
         //[Benchmark]
         public void IxSplit()
         {
-            var result = IxSplitIterator(Items, bothAreZeroOrNot)
+            var result = IxSplitIterator(Items, _bothAreZeroOrNot)
                 .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
 
             result.Consume(_consumer);
@@ -94,7 +93,7 @@ namespace CS.Edu.Benchmarks.Extensions
         //[Benchmark]
         public void RxSplit()
         {
-            var result = RxSplitIterator(Items, bothAreZeroOrNot)
+            var result = RxSplitIterator(Items, _bothAreZeroOrNot)
                 .SelectMany(x => x.First() == 0 ? EnumerableEx.Return(0) : x);
 
             result.Consume(_consumer);

@@ -1,71 +1,64 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.LINQTests
+namespace CS.Edu.Tests.LINQTests;
+
+public class AggregateBoolTest
 {
-    [TestFixture]
-    public class AggregateBoolTest
+    [Fact]
+    public void EnumerableOfBooleansTest()
     {
-        [Test]
-        public void EnumerableOfBoolsTest()
+        var func = new Func<IEnumerable<bool>, bool?>(source =>
         {
-            var func = new Func<IEnumerable<bool>, bool?>((source) =>
-            {
-                return source.Aggregate<bool, bool?>(source.First(), (acc, cur) =>
-                {
-                    if (acc.HasValue && acc.Value == cur)
-                        return cur;
+            return source.Skip(1).Aggregate<bool, bool?>(source.First(), (acc, cur) => acc == cur ? cur : null);
+        });
 
-                    return null;
-                });
-            });
+        var items = new [] { true };
+        func(items).Should().BeTrue();
 
-            var items = new bool[] { true };
-            Assert.That(func(items), Is.True);
+        items = new [] { false };
+        func(items).Should().BeFalse();
 
-            items = new bool[] { false };
-            Assert.That(func(items), Is.False);
+        items = new [] { true, false, true };
+        func(items).Should().BeNull();
 
-            items = new bool[] { true, false, true };
-            Assert.That(func(items), Is.Null);
+        items = new [] { false, true, false };
+        func(items).Should().BeNull();
 
-            items = new bool[] { false, false, false };
-            Assert.That(func(items), Is.False);
+        items = new [] { false, false, false };
+        func(items).Should().BeFalse();
 
-            items = new bool[] { true, true, true };
-            Assert.That(func(items), Is.True);
-        }
+        items = new [] { true, true, true };
+        func(items).Should().BeTrue();
+    }
 
-        [Test]
-        public void EnumerableOfNullableBoolsTest()
+    [Fact]
+    public void EnumerableOfNullableBooleansTest()
+    {
+        var func = new Func<IEnumerable<bool?>, bool?>(source =>
         {
-            var func = new Func<IEnumerable<bool?>, bool?>((source) =>
-            {
-                return source.Aggregate((acc, cur) =>
-                {
-                    return acc.HasValue && acc.Value == cur ? cur : null;
-                });
-            });
+            return source.Aggregate((acc, cur) => acc.HasValue && acc.Value == cur ? cur : null);
+        });
 
-            var items = new bool?[] { true };
-            Assert.That(func(items), Is.True);
+        var items = new bool?[] { true };
+        func(items).Should().BeTrue();
 
-            items = new bool?[] { false };
-            Assert.That(func(items), Is.False);
+        items = new bool?[] { false };
+        func(items).Should().BeFalse();
 
-            items = new bool?[] { true, false, true };
-            Assert.That(func(items), Is.Null);
+        items = new bool?[] { true, false, true };
+        func(items).Should().BeNull();
 
-            items = new bool?[] { false, false, false };
-            Assert.That(func(items), Is.False);
+        items = new bool?[] { false, false, false };
+        func(items).Should().BeFalse();
 
-            items = new bool?[] { true, true, true };
-            Assert.That(func(items), Is.True);
+        items = new bool?[] { true, true, true };
+        func(items).Should().BeTrue();
 
-            items = new bool?[] { true, true, null };
-            Assert.That(func(items), Is.Null);
-        }
+        items = new bool?[] { true, true, null };
+        func(items).Should().BeNull();
     }
 }

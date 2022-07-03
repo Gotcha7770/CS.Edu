@@ -1,90 +1,52 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using CS.Edu.Core;
+using CS.Edu.Core.Extensions;
 
-namespace CS.Edu.Benchmarks.Extensions
+namespace CS.Edu.Benchmarks.Extensions;
+
+[MemoryDiagnoser]
+[Config(typeof(DefaultConfig))]
+public class AggregateManyBench
 {
-    [MemoryDiagnoser]
-    [Config(typeof(DefaultConfig))]
-    public class AggregateManyBench
-    {        
-        private readonly Random _random = new Random((int)DateTime.Now.Ticks);
-        private IEnumerable<int> _items;
+    private IEnumerable<int> _items;
 
-        static (int min, int max) GetMinMax1(IEnumerable<int> source)
+    static (int min, int max) Interactive(IEnumerable<int> source)
+    {
+        if (source == null)
+            throw new ArgumentNullException(nameof(source));
+
+        using (var enumerator = source.GetEnumerator())
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            if (!enumerator.MoveNext())
+                throw new InvalidOperationException("Source is empty");
 
-            int min = 0, max = 0;
-            bool flag = false;
-            foreach (int d in source)
+            int min = int.MaxValue, max = int.MinValue;
+
+            do
             {
-                if (flag)
-                {
-                    if (d < min)
-                        min = d;
-                    if (d > max)
-                        max = d;
-                }
-                else
-                {
-                    min = d;
-                    max = d;
-                    flag = true;
-                }
-            }
-            if (flag)
-                return (min, max);
+                min = Math.Min(enumerator.Current, min);
+                max = Math.Max(enumerator.Current, max);
 
-            throw new InvalidOperationException("Source is empty");
-        }
-
-        static (int min, int max) GetMinMax2(IEnumerable<int> source)
-        {
-            int min = int.MaxValue;
-
-            int max = source.Do((x) => min = Math.Min(x, min))
-                .Aggregate((acc, curr) => acc = Math.Max(curr, acc));
+            } while (enumerator.MoveNext());
 
             return (min, max);
         }
-
-        static (int min, int max) GetMinMax3(IEnumerable<int> source)
-        {
-            return source.Aggregate((min: int.MaxValue, max: int.MinValue), (acc, curr) => (Math.Min(curr, acc.min), Math.Max(curr, acc.max)));
-        }
-
-        [GlobalSetup]
-        public void GlobalSetup()
-        {
-            var array = new int[1000];
-            for (int i = 0; i < 1000; i++)
-            {
-                array[i] = _random.Next(0, 5000);
-            }
-
-            _items = array;
-        }
-
-        [Benchmark]
-        public (int min, int max) GetMinMaxBench()
-        {
-            return GetMinMax1(_items);
-        }
-
-        [Benchmark]
-        public (int min, int max) DoBench()
-        {
-            return GetMinMax2(_items);
-        }
-
-        [Benchmark]
-        public (int min, int max) AggregateBench()
-        {
-            return GetMinMax3(_items);
-        }
     }
+
+    static (int min, int max) Linq_Aggregate(IEnumerable<int> source)
+    {
+        return source.Aggregate((min: int.MaxValue, max: int.MinValue), (acc, curr) => (Math.Min(curr, acc.min), Math.Max(curr, acc.max)));
+    }
+
+    [GlobalSetup]
+    public void GlobalSetup() => _items = Enumerables.Random(new Range<int>(0, 5000), 10000);
+
+    [Benchmark]
+    public (int min, int max) GetMinMaxBench() => Interactive(_items);
+
+    [Benchmark]
+    public (int min, int max) AggregateBench() => Linq_Aggregate(_items);
 }

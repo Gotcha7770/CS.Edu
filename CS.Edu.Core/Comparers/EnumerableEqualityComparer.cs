@@ -2,29 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CS.Edu.Core.Comparers
+namespace CS.Edu.Core.Comparers;
+
+public class EnumerableEqualityComparer<T> : IEqualityComparer<IEnumerable<T>>
 {
-    public class EnumerableEqualityComparer<T> : IEqualityComparer<IEnumerable<T>>
+    public static EnumerableEqualityComparer<T> Instance => new EnumerableEqualityComparer<T>();
+
+    public bool Equals(IEnumerable<T> one, IEnumerable<T> other)
     {
-        private static readonly Lazy<EnumerableEqualityComparer<T>> Lazy = new Lazy<EnumerableEqualityComparer<T>>();
+        return ReferenceEquals(one, other) || (one != null && other != null && one.SequenceEqual(other));
+    }
 
-        public static EnumerableEqualityComparer<T> Instance => Lazy.Value;
+    public int GetHashCode(IEnumerable<T> enumerable)
+    {
+        var result = new HashCode();
 
-        public bool Equals(IEnumerable<T> one, IEnumerable<T> other)
+        foreach (var item in enumerable)
         {
-            return ReferenceEquals(one, other) || (one != null && other != null && one.SequenceEqual(other));
+            result.Add(item);
         }
 
-        public int GetHashCode(IEnumerable<T> enumerable)
-        {
-            var result = new HashCode();
-
-            foreach (var item in enumerable)
-            {
-                result.Add(item);
-            }
-
-            return result.ToHashCode();
-        }
+        return result.ToHashCode();
     }
 }

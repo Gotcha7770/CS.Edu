@@ -39,7 +39,7 @@ public class AsyncEnumerable
     [Test]
     public void ExampleWithTask()
     {
-        var query = _customers.Select(x => GetOrdersTask(x.Id));
+        IEnumerable<Task<Order[]>> query = _customers.Select(x => GetOrdersTask(x.Id));
     }
 
     [Test]
