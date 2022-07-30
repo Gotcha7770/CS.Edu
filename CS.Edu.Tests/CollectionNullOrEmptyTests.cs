@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -12,8 +11,7 @@ namespace CS.Edu.Tests
         [TestCase(new[] { 1 }, ExpectedResult = false)]
         public bool EnumerableIsNullOrEmpty(int[] input)
         {
-            var enumerable = input?.OfType<int>();
-            return enumerable is null || enumerable.IsEmpty();
+            return input is null || input.IsEmpty();
 
             //return enumerable is null or [];
             //return enumerable is null or empty;
@@ -25,8 +23,7 @@ namespace CS.Edu.Tests
         [TestCase(new[] { 1 }, ExpectedResult = true)]
         public bool EnumerableIsNotNullOrEmpty(int[] input)
         {
-            var enumerable = input?.OfType<int>();
-            return enumerable is not null && enumerable.Any();
+            return input is not null && input.Any();
         }
 
         [TestCase(null, ExpectedResult = true)]

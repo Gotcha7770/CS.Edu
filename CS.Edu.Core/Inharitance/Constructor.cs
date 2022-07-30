@@ -5,7 +5,17 @@ namespace CS.Edu.Core.Inharitance
 {
     interface IBase { }
 
-    class Base : IBase { }
+    class Base : IBase
+    {
+        private readonly int _value;
+
+        public Base() { }
+
+        public Base(int value)
+        {
+            _value = value;
+        }
+    }
 
     struct BaseStruct : IBase { }
 
@@ -31,7 +41,7 @@ namespace CS.Edu.Core.Inharitance
         Test()
         {
             _items = new Collection<Derrived>();
-            
+
             _array = new Derrived[10];
             _array[0] = new Derrived();
 
