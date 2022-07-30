@@ -2,24 +2,23 @@ using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 
-namespace CS.Edu.Benchmarks
+namespace CS.Edu.Benchmarks;
+
+[MemoryDiagnoser]
+[Config(typeof(DefaultConfig))]
+public class ToArrayVsToListBench
 {
-    [MemoryDiagnoser]
-    [Config(typeof(DefaultConfig))]
-    public class ToArrayVsToListBench
+    private readonly IEnumerable<int> _items = Enumerable.Range(0, 100000);
+
+    [Benchmark]
+    public int[] ToArrayBench()
     {
-        IEnumerable<int> items = Enumerable.Range(0, 100000);
+        return _items.ToArray();
+    }
 
-        [Benchmark]
-        public int[] ToArrayBench()
-        {
-            return items.ToArray();
-        }
-
-        [Benchmark]
-        public List<int> ToListBench()
-        {
-            return items.ToList();
-        }
+    [Benchmark]
+    public List<int> ToListBench()
+    {
+        return _items.ToList();
     }
 }
