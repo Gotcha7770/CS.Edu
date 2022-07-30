@@ -23,5 +23,18 @@ namespace CS.Edu.Tests.LINQTests
 
             CollectionAssert.AreEqual(source.SelectMany(selector), source.Select(selector).Concat());
         }
+
+        [Test]
+        public void SelectManyTest2()
+        {
+            var result1 = from x in Enumerable.Range(0, 2)
+                          from y in Enumerable.Range(0, 2)
+                          from z in Enumerable.Range(0, 2)
+                          select x + y + z;
+
+            var result2 = Enumerable.Range(0, 2)
+                .SelectMany(x => Enumerable.Range(0, 2), (x, y) => new { x, y })
+                .SelectMany(t => Enumerable.Range(0, 2), (t, z) => t.x + t.y + z);
+        }
     }
 }
