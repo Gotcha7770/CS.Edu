@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
+using CS.Edu.Benchmarks.Helpers;
 
 namespace CS.Edu.Benchmarks;
 
@@ -8,62 +11,62 @@ namespace CS.Edu.Benchmarks;
 [Config(typeof(DefaultConfig))]
 public class HashsetVsContainsBench
 {
-    public class Item
-    {
-        public Item(int id) => Id = id;
+    private readonly Consumer _consumer = new Consumer();
+    private readonly Random _random = new Random((int)DateTime.Now.Ticks);
 
-        public int Id { get; }
-        public bool IsValid { get; set; }
+    public record Item(int Id);
+
+    [Benchmark]
+    [ArgumentsSource(nameof(Data))]
+    public void ArrayContainsBench(int[] indexes, Item[] items)
+    {
+        items.Where(x => indexes.Contains(x.Id)).Consume(_consumer);
     }
 
     [Benchmark]
     [ArgumentsSource(nameof(Data))]
-    public Item[] ContainsBench(int[] indexes, Item[] items)
+    public void HashSetContainsBench(int[] indexes, Item[] items)
     {
-        foreach (Item item in items)
-        {
-            if (indexes.Contains(item.Id))
-            {
-                item.IsValid = true;
-            }
-        }
-
-        return items;
-    }
-
-    [Benchmark]
-    [ArgumentsSource(nameof(Data))]
-    public Item[] HashSetBench(int[] indexes, Item[] items)
-    {
-        foreach (Item item in items.IntersectBy(indexes, x => x.Id))
-        {
-            item.IsValid = true;
-        }
-
-        return items;
+        var set = indexes.ToHashSet();
+        items.Where(x => set.Contains(x.Id)).Consume(_consumer);
     }
 
     public IEnumerable<object[]> Data()
     {
         yield return new object[]
         {
-            Enumerable.Range(0, 10).ToArray(),
-            Enumerable.Range(0, 10).Where(x => x % 3 == 0).Select(x => new Item(x)).ToArray()
+            GetNumbers(10),
+            GetItems(10)
         };
         yield return new object[]
         {
-            Enumerable.Range(0, 100).ToArray(),
-            Enumerable.Range(0, 100).Where(x => x % 3 == 0).Select(x => new Item(x)).ToArray()
+            GetNumbers(100),
+            GetItems(100)
         };
         yield return new object[]
         {
-            Enumerable.Range(0, 1000).ToArray(),
-            Enumerable.Range(0, 1000).Where(x => x % 3 == 0).Select(x => new Item(x)).ToArray()
+            GetNumbers(1000),
+            GetItems(1000)
         };
-        yield return new object[]
-        {
-            Enumerable.Range(0, 10000).ToArray(),
-            Enumerable.Range(0, 10000).Where(x => x % 3 == 0).Select(x => new Item(x)).ToArray()
-        };
+    }
+
+    public int[] GetNumbers(int count)
+    {
+        var array = Enumerable.Range(0, count).ToArray();
+        _random.Shuffle(array);
+
+        return array;
+    }
+
+    public Item[] GetItems(int count)
+    {
+        var array = Enumerable.Range(0, count)
+            .Where(x => x % 3 == 0)
+            .Select(x => new Item(x))
+            .ToArray();
+
+        _random.Shuffle(array);
+
+        return array;
     }
 }
