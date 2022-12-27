@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace CS.Edu.Tests.LINQTests;
 
-[TestFixture]
 public class AsyncEnumerableTests
 {
-    record Customer(Guid Id);
+    private record Customer(Guid Id);
 
-    record Order(Guid Id, Guid Owner);
+    private record Order(Guid Id, Guid Owner);
 
     private readonly Customer[] _customers =
     {
@@ -37,13 +36,19 @@ public class AsyncEnumerableTests
             .ToAsyncEnumerable();
     }
 
-    [Test]
-    public void ExampleWithTask()
+    [Fact]
+    public async void ExampleWithTask()
     {
         IEnumerable<Task<Order[]>> query = _customers.Select(x => GetOrdersTask(x.Id));
+
+        foreach (var task in query)
+        {
+            var order = await task;
+            // ...
+        }
     }
 
-    [Test]
+    [Fact]
     public async Task ExampleWithAsyncEnumerable()
     {
         var query = _customers.ToAsyncEnumerable()
@@ -55,42 +60,10 @@ public class AsyncEnumerableTests
         }
     }
 
-    [Test]
-    public async Task PassCancellationToSelector()
+    [Fact]
+    public async Task AsyncGroupBy()
     {
-        ValueTask<int> AsyncJob(int x, CancellationToken cancellationToken = default) => new ValueTask<int>(x * x);
-        ValueTask<IAsyncEnumerable<int>> Unfold(int x, CancellationToken cancellationToken = default)
-        {
-            return new ValueTask<IAsyncEnumerable<int>>(Enumerable.Range(0, x).ToAsyncEnumerable());
-        }
-
-        var cts = new CancellationTokenSource();
-        var result = await Enumerable.Range(0, 10)
-            .ToAsyncEnumerable()
-            //.Select(x => AsyncJob(x))
-            .SelectAwaitWithCancellation(AsyncJob)
-            //.SelectMany(x => Unfold(x))
-            .SelectManyAwaitWithCancellation(Unfold)
-            .ToArrayAsync(cts.Token);
-    }
-
-    [Test]
-    public async Task AsyncEnumerableCreate()
-    {
-        var t = await Method1().ToArrayAsync();
-        t = await AsyncEnumerable.Create(Method2).ToArrayAsync();
-        //var source = AsyncEnumerable.Create(token => AsyncEnumerator.Create());
-    }
-
-    private async IAsyncEnumerable<int> Method1()
-    {
-        await Task.Delay(50);
-        yield return 1;
-    }
-
-    private async IAsyncEnumerator<int> Method2(CancellationToken cancellationToken)
-    {
-        await Task.Delay(50, cancellationToken);
-        yield return 1;
+        var query = _customers.ToAsyncEnumerable()
+            .GroupBy(x => x.Id);
     }
 }

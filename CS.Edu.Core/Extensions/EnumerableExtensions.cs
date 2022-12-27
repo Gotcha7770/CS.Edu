@@ -23,7 +23,7 @@ namespace CS.Edu.Core.Extensions
         IncludeBorders = 0x1
     }
 
-    public static partial class Enumerables
+    public static partial class EnumerableExtensions
     {
         public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item)
         {

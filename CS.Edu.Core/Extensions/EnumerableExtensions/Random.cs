@@ -4,7 +4,7 @@ using System.Collections.Generic;
 // ReSharper disable once CheckNamespace
 namespace CS.Edu.Core.Extensions;
 
-public static partial class Enumerables
+public static partial class EnumerableExtensions
 {
     private static readonly Func<Random, Func<Range<int>, int>> Rand = rand => range => rand.Next(range.Min, range.Max);
 

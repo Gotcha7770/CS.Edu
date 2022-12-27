@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="DynamicData" Version="7.4.3" />
     <PackageReference Include="System.Interactive" Version="5.0.0" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="System.Memory" Version="4.5.3" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>

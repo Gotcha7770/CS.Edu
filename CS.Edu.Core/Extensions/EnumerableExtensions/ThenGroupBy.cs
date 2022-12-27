@@ -6,7 +6,7 @@ using CS.Edu.Core.Monads;
 // ReSharper disable once CheckNamespace
 namespace CS.Edu.Core.Extensions
 {
-    public static partial class Enumerables
+    public static partial class EnumerableExtensions
     {
         public static Group<TKey, T> ToGroup<TKey, T>(this IGrouping<TKey, T> grouping)
         {

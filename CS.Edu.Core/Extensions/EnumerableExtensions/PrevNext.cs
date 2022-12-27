@@ -5,7 +5,7 @@ using DynamicData.Kernel;
 // ReSharper disable once CheckNamespace
 namespace CS.Edu.Core.Extensions;
 
-public static partial class Enumerables
+public static partial class EnumerableExtensions
 {
     public static IEnumerable<PrevNextValue<T>> ToPrevNextIterator<T>(this IEnumerable<T> source)
     {
