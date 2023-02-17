@@ -1,18 +1,17 @@
 using System.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.LINQTests
+namespace CS.Edu.Tests.LINQTests;
+
+public class CircularBufferTests
 {
-    [TestFixture]
-    public class CircularBufferTests
+    [Fact]
+    public void CircularBufferWithLINQ()
     {
-        [Test]
-        public void CircularBufferWithLINQ()
-        {
-            var items = new[] { 0, 1, 2 };
-            var buffer = items.Repeat();
+        var items = new[] { 0, 1, 2 };
+        var buffer = items.Repeat();
 
-            CollectionAssert.AreEqual(new [] {0, 1, 2, 0, 1}, buffer.Take(5));
-        }
+        buffer.Take(5).Should().BeEquivalentTo(new [] { 0, 1, 2, 0, 1 });
     }
 }

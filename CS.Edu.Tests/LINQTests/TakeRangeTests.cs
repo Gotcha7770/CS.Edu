@@ -1,12 +1,11 @@
 ﻿using System.Linq;
-using NUnit.Framework;
+using Xunit;
 
 namespace CS.Edu.Tests.LINQTests;
 
-[TestFixture]
 public class TakeRangeTests
 {
-    [Test]
+    [Fact]
     public void TakeRange()
     {
         var items = Enumerable.Range(0, 20);

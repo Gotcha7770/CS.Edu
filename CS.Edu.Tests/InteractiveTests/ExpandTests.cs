@@ -1,27 +1,37 @@
 using System.Linq;
 using System.Xml.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ExpandTests
+namespace CS.Edu.Tests.InteractiveTests;
+
+public class ExpandTests
 {
-    [TestFixture]
-    public class ExpandTests
-    {
-        XElement root = new XElement("root",
-                                     new XElement("firstLevel",
-                                                  new XElement("secondLevel"),
-                                                  new XElement("secondLevel")),
-                                     new XElement("firstLevel",
-                                                  new XElement("secondLevel"),
-                                                  new XElement("secondLevel")));
-        [Test]
-        public void TreeTest()
-        {
-            var flatElements = root.Elements()
-                .Expand(x => x.Elements())
-                .ToArray();
+    private readonly XElement _root = new XElement("root",
+        new XElement("firstLevel",
+            new XElement("secondLevel"),
+            new XElement("secondLevel")),
+        new XElement("firstLevel",
+            new XElement("secondLevel"),
+            new XElement("secondLevel")));
 
-            Assert.That(flatElements.Length, Is.EqualTo(6));
-        }
+    [Fact]
+    public void TreeTest()
+    {
+        var flatElements = _root.Elements()
+            .Expand(x => x.Elements())
+            .ToArray();
+
+        flatElements.Select(x => x.Name.LocalName)
+            .Should()
+            .BeEquivalentTo(new[]
+            {
+                "firstLevel",
+                "firstLevel",
+                "secondLevel",
+                "secondLevel",
+                "secondLevel",
+                "secondLevel"
+            });
     }
 }

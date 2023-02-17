@@ -1,44 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
+using static FluentAssertions.FluentActions;
 
-namespace CS.Edu.Tests.LINQTests
+namespace CS.Edu.Tests.LINQTests;
+
+public class ToDictionaryTest
 {
-    [TestFixture]
-    public class ToDictionaryTest
+    private record KeyValue(int Key, string Value);
+
+    private readonly KeyValue[] _items =
     {
-        private readonly (int Key, string Value)[] _items =
+        new KeyValue(0, "first"),
+        new KeyValue(1, "first"),
+        new KeyValue(0, "second"),
+        new KeyValue(2, "first"),
+        new KeyValue(0, "third"),
+        new KeyValue(1, "second")
+    };
+
+    [Fact]
+    public void ToDictionaryWithGroupBy()
+    {
+        var dic = _items.GroupBy(x => x.Key)
+            .Select(x => x.Last())
+            .ToDictionary(x => x.Key, x => x);
+
+        dic.Values.Should().BeEquivalentTo(new[]
         {
-            (0, "first"),
-            (1, "first"),
-            (0, "second"),
-            (2, "first"),
-            (0, "third"),
-            (1, "second")
-        };
+            new KeyValue(0, "third"),
+            new KeyValue(1, "second"),
+            new KeyValue(2, "first")
+        });
+    }
 
-        [Test]
-        public void ToDictionaryWithGroupBy()
-        {
-            var dic = _items.GroupBy(x => x.Key)
-                .Select(x => x.Last())
-                .ToDictionary(x => x.Key, x => x.Value);
-
-            Assert.AreEqual(3, dic.Keys.Count);
-            Assert.AreEqual("third", dic[0]);
-            Assert.AreEqual("second", dic[1]);
-            Assert.AreEqual("first", dic[2]);
-        }
-
-        [Test]
-        public void ToDictionaryWithoutGroupBy()
-        {
-            var dic = _items.ToDictionary(x => x.Key, x => x.Value);
-
-            Assert.AreEqual(3, dic.Keys.Count);
-            Assert.AreEqual("third", dic[0]);
-            Assert.AreEqual("second", dic[1]);
-            Assert.AreEqual("first", dic[2]);
-        }
+    [Fact]
+    public void ToDictionaryWithoutGroupBy()
+    {
+        Invoking(() => _items.ToDictionary(x => x.Key, x => x.Value))
+            .Should().Throw<ArgumentException>();
     }
 }

@@ -1,25 +1,24 @@
 using System.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.LINQTests
+namespace CS.Edu.Tests.LINQTests;
+
+public class AnyAllTests
 {
-    [TestFixture]
-    public class AnyAllTests
+    [Fact]
+    public void All_WithoutItems_ReturnsTrue()
     {
-        [Test]
-        public void All_WithoutItems_ReturnsTrue()
-        {
-            var result = Enumerable.Empty<int>().All(x => x % 2 == 0);
+        var result = Enumerable.Empty<int>().All(x => x % 2 == 0);
 
-            Assert.AreEqual(true, result);
-        }
+        result.Should().BeTrue();
+    }
 
-        [Test]
-        public void Any_WithoutItems_ReturnsFalse()
-        {
-            var result = Enumerable.Empty<int>().Any(x => x % 2 != 0);
+    [Fact]
+    public void Any_WithoutItems_ReturnsFalse()
+    {
+        var result = Enumerable.Empty<int>().Any(x => x % 2 != 0);
 
-            Assert.AreEqual(false, result);
-        }
+        result.Should().BeFalse();
     }
 }
