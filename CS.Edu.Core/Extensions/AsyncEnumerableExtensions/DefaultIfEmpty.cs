@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CS.Edu.Core.Extensions.AsyncEnumerableExtensions;
+// ReSharper disable once CheckNamespace
+namespace CS.Edu.Core.Extensions;
 
 public static partial class AsyncEnumerableExtensions
 {

@@ -1,36 +1,35 @@
 using System;
 using System.Collections.Generic;
 
-namespace CS.Edu.Core.Comparers
+namespace CS.Edu.Core.Comparers;
+
+public class GenericEqualityComparer<TValue, TKey> : IEqualityComparer<TValue>
 {
-    public class GenericEqualityComparer<TValue, TKey> : IEqualityComparer<TValue>
+    private readonly Func<TValue, TValue, bool> _equalsFunction;
+    private readonly Func<TValue, int> _hashCodeFunction;
+
+    public GenericEqualityComparer(Func<TValue, TKey> keySelector)
     {
-        private readonly Func<TValue, TValue, bool> _equalsFunction;
-        private readonly Func<TValue, int> _hashCodeFunction;
+        if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
 
-        public GenericEqualityComparer(Func<TValue, TKey> keySelector)
+        _equalsFunction = (x, y) =>
         {
-            if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
+            TKey one = keySelector(x);
+            TKey other = keySelector(y);
 
-            _equalsFunction = (x, y) =>
-            {
-                TKey one = keySelector(x);
-                TKey other = keySelector(y);
+            return Equals(one, other);
+        };
 
-                return Equals(one, other);
-            };
+        _hashCodeFunction = x => keySelector(x).GetHashCode();
+    }
 
-            _hashCodeFunction = x => keySelector(x).GetHashCode();
-        }
+    public bool Equals(TValue x, TValue y)
+    {
+        return _equalsFunction(x,y);
+    }
 
-        public bool Equals(TValue x, TValue y)
-        {
-            return _equalsFunction(x,y);
-        }
-
-        public int GetHashCode(TValue obj)
-        {
-            return _hashCodeFunction(obj);
-        }
+    public int GetHashCode(TValue obj)
+    {
+        return _hashCodeFunction(obj);
     }
 }

@@ -1,70 +1,40 @@
-using NUnit.Framework;
-using System;
 using System.Linq;
-using CS.Edu.Core.Extensions;
 using CS.Edu.Core;
+using CS.Edu.Core.Extensions;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.Extensions
+namespace CS.Edu.Tests.Extensions.EnumerableExtensions;
+
+public class BinarySplitTests
 {
-    [TestFixture]
-    public class BinarySplitTests
+    private readonly Relation<int> _lessThan = (x, y) => x < y;
+
+    [Fact]
+    public void Split_Empty_ReturnsEmpty()
     {
-        public Relation<int> lessThan = (x, y) => x < y;
+        var items = Enumerable.Empty<int>();
+        var result = items.Split(_lessThan);
 
-        [Test]
-        public void Split_Empty_ReturnsEmpty()
-        {
-            var items = Enumerable.Empty<int>();
-            var result = items.Split(lessThan).ToArray();
+        result.Should().BeEmpty();
+    }
 
-            Assert.That(result, Is.EqualTo(Array.Empty<int>()));
-        }
+    [Fact]
+    public void Split_OneElement_ReturnsThatElement()
+    {
+        var items = new[] { 1 };
+        var result = items.Split(_lessThan);
 
-        [Test]
-        public void SplitFirstDimension_OneElement_ReturnsThatElement()
-        {
-            var items = new int[] { 1 };
-            var result = items.Split(lessThan).ToArray();
+        result.Should().BeEquivalentTo(new[] { items });
+    }
 
-            Assert.That(result.Length, Is.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo(new int[] { 1 }));
-        }
+    [Fact]
+    public void Split_WhilePrevLessThenNext_Returns2Groups()
+    {
+        var items = new[] { 1, 2, 3, 2, 3 };
+        var result = items.Split(_lessThan)
+            .ToArray();
 
-        [Test]
-        public void SplitSecondDimension_OneElement_ReturnsThatElement()
-        {
-            var items = new int[] { 1 };
-            var result = items.Split(lessThan)
-                .Select(x => x.ToArray())
-                .ToArray();
-
-            Assert.That(result.Length, Is.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo(new int[] { 1 }));
-        }
-
-        [Test]
-        public void SplitFirstDimension_WhilePrevLessThenNext_Returns2Groups()
-        {
-            var items = new int[] { 1, 2, 3, 2, 3 };
-            var result = items.Split(lessThan)
-                .ToArray();
-
-            Assert.That(result.Length, Is.EqualTo(2));
-            Assert.That(result[0], Is.EqualTo(new int[] { 1, 2, 3 }));
-            Assert.That(result[1], Is.EqualTo(new int[] { 2, 3 }));
-        }
-
-        [Test]
-        public void SplitSecondDimension_WhilePrevLessThenNext_Returns2Groups()
-        {
-            var items = new int[] { 1, 2, 3, 2, 3 };
-            var result = items.Split(lessThan)
-                .Select(x => x.ToArray())
-                .ToArray();
-
-            Assert.That(result.Length, Is.EqualTo(2));
-            Assert.That(result[0], Is.EqualTo(new int[] { 1, 2, 3 }));
-            Assert.That(result[1], Is.EqualTo(new int[] { 2, 3 }));
-        }
+        result.Should().BeEquivalentTo(new[] { new[] { 1, 2, 3 }, new[] { 2, 3 } });
     }
 }

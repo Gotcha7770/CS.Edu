@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
-using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
 
 namespace CS.Edu.Benchmarks.Extensions;
@@ -42,7 +41,7 @@ public class AggregateManyBench
     }
 
     [GlobalSetup]
-    public void GlobalSetup() => _items = EnumerableExtensions.Random(new Range<int>(0, 5000), 10000);
+    public void GlobalSetup() => _items = EnumerableExtensions.Random(..5000, 10000);
 
     [Benchmark]
     public (int min, int max) GetMinMaxBench() => Interactive(_items);

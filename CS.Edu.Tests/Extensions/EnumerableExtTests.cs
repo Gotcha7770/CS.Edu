@@ -52,39 +52,6 @@ namespace CS.Edu.Tests.Extensions
         }
 
         [Test]
-        public void SkipWhile_PrevLessThenNext_SkipFirst2Elements()
-        {
-            var items = new int[] {1, 2, 3, 2, 1};
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.SkipWhile(lessThan);
-
-            CollectionAssert.AreEqual(result, new[] {2, 1});
-        }
-
-        [Test]
-        public void SkipWhile_OneElement_ReturnsEmpty()
-        {
-            var items = new List<int> {1};
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.SkipWhile(lessThan);
-
-            CollectionAssert.AreEqual(result, (Array.Empty<int>()));
-        }
-
-        [Test]
-        public void SkipWhile_Empty_ReturnsEmpty()
-        {
-            var items = Array.Empty<int>();
-            Relation<int> lessThan = (x, y) => x < y;
-
-            var result = items.SkipWhile(lessThan);
-
-            CollectionAssert.AreEqual(result, Array.Empty<int>());
-        }
-
-        [Test]
         public void ShrinkDuplicatesTest()
         {
             var points = new[] {0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0};

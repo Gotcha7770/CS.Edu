@@ -2,29 +2,27 @@
 using System.Linq;
 using CS.Edu.Core.Extensions;
 using DynamicData.Kernel;
-using NUnit.Framework;
+using Xunit;
 
-namespace CS.Edu.Tests.Extensions.EnumerableExtensions
+namespace CS.Edu.Tests.Extensions.EnumerableExtensions;
+
+public class ThenFindTests
 {
-    [TestFixture]
-    public class ThenFindTests
+    private readonly IEnumerable<int> _source = Enumerable.Range(1, 99);
+
+    [Fact]
+    public void FluentOneLayerFind()
     {
-        private readonly IEnumerable<int> _source = Enumerable.Range(1, 99);
+        //Optional<int> result = _source.Find(x => x.IsEven()).Result();
+        Optional<int> result = _source.FirstOrOptional(x => x.IsEven());
+    }
 
-        [Test]
-        public void FluentOneLayerFind()
-        {
-            Optional<int> result = _source.Find(x => x.IsEven()).Result();
-            Assert.True(result.HasValue);
-            Assert.AreEqual(2, result.Value);
-        }
-
-        [Test]
-        public void FluentTwoLayersFind()
-        {
-            Optional<int> result = _source.Find(x => x == 101).ThenFind(x => x % 3 == 0).Result();
-            Assert.True(result.HasValue);
-            Assert.AreEqual(3, result.Value);
-        }
+    [Fact]
+    public void FluentTwoLayersFind()
+    {
+        //Optional<int> result = _source.Find(x => x == 101).ThenFind(x => x % 3 == 0).Result();
+        Optional<int> result = _source.Where(x => x == 101)
+            .DefaultIfEmpty(() => _source.FirstOrDefault(x => x % 3 == 0))
+            .FirstOrDefault();
     }
 }

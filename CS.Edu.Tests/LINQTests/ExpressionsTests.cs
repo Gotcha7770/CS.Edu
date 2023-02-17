@@ -40,7 +40,7 @@ namespace CS.Edu.Tests.LINQTests
         }
 
         [Test]
-        public void CombinePredicateExpressions()
+        public void CombinePredicateExpression()
         {
             //Expression<Func<int, bool>> and = x => x > 0 && x < 10;
             //Expression<Func<int, bool>> and = x => x is > 0 and < 10; pattern matching in expressions?
@@ -48,7 +48,7 @@ namespace CS.Edu.Tests.LINQTests
             var parameter = Expression.Parameter(typeof(int), "x");
 
             var lambda = Expression.Lambda<Func<int, bool>>(
-                Expression.And(
+                Expression.AndAlso(
                     Expression.GreaterThan(parameter, Expression.Constant(0)),
                     Expression.LessThan(parameter, Expression.Constant(10))),
                 parameter);
@@ -62,7 +62,40 @@ namespace CS.Edu.Tests.LINQTests
         }
 
         [Test]
-        public void PropertyAccessorExpressions()
+        public void IsOfTypeExpression()
+        {
+            // Func<object, bool> function = x => x.GetType() == typeof(Identity<int>) && ((Identity<int>)x).Key == 15;
+            //Expression<Func<object, bool>> ofType = x => x.GetType() == typeof(Identity<int>) && ((Identity<int>)x).Key == 15;
+
+            Expression<Func<Identity<int>, bool>> expression = x => x.Key == 15;
+
+            var parameter = Expression.Parameter(typeof(object), "x");
+
+            var lambda = Expression.Lambda<Func<object, bool>>(
+                Expression.AndAlso(
+                    Expression.TypeIs(parameter, typeof(Identity<int>)),
+                    Expression.Equal(
+                        Expression.Property(
+                            Expression.Convert(parameter, typeof(Identity<int>)), nameof(Identity<int>.Key)),
+                        Expression.Constant(15))),
+                parameter);
+
+            var function = lambda.Compile();
+            Assert.IsFalse(function(new object()));
+            Assert.IsFalse(function(new Identity<int>(42)));
+            Assert.IsTrue(function(new Identity<int>(15)));
+        }
+
+        [Test]
+        public void ReplaceLambda()
+        {
+            Func<Identity<int>, bool> func = x => x.Key is > 15 and < 35;
+            Expression<Func<Identity<int>, bool>> expression1 = x => func(x);
+            Expression<Func<object, bool>> expression2 = x => x.GetType() == typeof(Identity<int>) && func((Identity<int>)x);
+        }
+
+        [Test]
+        public void PropertyAccessorExpression()
         {
             // Expression<Func<Valuable<int>, bool>> e2 = x => x.Value > 0;
 

@@ -46,7 +46,8 @@ namespace CS.Edu.Tests
             Assert.AreEqual(main, moq.Process(main));
 
             //Требует явного указания параметров, в отличии от NSubstitute
-            sub.Setup(x => x.ProcessParams(It.IsAny<object>())).Returns<object, object>((x, _) => x);
+            //sub.Setup(x => x.ProcessParams(It.IsAny<object>())).Returns<object, object>((x, _) => x);
+            sub.Setup(x => x.ProcessParams(It.IsAny<object>())).Returns(new object());
             Assert.AreEqual(main, sub.Object.Process(main));
         }
 
