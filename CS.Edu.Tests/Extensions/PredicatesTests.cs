@@ -1,40 +1,41 @@
 ﻿using System;
 using CS.Edu.Core.Extensions;
-using NUnit.Framework;
+using Shouldly;
+using Xunit;
 
-namespace CS.Edu.Tests.Extensions
+namespace CS.Edu.Tests.Extensions;
+
+public class PredicatesTests
 {
-    [TestFixture]
-    public class PredicatesTests
+    [Theory]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    [InlineData(6, true)]
+    [InlineData(10, false)]
+    [InlineData(12, true)]
+    public void PredicatesAndTest(int value, bool expected)
     {
-        [TestCase(2, ExpectedResult = false)]
-        [TestCase(3, ExpectedResult = false)]
-        [TestCase(6, ExpectedResult = true)]
-        [TestCase(10, ExpectedResult = false)]
-        [TestCase(12, ExpectedResult = true)]
-        public bool PredicatesAndTest(int value)
-        {
-            Predicate<int> predicate1 = x => x % 2 == 0;
-            Predicate<int> predicate2 = x => x % 3 == 0;
-            Predicate<int> predicate3 = predicate1
-                .And(predicate2);
+        Predicate<int> predicate1 = x => x % 2 == 0;
+        Predicate<int> predicate2 = x => x % 3 == 0;
+        Predicate<int> predicate3 = predicate1
+            .And(predicate2);
 
-            return predicate3(value);
-        }
+        predicate3(value).ShouldBe(expected);
+    }
 
-        [TestCase(2, ExpectedResult = true)]
-        [TestCase(3, ExpectedResult = true)]
-        [TestCase(4, ExpectedResult = true)]
-        [TestCase(5, ExpectedResult = false)]
-        [TestCase(6, ExpectedResult = true)]
-        public bool PredicatesOrTest(int value)
-        {
-            Predicate<int> predicate1 = x => x % 2 == 0;
-            Predicate<int> predicate2 = x => x % 3 == 0;
-            Predicate<int> predicate3 = predicate1
-                .Or(predicate2);
+    [Theory]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    [InlineData(4, true)]
+    [InlineData(5, false)]
+    [InlineData(6, true)]
+    public void PredicatesOrTest(int value, bool expected)
+    {
+        Predicate<int> predicate1 = x => x % 2 == 0;
+        Predicate<int> predicate2 = x => x % 3 == 0;
+        Predicate<int> predicate3 = predicate1
+            .Or(predicate2);
 
-            return predicate3(value);
-        }
+        predicate3(value).ShouldBe(expected);
     }
 }

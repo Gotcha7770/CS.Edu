@@ -1,60 +1,60 @@
-﻿using NUnit.Framework;
-using CS.Edu.Core.Extensions;
-using System.Linq;
-using System;
+﻿using CS.Edu.Core.Extensions;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.Extensions
+namespace CS.Edu.Tests.Extensions;
+
+public class IntExtTests
 {
-    [TestFixture]
-    public class IntExtTests
+    [Theory]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    [InlineData(2, true)]
+    [InlineData(3, false)]
+    [InlineData(10, true)]
+    [InlineData(11, false)]
+    [InlineData(99, false)]
+    [InlineData(100, true)]
+    [InlineData(101, false)]
+    public void IsEvenTest(int input, bool expected)
     {
-        [TestCase(0, ExpectedResult = true)]
-        [TestCase(1, ExpectedResult = false)]
-        [TestCase(2, ExpectedResult = true)]
-        [TestCase(3, ExpectedResult = false)]
-        [TestCase(10, ExpectedResult = true)]
-        [TestCase(11, ExpectedResult = false)]
-        [TestCase(99, ExpectedResult = false)]
-        [TestCase(100, ExpectedResult = true)]
-        [TestCase(101, ExpectedResult = false)]
-        public bool IsEvenTest(int input)
-        {
-            return input.IsEven();
-        }
+        input.IsEven().Should().Be(expected);
+    }
 
-        [TestCase(0, ExpectedResult = new long[0])]
-        [TestCase(1, ExpectedResult = new[] { 1 })]
-        [TestCase(2, ExpectedResult = new[] { 1, 2 })]
-        [TestCase(3, ExpectedResult = new[] { 1, 3 })]
-        [TestCase(4, ExpectedResult = new[] { 1, 2, 2 })]
-        [TestCase(6, ExpectedResult = new[] { 1, 2, 3 })]
-        [TestCase(12, ExpectedResult = new[] { 1, 2, 2, 3 })]
-        [TestCase(120, ExpectedResult = new[] { 1, 2, 2, 2, 3, 5 })]
-        public long[] FactorizeTest(long input)
-        {
-            return input.Factorize().ToArray();
-        }
+    [Theory]
+    [InlineData(0, new long[0])]
+    [InlineData(1, new[] { 1L })]
+    [InlineData(2, new[] { 1L, 2 })]
+    [InlineData(3, new[] { 1L, 3 })]
+    [InlineData(4, new[] { 1L, 2, 2 })]
+    [InlineData(6, new[] { 1L, 2, 3 })]
+    [InlineData(12, new[] { 1L, 2, 2, 3 })]
+    [InlineData(120, new[] { 1L, 2, 2, 2, 3, 5 })]
+    public void FactorizeTest(long input, long[] expected)
+    {
+        input.Factorize().Should().BeEquivalentTo(expected);
+    }
 
-        [TestCase(0, ExpectedResult = false)]
-        [TestCase(1, ExpectedResult = false)]
-        [TestCase(2, ExpectedResult = true)]
-        [TestCase(3, ExpectedResult = true)]
-        [TestCase(4, ExpectedResult = false)]
-        [TestCase(5, ExpectedResult = true)]
-        [TestCase(6, ExpectedResult = false)]
-        [TestCase(7, ExpectedResult = true)]
-        [TestCase(11, ExpectedResult = true)]
-        [TestCase(13, ExpectedResult = true)]
-        [TestCase(17, ExpectedResult = true)]
-        [TestCase(19, ExpectedResult = true)]
-        [TestCase(21, ExpectedResult = false)]
-        [TestCase(23, ExpectedResult = true)]
-        [TestCase(101, ExpectedResult = true)]
-        [TestCase(1009, ExpectedResult = true)]
-        [TestCase(10007, ExpectedResult = true)]
-        public bool IsPrimeTest(long input)
-        {
-            return input.IsPrime();
-        }
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(1, false)]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    [InlineData(4, false)]
+    [InlineData(5, true)]
+    [InlineData(6, false)]
+    [InlineData(7, true)]
+    [InlineData(11, true)]
+    [InlineData(13, true)]
+    [InlineData(17, true)]
+    [InlineData(19, true)]
+    [InlineData(21, false)]
+    [InlineData(23, true)]
+    [InlineData(101, true)]
+    [InlineData(1009, true)]
+    [InlineData(10007, true)]
+    public void IsPrimeTest(long input, bool expected)
+    {
+        input.IsPrime().Should().Be(expected);
     }
 }
