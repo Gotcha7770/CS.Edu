@@ -5,84 +5,83 @@ using DynamicData;
 using DynamicData.Kernel;
 
 // ReSharper disable once CheckNamespace
-namespace CS.Edu.Core.Extensions
+namespace CS.Edu.Core.Extensions;
+
+public static partial class Observables
 {
-    public static partial class Observables
+    public static IObservable<IChangeSet<T>> OnLoaded<T>(this IObservable<IChangeSet<T>> source, Action<IChangeSet<T>> action)
     {
-        public static IObservable<IChangeSet<T>> OnLoaded<T>(this IObservable<IChangeSet<T>> source, Action<IChangeSet<T>> action)
-        {
-            return new LoadedMonitor<T>(source, action).Run();
-        }
-
-        public static IObservable<IChangeSet<T, TKey>> OnLoaded<T, TKey>(this IObservable<IChangeSet<T, TKey>> source, Action<IChangeSet<T, TKey>> action)
-        {
-            return new LoadedMonitor<T, TKey>(source, action).Run();
-        }
+        return new LoadedMonitor<T>(source, action).Run();
     }
 
-    internal class LoadedMonitor<T>
+    public static IObservable<IChangeSet<T, TKey>> OnLoaded<T, TKey>(this IObservable<IChangeSet<T, TKey>> source, Action<IChangeSet<T, TKey>> action)
     {
-        private readonly IObservable<IChangeSet<T>> _source;
-        private readonly Action<IChangeSet<T>> _action;
+        return new LoadedMonitor<T, TKey>(source, action).Run();
+    }
+}
 
-        public LoadedMonitor(IObservable<IChangeSet<T>> source, Action<IChangeSet<T>> action)
-        {
-            _source = source;
-            _action = action;
-        }
+internal class LoadedMonitor<T>
+{
+    private readonly IObservable<IChangeSet<T>> _source;
+    private readonly Action<IChangeSet<T>> _action;
 
-        public IObservable<IChangeSet<T>> Run()
-        {
-            return Observable.Create<IChangeSet<T>>(observer =>
-            {
-                using var batchGuard = new BehaviorSubject<bool>(true);
-                var loadedObservable = _source.MonitorStatus()
-                    .Where(x => x == ConnectionStatus.Loaded);
-
-                using var actionInvoker = _source.SkipUntil(loadedObservable)
-                    .BufferIf(batchGuard)
-                    .Take(1)
-                    .Do(_action)
-                    .Subscribe();
-
-                var subscription = _source.Subscribe(observer);
-                batchGuard.OnNext(false);
-
-                return subscription;
-            });
-        }
+    public LoadedMonitor(IObservable<IChangeSet<T>> source, Action<IChangeSet<T>> action)
+    {
+        _source = source;
+        _action = action;
     }
 
-    internal class LoadedMonitor<T, TKey>
+    public IObservable<IChangeSet<T>> Run()
     {
-        private readonly IObservable<IChangeSet<T, TKey>> _source;
-        private readonly Action<IChangeSet<T, TKey>> _action;
-
-        public LoadedMonitor(IObservable<IChangeSet<T, TKey>> source, Action<IChangeSet<T, TKey>> action)
+        return Observable.Create<IChangeSet<T>>(observer =>
         {
-            _source = source;
-            _action = action;
-        }
+            using var batchGuard = new BehaviorSubject<bool>(true);
+            var loadedObservable = _source.MonitorStatus()
+                .Where(x => x == ConnectionStatus.Loaded);
 
-        public IObservable<IChangeSet<T, TKey>> Run()
+            using var actionInvoker = _source.SkipUntil(loadedObservable)
+                .BufferIf(batchGuard)
+                .Take(1)
+                .Do(_action)
+                .Subscribe();
+
+            var subscription = _source.Subscribe(observer);
+            batchGuard.OnNext(false);
+
+            return subscription;
+        });
+    }
+}
+
+internal class LoadedMonitor<T, TKey>
+{
+    private readonly IObservable<IChangeSet<T, TKey>> _source;
+    private readonly Action<IChangeSet<T, TKey>> _action;
+
+    public LoadedMonitor(IObservable<IChangeSet<T, TKey>> source, Action<IChangeSet<T, TKey>> action)
+    {
+        _source = source;
+        _action = action;
+    }
+
+    public IObservable<IChangeSet<T, TKey>> Run()
+    {
+        return Observable.Create<IChangeSet<T, TKey>>(observer =>
         {
-            return Observable.Create<IChangeSet<T, TKey>>(observer =>
-            {
-                using var batchGuard = new BehaviorSubject<bool>(true);
-                var loadedObservable = _source.MonitorStatus()
-                    .Where(x => x == ConnectionStatus.Loaded);
+            using var batchGuard = new BehaviorSubject<bool>(true);
+            var loadedObservable = _source.MonitorStatus()
+                .Where(x => x == ConnectionStatus.Loaded);
 
-                using var actionInvoker = _source.SkipUntil(loadedObservable)
-                    .BatchIf(batchGuard, null)
-                    .Take(1)
-                    .Do(_action)
-                    .Subscribe();
+            using var actionInvoker = _source.SkipUntil(loadedObservable)
+                .BatchIf(batchGuard, null)
+                .Take(1)
+                .Do(_action)
+                .Subscribe();
 
-                var subscription = _source.Subscribe(observer);
-                batchGuard.OnNext(false);
+            var subscription = _source.Subscribe(observer);
+            batchGuard.OnNext(false);
 
-                return subscription;
-            });
-        }
+            return subscription;
+        });
     }
 }

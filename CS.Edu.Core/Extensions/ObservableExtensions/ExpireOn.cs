@@ -5,59 +5,58 @@ using System.Reactive.Linq;
 using DynamicData;
 
 // ReSharper disable once CheckNamespace
-namespace CS.Edu.Core.Extensions
+namespace CS.Edu.Core.Extensions;
+
+public static partial class Observables
 {
-    public static partial class Observables
+    public static IObservable<IChangeSet<T, TKey>> ExpireOn<T, TKey>(this IObservable<IChangeSet<T, TKey>> source, IObservable<Unit> evaluator)
     {
-        public static IObservable<IChangeSet<T, TKey>> ExpireOn<T, TKey>(this IObservable<IChangeSet<T, TKey>> source, IObservable<Unit> evaluator)
-        {
-            return new ObservableExpirer<T, TKey>(source, evaluator).Run();
-        }
+        return new ObservableExpirer<T, TKey>(source, evaluator).Run();
+    }
+}
+
+internal class ObservableExpirer<T, TKey>
+{
+    private readonly IObservable<IChangeSet<T, TKey>> _source;
+    private readonly IObservable<Unit> _evaluator;
+
+    public ObservableExpirer(IObservable<IChangeSet<T, TKey>> source, IObservable<Unit> evaluator)
+    {
+        _source = source;
+        _evaluator = evaluator;
     }
 
-    internal class ObservableExpirer<T, TKey>
+    public IObservable<IChangeSet<T, TKey>> Run()
     {
-        private readonly IObservable<IChangeSet<T, TKey>> _source;
-        private readonly IObservable<Unit> _evaluator;
-
-        public ObservableExpirer(IObservable<IChangeSet<T, TKey>> source, IObservable<Unit> evaluator)
+        return Observable.Create<IChangeSet<T, TKey>>(observer =>
         {
-            _source = source;
-            _evaluator = evaluator;
-        }
+            var cache = new IntermediateCache<T, TKey>(_source);
 
-        public IObservable<IChangeSet<T, TKey>> Run()
-        {
-            return Observable.Create<IChangeSet<T, TKey>>(observer =>
-            {
-                var cache = new IntermediateCache<T, TKey>(_source);
+            var published = cache.Connect().Publish();
+            var subscriber = published.SubscribeSafe(observer);
 
-                var published = cache.Connect().Publish();
-                var subscriber = published.SubscribeSafe(observer);
-
-                var remover = _evaluator.Finally(observer.OnCompleted)
-                    .Subscribe(_ =>
-                    {
-                        try
-                        {
-                            cache.Clear();
-                        }
-                        catch (Exception ex)
-                        {
-                            observer.OnError(ex);
-                        }
-                    });
-
-                var connected = published.Connect();
-
-                return new CompositeDisposable
+            var remover = _evaluator.Finally(observer.OnCompleted)
+                .Subscribe(_ =>
                 {
-                    connected,
-                    subscriber,
-                    remover,
-                    cache
-                };
-            });
-        }
+                    try
+                    {
+                        cache.Clear();
+                    }
+                    catch (Exception ex)
+                    {
+                        observer.OnError(ex);
+                    }
+                });
+
+            var connected = published.Connect();
+
+            return new CompositeDisposable
+            {
+                connected,
+                subscriber,
+                remover,
+                cache
+            };
+        });
     }
 }

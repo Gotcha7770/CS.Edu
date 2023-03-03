@@ -1,22 +1,20 @@
-﻿using System;
-using NUnit.Framework;
+﻿using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.MathExtTests
+namespace CS.Edu.Tests.MathExtTests;
+
+public class DoubleMathTests
 {
-    [TestFixture]
-    public class DoubleMathTests
+    [Fact]
+    public void ProductOfDoubleSpecialValues()
     {
-        [Test]
-        public void Test4()
-        {
-            Assert.AreEqual(double.NegativeInfinity, 2 * double.NegativeInfinity);
-            Assert.AreEqual(double.NegativeInfinity, double.NegativeInfinity * 2);
-            Assert.AreEqual(double.PositiveInfinity, double.NegativeInfinity * double.NegativeInfinity);
-            Assert.AreEqual(double.PositiveInfinity, double.PositiveInfinity * double.PositiveInfinity);
-            Assert.AreEqual(double.NaN, double.NaN * double.NegativeInfinity);
-            Assert.AreEqual(double.NaN, double.NegativeInfinity * double.NaN);
-            Assert.AreEqual(double.NaN, 2 * double.NaN);
-            Assert.AreEqual(double.NaN, double.NaN * 2);
-        }
+        double.NegativeInfinity.Should().Be(2 * double.NegativeInfinity);
+        double.NegativeInfinity.Should().Be(double.NegativeInfinity * 2);
+        double.PositiveInfinity.Should().Be(double.NegativeInfinity * double.NegativeInfinity);
+        double.PositiveInfinity.Should().Be(double.PositiveInfinity * double.PositiveInfinity);
+        double.NaN.Should().Be(double.NaN * double.NegativeInfinity);
+        double.NaN.Should().Be(double.NegativeInfinity * double.NaN);
+        double.NaN.Should().Be(2 * double.NaN);
+        double.NaN.Should().Be(double.NaN * 2);
     }
 }

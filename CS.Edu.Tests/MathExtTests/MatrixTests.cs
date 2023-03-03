@@ -1,36 +1,24 @@
 using System;
 using System.Linq;
 using CS.Edu.Core.MathExt;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.MathExt
+namespace CS.Edu.Tests.MathExtTests;
+
+public class MatrixTests
 {
-    [TestFixture]
-    public class MatrixTests
+    private readonly double[][] _matrix = Enumerable.Range(0, 4)
+        .Select(c => Enumerable.Range(0, 1000).Select(r => r * Math.Pow(10, c)).ToArray())
+        .ToArray();
+
+    [Fact]
+    public void ConvertTo2D_Jagged_returns2D()
     {
-        [Test]
-        public void CreateJagged()
-        {
-            double[][] mtrx = Enumerable.Range(0, 4)
-                .Select(c => Enumerable.Range(0, 1000).Select(r => r * Math.Pow(10, c)).ToArray())
-                .ToArray();
+        double[,] result = _matrix.To2D();
 
-            Assert.That(mtrx.Length, Is.EqualTo(4));
-            Assert.That(mtrx[0].Length, Is.EqualTo(1000));
-        }
-
-        [Test]
-        public void ConvertTo2D_Jagged_returns2D()
-        {
-            double[][] mtrx = Enumerable.Range(0, 4)
-                .Select(c => Enumerable.Range(0, 1000).Select(r => r * Math.Pow(10, c)).ToArray())
-                .ToArray();
-
-            double[,] result = mtrx.To2D();
-
-            Assert.That(result.Rank, Is.EqualTo(2));
-            Assert.That(result.GetLength(0), Is.EqualTo(4));
-            Assert.That(result.GetLength(1), Is.EqualTo(1000));
-        }
+        result.Rank.Should().Be(2);
+        result.GetLength(0).Should().Be(4);
+        result.GetLength(1).Should().Be(1000);
     }
 }

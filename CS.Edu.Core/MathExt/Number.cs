@@ -1,37 +1,35 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CS.Edu.Core.MathExt
+namespace CS.Edu.Core.MathExt;
+
+public static class Number
 {
-    public static class Number
+    public static long PowerOfTwo(int pow)
     {
-        public static long PowerOfTwo(int pow)
+        if(pow == 0)
+            return 1;
+
+        long @base = 2;
+        for (int i = 1; i < pow; i++)
         {
-            if(pow == 0)
-                return 1;
-
-            long @base = 2;
-            for (int i = 1; i < pow; i++)
-            {
-                 @base <<= 1;
-            }
-
-            return @base;
+            @base <<= 1;
         }
 
-        public static int[] Digits(int number, int @base)
-        {
-            return DigitsIterator(number, @base).ToArray();
-        }
+        return @base;
+    }
 
-        public static IEnumerable<int> DigitsIterator(int number, int @base)
+    public static int[] Digits(int number, int @base)
+    {
+        return DigitsIterator(number, @base).ToArray();
+    }
+
+    private static IEnumerable<int> DigitsIterator(int number, int @base)
+    {
+        do
         {
-            do
-            {
-                yield return number % @base;
-                number /= @base;
-            } while (number > 0);
-        }
+            yield return number % @base;
+            number /= @base;
+        } while (number > 0);
     }
 }

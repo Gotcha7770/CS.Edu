@@ -2,54 +2,52 @@ using System;
 using System.Linq;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core.MathExt;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.MathExt
+namespace CS.Edu.Tests.MathExtTests;
+
+public class NumberTests
 {
-    [TestFixture]
-    public class NumberTests
+    [Theory]
+    [InlineData(2)]
+    [InlineData(8)]
+    [InlineData(10)]
+    [InlineData(16)]
+    public void DigitsTest_Zero_ReturnsZero(int @base)
     {
-        [TestCase(2)]
-        [TestCase(8)]
-        [TestCase(10)]
-        [TestCase(16)]
-        public void DigitsTest_Zero_ReturnsZero(int @base)
-        {
-            int[] result = Number.Digits(0, @base);
-            Assert.That(result, Is.EqualTo(new[] { 0 }));
-        }
+        Number.Digits(0, @base).Should()
+            .BeEquivalentTo(new[] { 0 });
+    }
 
-        [Test]
-        public void DigitsTest_BaseIs2()
-        {
-            int[] result = Number.Digits(0b1011, 2);
-            Assert.That(result, Is.EqualTo(new[] { 1, 1, 0, 1 }));
-        }
+    [Fact]
+    public void DigitsTest_BaseIs2()
+    {
+        Number.Digits(0b1011, 2).Should()
+            .BeEquivalentTo(new[] { 1, 1, 0, 1 });
+    }
 
-        [Test]
-        public void DigitsTest_BaseIs10()
-        {
-            int[] result = Number.Digits(123, 10);
-            Assert.That(result, Is.EqualTo(new[] { 3, 2, 1 }));
-        }
+    [Fact]
+    public void DigitsTest_BaseIs10()
+    {
+        Number.Digits(123, 10).Should()
+            .BeEquivalentTo(new[] { 3, 2, 1 });
+    }
 
-        [Test]
-        public void ReductionTest()
-        {
-            var array = new[] { 3, 2, 1 };
+    [Fact]
+    public void ReductionTest()
+    {
+        var array = new[] { 3, 2, 1 };
 
-            long number = array.Select((x, i) => x * 10.Power(i)).Sum();
+        long number = array.Select((x, i) => x * 10.Power(i)).Sum();
 
-            Assert.That(number, Is.EqualTo(123));
-        }
+        number.Should().Be(123);
+    }
 
-        [Test]
-        public void PowerOfTwoTests()
-        {
-            long standard = (long)Math.Pow(2, 32);
-            long result = Number.PowerOfTwo(32);
-
-            Assert.That(result, Is.EqualTo(standard));
-        }
+    [Fact]
+    public void PowerOfTwoTests()
+    {
+        Number.PowerOfTwo(32).Should()
+            .Be((long)Math.Pow(2, 32));
     }
 }

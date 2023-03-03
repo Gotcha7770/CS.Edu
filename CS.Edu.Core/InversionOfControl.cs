@@ -3,114 +3,113 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CS.Edu.Core
+namespace CS.Edu.Core;
+
+interface IContext {}
+
+interface IRepository
 {
-    interface IContext {}
+    IEnumerable<int> All();
+}
 
-    interface IRepository
+interface IWorker
+{
+    void Work();
+}
+
+class Repository : IRepository
+{
+    private readonly IContext _context;
+
+    public Repository(IContext context)
     {
-        IEnumerable<int> All();
+        _context = context;
     }
-
-    interface IWorker
-    {
-        void Work();
-    }
-
-    class Repository : IRepository
-    {
-        private readonly IContext _context;
-
-        public Repository(IContext context)
-        {
-            _context = context;
-        }
         
-        public IEnumerable<int> All()
-        {
-            return Enumerable.Range(0, 1000);
-        }
+    public IEnumerable<int> All()
+    {
+        return Enumerable.Range(0, 1000);
+    }
+}
+
+class Worker : IWorker
+{
+    private readonly IRepository _repository;
+
+    internal Worker()
+    { 
+        var context = new Context();
+        _repository = new Repository(context);
     }
 
-    class Worker : IWorker
+    internal Worker(IRepository repository)
     {
-        private readonly IRepository _repository;
-
-        internal Worker()
-        { 
-            var context = new Context();
-            _repository = new Repository(context);
-        }
-
-        internal Worker(IRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public void Work()
-        {
-            foreach (var item in _repository.All())
-            {
-                Console.WriteLine(item);
-            }
-        }
+        _repository = repository;
     }
 
-    class CompositionWithoutDI
+    public void Work()
     {
-        public void Main()
+        foreach (var item in _repository.All())
         {
-            var worker = new Worker();
-            worker.Work();
+            Console.WriteLine(item);
         }
     }
+}
 
-    class CompositionWithDI
+class CompositionWithoutDI
+{
+    public void Main()
     {
-        void Main()
-        {
-            IContext context = new Context();
-            IRepository repository = new Repository(context);
-            IWorker worker = new Worker(repository);
-            worker.Work();
-        }
+        var worker = new Worker();
+        worker.Work();
     }
+}
 
-    class Context : IContext
+class CompositionWithDI
+{
+    void Main()
     {
-        public Options Options { get; } = new Options();
-
-        public string GetRootDirectory()
-        {
-            return Options.GetDirectory().Root.Name;
-        }
+        IContext context = new Context();
+        IRepository repository = new Repository(context);
+        IWorker worker = new Worker(repository);
+        worker.Work();
     }
+}
 
-    class Options
+class Context : IContext
+{
+    public Options Options { get; } = new Options();
+
+    public string GetRootDirectory()
     {
-        public DirectoryInfo GetDirectory()
-        {
-            return new DirectoryInfo(Environment.CurrentDirectory);
-        }
+        return Options.GetDirectory().Root.Name;
     }
+}
 
-    class DisclosureOfStructure
+class Options
+{
+    public DirectoryInfo GetDirectory()
     {
-        public void Main()
-        {
-            Context context = new Context();
-            Options options = context.Options;
-            DirectoryInfo directory = options.GetDirectory();
-            string path = directory.Root.Name;
-        }
+        return new DirectoryInfo(Environment.CurrentDirectory);
     }
+}
 
-    class HidingStructure
+class DisclosureOfStructure
+{
+    public void Main()
     {
-        public void Main()
-        {
-            Context context = new Context();
-            string path = context.GetRootDirectory();
-        }
+        Context context = new Context();
+        Options options = context.Options;
+        DirectoryInfo directory = options.GetDirectory();
+        string path = directory.Root.Name;
+    }
+}
+
+class HidingStructure
+{
+    public void Main()
+    {
+        Context context = new Context();
+        string path = context.GetRootDirectory();
     }
 }

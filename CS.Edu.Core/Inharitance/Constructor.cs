@@ -1,54 +1,53 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace CS.Edu.Core.Inharitance
+namespace CS.Edu.Core.Inharitance;
+
+interface IBase { }
+
+class Base : IBase
 {
-    interface IBase { }
+    private readonly int _value;
 
-    class Base : IBase
+    public Base() { }
+
+    public Base(int value)
     {
-        private readonly int _value;
-
-        public Base() { }
-
-        public Base(int value)
-        {
-            _value = value;
-        }
+        _value = value;
     }
+}
 
-    struct BaseStruct : IBase { }
+struct BaseStruct : IBase { }
 
-    class Derrived : Base { }
+class Derrived : Base { }
 
-    interface IContainer<out T>
+interface IContainer<out T>
+{
+    T Value { get; }
+}
+
+class TestContainer<T> : IContainer<T>
+{
+    public T Value { get; }
+}
+
+class Test
+{
+    IEnumerable<Base> _items;
+    Base[] _array;
+    IContainer<Base> _container;
+    List<Base> _list;
+
+    Test()
     {
-        T Value { get; }
-    }
+        _items = new Collection<Derrived>();
 
-    class TestContainer<T> : IContainer<T>
-    {
-        public T Value { get; }
-    }
+        _array = new Derrived[10];
+        _array[0] = new Derrived();
 
-    class Test
-    {
-        IEnumerable<Base> _items;
-        Base[] _array;
-        IContainer<Base> _container;
-        List<Base> _list;
+        _container = new TestContainer<Derrived>();
 
-        Test()
-        {
-            _items = new Collection<Derrived>();
-
-            _array = new Derrived[10];
-            _array[0] = new Derrived();
-
-            _container = new TestContainer<Derrived>();
-
-            //_list = new List<Derrived>(); //ERROR
-            //IBase[] items = EnumerableEx.Return(new BaseStruct()).ToArray(); //ERROR
-        }
+        //_list = new List<Derrived>(); //ERROR
+        //IBase[] items = EnumerableEx.Return(new BaseStruct()).ToArray(); //ERROR
     }
 }
