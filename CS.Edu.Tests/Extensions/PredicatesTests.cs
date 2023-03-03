@@ -1,6 +1,6 @@
 ﻿using System;
 using CS.Edu.Core.Extensions;
-using Shouldly;
+using FluentAssertions;
 using Xunit;
 
 namespace CS.Edu.Tests.Extensions;
@@ -20,7 +20,7 @@ public class PredicatesTests
         Predicate<int> predicate3 = predicate1
             .And(predicate2);
 
-        predicate3(value).ShouldBe(expected);
+        predicate3(value).Should().Be(expected);
     }
 
     [Theory]
@@ -36,6 +36,6 @@ public class PredicatesTests
         Predicate<int> predicate3 = predicate1
             .Or(predicate2);
 
-        predicate3(value).ShouldBe(expected);
+        predicate3(value).Should().Be(expected);
     }
 }

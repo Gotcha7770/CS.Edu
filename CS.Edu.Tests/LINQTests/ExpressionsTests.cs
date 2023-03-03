@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
 using FluentAssertions;
 using Xunit;
@@ -111,5 +112,46 @@ public class ExpressionsTests
         function(new Valuable<int>(-1)).Should().BeFalse();
         function(new Valuable<int>(0)).Should().BeFalse();
         function(new Valuable<int>(1)).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData(2, false)]
+    [InlineData(3, true)]
+    public void NotExpression(int value, bool expected)
+    {
+        Expression<Func<int, bool>> expr = x => x % 2 == 0;
+        Func<int, bool> predicate = Expressions.Not(expr).Compile();
+
+        predicate(value).Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(2, false)]
+    [InlineData(3, false)]
+    [InlineData(6, true)]
+    [InlineData(10, false)]
+    [InlineData(12, true)]
+    public void AndExpressions(int value, bool expected)
+    {
+        Expression<Func<int, bool>> expr1 = x => x % 3 == 0;
+        Expression<Func<int, bool>> expr2 = x => x % 2 == 0;
+        Func<int, bool> predicate = Expressions.And(expr1, expr2).Compile();
+
+        predicate(value).Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    [InlineData(4, true)]
+    [InlineData(5, false)]
+    [InlineData(6, true)]
+    public void OrExpressions(int value, bool expected)
+    {
+        Expression<Func<int, bool>> expr1 = x => x % 2 == 0;
+        Expression<Func<int, bool>> expr2 = x => x % 3 == 0;
+        Func<int, bool> predicate = Expressions.Or(expr1, expr2).Compile();
+
+        predicate(value).Should().Be(expected);
     }
 }
