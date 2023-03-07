@@ -5,82 +5,80 @@ using System.Reactive.Subjects;
 using CS.Edu.Tests.Utils;
 using DynamicData;
 using DynamicData.Tests;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class GroupTests
 {
-    [TestFixture]
-    public class GroupTests
+    private Groupable<int, string>[] _items = Enumerable.Range(1, 10)
+        .Select(x => new Groupable<int, string>(x, "Group1"))
+        .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group2")))
+        .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group3")))
+        .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group4")))
+        .ToArray();
+
+    [Fact]
+    public void GroupTest_RefreshItemWithoutGroupKeyChanged()
     {
-        private Groupable<int, string>[] _items = Enumerable.Range(1, 10)
-            .Select(x => new Groupable<int, string>(x, "Group1"))
-            .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group2")))
-            .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group3")))
-            .Concat(Enumerable.Range(1, 10).Select(x => new Groupable<int, string>(x, "Group4")))
-            .ToArray();
+        using var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key);
+        using var aggregator = cache.Connect()
+            .Group(x => x.GroupKey)
+            .AsAggregator();
 
-        [Test]
-        public void GroupTest_RefreshItemWithoutGroupKeyChanged()
-        {
-            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
-            using (var aggregator = cache.Connect()
-                .Group(x => x.GroupKey)
-                .AsAggregator())
-            {
-                cache.AddOrUpdate(_items);
-                cache.Refresh(_items[0]);
+        cache.AddOrUpdate(_items);
+        cache.Refresh(_items[0]);
 
-                Assert.AreEqual(1, aggregator.Messages.Count);
-                EnumerableAssert.None(aggregator.Messages.SelectMany(x => x), x => x.Reason == ChangeReason.Refresh);
-            }
-        }
+        aggregator.Messages.Should().ContainSingle();
+        aggregator.Messages.SelectMany(x => x)
+            .Should().NotContain(x => x.Reason == ChangeReason.Refresh);
+    }
 
-        [Test]
-        public void GroupTest_RefreshGroupsWithoutGroupKeyChanged()
-        {
-            using (var refresher = new Subject<Unit>())
-            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
-            using (var aggregator = cache.Connect()
-                .Group(x => x.GroupKey, refresher)
-                .AsAggregator())
-            {
-                cache.AddOrUpdate(_items);
-                refresher.OnNext(Unit.Default);
+    [Fact]
+    public void GroupTest_RefreshGroupsWithoutGroupKeyChanged()
+    {
+        using var refresher = new Subject<Unit>();
+        using var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key);
+        using var aggregator = cache.Connect()
+            .Group(x => x.GroupKey, refresher)
+            .AsAggregator();
 
-                Assert.AreEqual(1, aggregator.Messages.Count);
-                EnumerableAssert.None(aggregator.Messages.SelectMany(x => x), x => x.Reason == ChangeReason.Refresh);
-            }
-        }
+        cache.AddOrUpdate(_items);
+        refresher.OnNext(Unit.Default);
 
-        [Test]
-        public void GroupTest_Add()
-        {
-            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
-            using (var aggregator = cache.Connect()
-                .Group(x => x.GroupKey)
-                .AsAggregator())
-            {
-                cache.AddOrUpdate(_items);
-                cache.AddOrUpdate(new Groupable<int, string>(1, "Group 2"));
+        aggregator.Messages.Should().ContainSingle();
+        aggregator.Messages.SelectMany(x => x)
+            .Should().NotContain(x => x.Reason == ChangeReason.Refresh);
+    }
 
-                Assert.AreEqual(2, aggregator.Messages.Count);
-            }
-        }
+    [Fact]
+    public void GroupTest_Add()
+    {
+        using var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key);
+        using var aggregator = cache.Connect()
+            .Group(x => x.GroupKey)
+            .AsAggregator();
 
-        [Test]
-        public void GroupTest_Update()
-        {
-            using (var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key))
-            using (var aggregator = cache.Connect()
-                .Group(x => x.GroupKey)
-                .AsAggregator())
-            {
-                cache.AddOrUpdate(_items);
-                cache.AddOrUpdate(_items[0]);
+        cache.AddOrUpdate(_items);
+        cache.AddOrUpdate(new Groupable<int, string>(1, "Group 2"));
 
-                Assert.AreEqual(2, aggregator.Messages.Count);
-                EnumerableAssert.All(aggregator.Messages.SelectMany(x => x), x => x.Reason == ChangeReason.Refresh);
-            }
-        }
+        aggregator.Messages.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void GroupTest_Update()
+    {
+        using var cache = new SourceCache<Groupable<int, string>, Guid>(x => x.Key);
+        using var aggregator = cache.Connect()
+            .Group(x => x.GroupKey)
+            .AsAggregator();
+
+        cache.AddOrUpdate(_items);
+        cache.AddOrUpdate(_items[0]);
+
+        aggregator.Messages.Should().HaveCount(2);
+        aggregator.Messages.SelectMany(x => x)
+            .Should().NotContain(x => x.Reason == ChangeReason.Refresh);
     }
 }

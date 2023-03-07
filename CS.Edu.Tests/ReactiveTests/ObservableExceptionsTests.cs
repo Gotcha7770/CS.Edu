@@ -1,37 +1,31 @@
 using System;
 using System.Reactive.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
+using static FluentAssertions.FluentActions;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class ObservableExceptionsTests
 {
-    [TestFixture]
-    public class ObservableExceptionsTests
+    [Fact]
+    public void ThrowExceptionTest_WithoutOnError()
     {
-        [Test]
-        public void ThrowExceptionTest_WithoutOnError()
-        {
-            Assert.Throws<Exception>(() =>
-            {
-                Observable.Throw<Exception>(new Exception())
-                    .Subscribe();
-            });
-        }
+        Invoking(() => Observable.Throw<Exception>(new Exception()).Subscribe())
+            .Should().Throw<Exception>();
+    }
 
-        [Test]
-        public void ThrowExceptionTest_WithOnError()
-        {
-            object result = null;
-            Exception exception = null;
+    [Fact]
+    public void ThrowExceptionTest_WithOnError()
+    {
+        object result = null;
+        Exception exception = null;
 
-            Assert.DoesNotThrow(() =>
-            {
-                Observable.Throw<Exception>(new Exception())
-                    .Subscribe(x => result = x, 
-                               ex => exception = ex);
-            });
+        Invoking(() => Observable.Throw<Exception>(new Exception())
+                .Subscribe(x => result = x, ex => exception = ex))
+            .Should().NotThrow<Exception>();
 
-            Assert.IsNull(result);
-            Assert.IsNotNull(exception);
-        }
+        result.Should().BeNull();
+        exception.Should().NotBeNull();
     }
 }

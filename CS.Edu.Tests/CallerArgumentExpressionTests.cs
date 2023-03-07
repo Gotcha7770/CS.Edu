@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using CS.Edu.Tests.Utils;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
+using static FluentAssertions.FluentActions;
 
 namespace CS.Edu.Tests;
 
-[TestFixture]
 public class CallerArgumentExpressionTests
 {
-    public static void Check(bool condition, [CallerArgumentExpression("condition")] string message = default)
+    private static void Check(bool condition, [CallerArgumentExpression("condition")] string message = default)
     {
         if (!condition)
             throw new Exception($"Condition failed: {message}");
     }
 
-    [Test]
-    public void METHOD()
+    [Fact]
+    public void ExceptionMessageFromArgument()
     {
-        //var item = new Identity<int>(3);
         Identity<int> identity = null;
-        Assert.Throws<Exception>(() => Check(identity is { Key: 3 }));
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        Invoking(() => Check(identity is { Key: 3 }))
+            .Should().Throw<Exception>()
+            .WithMessage("Condition failed: identity is { Key: 3 }");
     }
 }

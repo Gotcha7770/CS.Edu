@@ -3,81 +3,80 @@ using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
 using NUnit.Framework;
 
-namespace CS.Edu.Tests
+namespace CS.Edu.Tests;
+
+[TestFixture]
+class PredicateEqualityTests
 {
-    [TestFixture]
-    class PredicateEqualityTests
+    [Test]
+    public void TwoPredicatesWithAnonymousMethods_NotEquals()
     {
-        [Test]
-        public void TwoPredicatesWithAnonymousMethods_NotEquals()
-        {
-            var predicate1 = new Predicate<long>(x => x.IsPrime());
-            var predicate2 = new Predicate<long>(x => x.IsPrime());
+        var predicate1 = new Predicate<long>(x => x.IsPrime());
+        var predicate2 = new Predicate<long>(x => x.IsPrime());
 
-            Assert.That(predicate1, Is.Not.EqualTo(predicate2));
-        }
+        Assert.That(predicate1, Is.Not.EqualTo(predicate2));
+    }
 
-        [Test]
-        public void TwoPredicatesWithMethods_Equals()
-        {
-            var predicate1 = new Predicate<long>(Numbers.IsPrime);
-            var predicate2 = new Predicate<long>(Numbers.IsPrime);
+    [Test]
+    public void TwoPredicatesWithMethods_Equals()
+    {
+        var predicate1 = new Predicate<long>(Numbers.IsPrime);
+        var predicate2 = new Predicate<long>(Numbers.IsPrime);
 
-            Assert.AreEqual(predicate1, predicate2);
-        }
+        Assert.AreEqual(predicate1, predicate2);
+    }
 
-        [Test]
-        public void TwoIdentityFunc_NotEquals()
-        {
-            var func1 = new Func<int, int>(x => x);
-            var func2 = new Func<int, int>(x => x);
+    [Test]
+    public void TwoIdentityFunc_NotEquals()
+    {
+        var func1 = new Func<int, int>(x => x);
+        var func2 = new Func<int, int>(x => x);
 
-            Assert.AreNotEqual(func1, func2);
-        }
+        Assert.AreNotEqual(func1, func2);
+    }
 
-        [Test]
-        public void TwoIdentityFunc_Equals()
-        {
-            var func1 = Functions.Identity<int>();
-            var func2 = Functions.Identity<int>();
+    [Test]
+    public void TwoIdentityFunc_Equals()
+    {
+        var func1 = Functions.Identity<int>();
+        var func2 = Functions.Identity<int>();
 
-            Assert.AreEqual(func1, func2);
-        }
+        Assert.AreEqual(func1, func2);
+    }
 
-        [Test]
-        public void TwoEmptyActions_NotEquals()
-        {
-            var act1 = new Action<int>(x => {});
-            var act2 = new Action<int>(x => {});
+    [Test]
+    public void TwoEmptyActions_NotEquals()
+    {
+        var act1 = new Action<int>(x => {});
+        var act2 = new Action<int>(x => {});
 
-            Assert.AreNotEqual(act1, act2);
-        }
+        Assert.AreNotEqual(act1, act2);
+    }
 
-        [Test]
-        public void TwoEmptyActions_Equals()
-        {
-            var act1 = Actions.Empty<int>();
-            var act2 = Actions.Empty<int>();
+    [Test]
+    public void TwoEmptyActions_Equals()
+    {
+        var act1 = Actions.Empty<int>();
+        var act2 = Actions.Empty<int>();
 
-            Assert.AreEqual(act1, act2);
-        }
+        Assert.AreEqual(act1, act2);
+    }
 
-        [Test]
-        public void TwoRelations_NotEquals()
-        {
-            var r1 = new Relation<bool>((x, y) => x || y);
-            var r2 = new Relation<bool>((x, y) => x || y);
+    [Test]
+    public void TwoRelations_NotEquals()
+    {
+        var r1 = new Relation<bool>((x, y) => x || y);
+        var r2 = new Relation<bool>((x, y) => x || y);
 
-            Assert.AreNotEqual(r1, r2);
-        }
+        Assert.AreNotEqual(r1, r2);
+    }
 
-        [Test]
-        public void TwoOrRelations_Equals()
-        {
-            var r1 = Relations.Or();
-            var r2 = Relations.Or();
+    [Test]
+    public void TwoOrRelations_Equals()
+    {
+        var r1 = Relations.Or();
+        var r2 = Relations.Or();
 
-            Assert.AreEqual(r1, r2);
-        }
+        Assert.AreEqual(r1, r2);
     }
 }

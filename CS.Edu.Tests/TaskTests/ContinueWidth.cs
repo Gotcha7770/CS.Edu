@@ -4,35 +4,34 @@ using CS.Edu.Tests.Utils;
 using DynamicData.Kernel;
 using NUnit.Framework;
 
-namespace CS.Edu.Tests.TaskTests
+namespace CS.Edu.Tests.TaskTests;
+
+public class ContinueWidth
 {
-    public class ContinueWidth
+    [Test]
+    public void ContinueWidth_CanceledTask()
     {
-        [Test]
-        public void ContinueWidth_CanceledTask()
+        Optional<int> result = default;
+        Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
+
+        Assert.DoesNotThrowAsync(async () =>
         {
-            Optional<int> result = default;
-            Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
+            result = await current.ContinueWith(t => !t.IsCanceled ? 42 : Optional<int>.None);
+        });
 
-            Assert.DoesNotThrowAsync(async () =>
-            {
-                result = await current.ContinueWith(t => !t.IsCanceled ? 42 : Optional<int>.None);
-            });
+        OptionalAssert.None(result);
+    }
 
-            OptionalAssert.None(result);
-        }
+    [Test]
+    public async Task Await_CanceledTask()
+    {
+        //Prefer await over continuation???
 
-        [Test]
-        public async Task Await_CanceledTask()
-        {
-            //Prefer await over continuation???
+        Optional<int> result = default;
+        Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
 
-            Optional<int> result = default;
-            Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
+        Assert.ThrowsAsync<TaskCanceledException>(async () => result = await current);
 
-            Assert.ThrowsAsync<TaskCanceledException>(async () => result = await current);
-
-            OptionalAssert.None(result);
-        }
+        OptionalAssert.None(result);
     }
 }

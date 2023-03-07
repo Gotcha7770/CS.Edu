@@ -1,97 +1,95 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
 using DynamicData;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class LastChangedTests
 {
-    [TestFixture]
-    public class LastChangedTests
+    [Fact]
+    public void LastOrDefaultTest()
     {
-        [Test]
-        public void LastOrDefaultTest()
-        {
-            int lastOrDefault = 0;
-            var source = new SourceList<int>();
+        int lastOrDefault = 0;
+        var source = new SourceList<int>();
 
-            var autoSelector = source.Connect()
-                .ToCollection()
-                .Subscribe(items => lastOrDefault = items.LastOrDefault());
+        using var autoSelector = source.Connect()
+            .ToCollection()
+            .Subscribe(items => lastOrDefault = items.LastOrDefault());
 
-            Assert.AreEqual(lastOrDefault, 0);
+        lastOrDefault.Should().Be(0);
 
-            source.Add(42);
-            Assert.AreEqual(lastOrDefault, 42);
+        source.Add(42);
+        lastOrDefault.Should().Be(42);
 
-            source.Remove(42);
-            Assert.AreEqual(lastOrDefault, 0);
-        }
+        source.Remove(42);
+        lastOrDefault.Should().Be(0);
+    }
 
-        [Test]
-        public void LastChangedTest()
-        {
-            Selectable<object> selected = null;
+    [Fact]
+    public void LastChangedTest()
+    {
+        Selectable<object> selected = null;
 
-            var first = new Selectable<object>();
-            var second = new Selectable<object>();
-            var third = new Selectable<object>();
+        var first = new Selectable<object>();
+        var second = new Selectable<object>();
+        var third = new Selectable<object>();
 
-            var source = new SourceCache<Selectable<object>, Guid>(x => x.Key);
-            source.AddOrUpdate(new[] { first, third });
+        var source = Source.From(new[] { first, third }, x => x.Key);
 
-            var autoSelector = source.Connect()
-                .AutoRefresh(x => x.IsSelected)
-                .Flatten()
-                .Select(change => change.Current)
-                .Where(x => x.IsSelected)
-                .Subscribe(latest => selected = latest);
+        using var autoSelector = source.Connect()
+            .AutoRefresh(x => x.IsSelected)
+            .Flatten()
+            .Select(change => change.Current)
+            .Where(x => x.IsSelected)
+            .Subscribe(latest => selected = latest);
 
-            Assert.IsNull(selected);
+        selected.Should().BeNull();
 
-            first.IsSelected = true;
-            Assert.AreSame(selected, first);
+        first.IsSelected = true;
+        selected.Should().Be(first);
 
-            third.IsSelected = true;
-            Assert.AreSame(selected, third);
+        third.IsSelected = true;
+        selected.Should().Be(third);
 
-            source.AddOrUpdate(second);
-            Assert.AreSame(selected, third);
+        source.AddOrUpdate(second);
+        selected.Should().Be(third);
 
-            second.IsSelected = true;
-            Assert.AreSame(selected, second);
-        }
+        second.IsSelected = true;
+        selected.Should().Be(second);
+    }
 
-        [Test]
-        public void LastChangedOrDefaultTest()
-        {
-            Selectable<object> selected = null;
+    [Fact]
+    public void LastChangedOrDefaultTest()
+    {
+        Selectable<object> selected = null;
 
-            var first = new Selectable<object>();
-            var second = new Selectable<object> { IsSelected = true };
-            var source = new SourceCache<Selectable<object>, Guid>(x => x.Key);
+        var first = new Selectable<object>();
+        var second = new Selectable<object> { IsSelected = true };
+        var source = new SourceCache<Selectable<object>, Guid>(x => x.Key);
 
-            var autoSelector = source.Connect()
-                .AutoRefresh(x => x.IsSelected)
-                .ToCollection()
-                .Subscribe(items => selected = items.LastOrDefault(x => x.IsSelected));
+        using var autoSelector = source.Connect()
+            .AutoRefresh(x => x.IsSelected)
+            .ToCollection()
+            .Subscribe(items => selected = items.LastOrDefault(x => x.IsSelected));
 
-            source.AddOrUpdate(first);
-            Assert.IsNull(selected);
+        source.AddOrUpdate(first);
+        selected.Should().BeNull();
 
-            first.IsSelected = true;
-            Assert.AreSame(selected, first);
+        first.IsSelected = true;
+        selected.Should().Be(first);
 
-            source.AddOrUpdate(second);
-            Assert.AreSame(selected, second);
+        source.AddOrUpdate(second);
+        selected.Should().Be(second);
 
-            second.IsSelected = false;
-            Assert.AreSame(selected, first);
+        second.IsSelected = false;
+        selected.Should().Be(first);
 
-            first.IsSelected = false;
-            Assert.IsNull(selected);
-        }
+        first.IsSelected = false;
+        selected.Should().BeNull();
     }
 }

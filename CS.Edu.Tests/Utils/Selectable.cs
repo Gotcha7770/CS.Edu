@@ -1,15 +1,14 @@
-namespace CS.Edu.Tests.Utils
+namespace CS.Edu.Tests.Utils;
+
+class Selectable<T> : Valuable<T>
 {
-    class Selectable<T> : Valuable<T>
+    private bool _isSelected;
+
+    public Selectable() : base(default) { }
+
+    public bool IsSelected
     {
-        private bool _isSelected;
-
-        public Selectable() : base(default) { }
-
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set => SetAndRaise(ref _isSelected, value);
-        }
+        get => _isSelected;
+        set => SetAndRaise(ref _isSelected, value);
     }
 }

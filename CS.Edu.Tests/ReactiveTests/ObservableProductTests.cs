@@ -6,143 +6,133 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CS.Edu.Core.Extensions;
 using DynamicData;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class ObservableProductTests
 {
-    [TestFixture]
-    public class ObservableProductTests
+    static readonly (int, int)[] Standard =
     {
-        static readonly (int, int)[] Standard =
-        {
-            (0, 0),
-            (0, 1),
-            (1, 0),
-            (1, 1),
-        };
+        (0, 0),
+        (0, 1),
+        (1, 0),
+        (1, 1),
+    };
 
-        static readonly int[] Left = {0, 1};
-        static readonly int[] Right = {0, 1};
+    static readonly int[] Left = {0, 1};
+    static readonly int[] Right = {0, 1};
 
-        [Test]
-        public void EnumerableCartesian()
-        {
-            var cartesian = from x in Left
-                            from y in Right
-                            select (x, y);
+    [Fact]
+    public void EnumerableCartesian()
+    {
+        var cartesian = from x in Left
+                        from y in Right
+                        select (x, y);
 
-            // foreach(var x in Left)
-            // {
-            //     foreach (var y in Right)
-            //     {
-            //         result.Add((x, y));
-            //     }
-            // }
+        // foreach(var x in Left)
+        // {
+        //     foreach (var y in Right)
+        //     {
+        //         result.Add((x, y));
+        //     }
+        // }
 
-            //cartesian = Left.SelectMany(x => Right.Select(y => (x, y)))
+        //cartesian = Left.SelectMany(x => Right.Select(y => (x, y)))
 
-            CollectionAssert.AreEqual(cartesian, Standard);
-        }
+       cartesian.Should().BeEquivalentTo(Standard);
+    }
 
-        [Test]
-        public void ObservableCartesianCold()
-        {
-            var product = from x in Left.ToObservable()
-                          from y in Right.ToObservable()
-                          select (x, y);
+    [Fact]
+    public void ObservableCartesianCold()
+    {
+        var product = from x in Left.ToObservable()
+                      from y in Right.ToObservable()
+                      select (x, y);
 
-            var cartesian = product.ToEnumerable();
+        var cartesian = product.ToEnumerable();
 
-            CollectionAssert.AreEqual(cartesian, Standard);
-        }
+        cartesian.Should().BeEquivalentTo(Standard);
+    }
 
-        [Test]
-        public void ObservableCartesianHot()
-        {
-            ISubject<int> left = new Subject<int>();
-            ISubject<int> right = new Subject<int>();
+    [Fact]
+    public void ObservableCartesianHot()
+    {
+        ISubject<int> left = new Subject<int>();
+        ISubject<int> right = new Subject<int>();
 
-            var cartesian = new List<(int, int)>();
+        var cartesian = new List<(int, int)>();
 
-            var product = from x in left
-                          from y in right
-                          select (x, y);
+        var product = from x in left
+                      from y in right
+                      select (x, y);
 
-            using (var subscription = product.Subscribe(x => cartesian.Add(x)))
-            {
+        using var subscription = product.Subscribe(x => cartesian.Add(x));
+        cartesian.Should().BeEmpty();
 
-                CollectionAssert.IsEmpty(cartesian);
+        left.OnNext(0);
+        left.OnNext(1);
 
-                left.OnNext(0);
-                left.OnNext(1);
+        cartesian.Should().BeEmpty();
 
-                CollectionAssert.IsEmpty(cartesian);
+        right.OnNext(0);
 
-                right.OnNext(0);
+        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0) });
 
-                CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
+        right.OnNext(1);
 
-                right.OnNext(1);
+        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+    }
 
-                CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
-            }
-        }
+    [Fact]
+    public void ObservableChangeSetCartesianCold()
+    {
+        IObservable<IChangeSet<int>> one = Left.AsObservableChangeSet();
+        IObservable<IChangeSet<int>> other = Right.AsObservableChangeSet();
 
-        [Test]
-        public void ObservableChangeSetCartesianCold()
-        {
-            IObservable<IChangeSet<int>> one = Left.AsObservableChangeSet();
-            IObservable<IChangeSet<int>> other = Right.AsObservableChangeSet();
+        using var subscription = one.Product(other, (x, y) => (x, y))
+            .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
+            .Subscribe();
 
-            var subscription = one.Product(other, (x, y) => (x, y))
-                .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
-                .Subscribe();
+        var product = from x in one
+                      from y in other
+                      select (x, y);
 
-            var product = from x in one
-                          from y in other
-                          select (x, y);
+        cartesian.Should().BeEquivalentTo(Standard);
+    }
 
-            //IObservable<(IChangeset<T1>, IChangeset<T2>) -> IObservable<IChangeset<(T1, T2)>>
+    [Fact]
+    public void ObservableChangeSetCartesianHot()
+    {
+        ISourceList<int> left = new SourceList<int>();
+        ISourceList<int> right = new SourceList<int>();
 
-            // var subscription = one.TransformMany<(int, int), int>(x => Transformation(x, other))
-            //     .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
-            //     .Subscribe();
+        using var subscription = left.Connect()
+            .Product(right.Connect(), (l, r) => (l, r))
+            .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
+            .Subscribe();
 
-            CollectionAssert.AreEqual(cartesian, Standard);
-        }
+        cartesian.Should().BeEmpty();
 
-        [Test]
-        public void ObservableChangeSetCartesianHot()
-        {
-            ISourceList<int> left = new SourceList<int>();
-            ISourceList<int> right = new SourceList<int>();
+        left.AddRange(new [] {0, 1});
 
-            var subscription = left.Connect()
-                .Product(right.Connect(), (l, r) => (l, r))
-                .Bind(out ReadOnlyObservableCollection<(int, int)> cartesian)
-                .Subscribe();
+        cartesian.Should().BeEmpty();
 
-            CollectionAssert.IsEmpty(cartesian);
+        right.Add(0);
 
-            left.AddRange(new [] {0, 1});
+        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0) });
 
-            CollectionAssert.IsEmpty(cartesian);
+        right.Add(1);
 
-            right.Add(0);
+        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
 
-            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0) });
+        left.Remove(0);
 
-            right.Add(1);
+        cartesian.Should().BeEquivalentTo(new[] { (1, 0), (1, 1) });
 
-            CollectionAssert.AreEqual(cartesian, new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+        right.Clear();
 
-            left.Remove(0);
-
-            CollectionAssert.AreEqual(cartesian, new[] { (1, 0), (1, 1) });
-
-            right.Clear();
-
-            CollectionAssert.IsEmpty(cartesian);
-        }
+        cartesian.Should().BeEmpty();
     }
 }

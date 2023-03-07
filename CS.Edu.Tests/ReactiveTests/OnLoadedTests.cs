@@ -4,96 +4,82 @@ using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
 using DynamicData;
 using DynamicData.Tests;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class OnLoadedTests
 {
-    [TestFixture]
-    public class OnLoadedTests
+    [Fact]
+    public void OnLoadedEmptySource()
     {
-        private readonly SourceCache<Identity<Guid>, Guid> _cache = new SourceCache<Identity<Guid>, Guid>(x => x.Key);
+        var cache = new SourceCache<Identity<Guid>, Guid>(x => x.Key);
+        var list = new List<IChangeSet<Identity<Guid>, Guid>>();
+        using var aggregator = cache.Connect()
+            .OnLoaded(x => list.Add(x))
+            .AsAggregator();
 
-        [TearDown]
-        public void TearDown()
+        aggregator.Messages.Should().BeEmpty();
+        list.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void OnLoadedWithInitialValues()
+    {
+        var cache = Source.From(new []
         {
-            _cache.Clear();
-        }
+            new Identity<Guid>(Guid.NewGuid()),
+            new Identity<Guid>(Guid.NewGuid())
+        }, x => x.Key);
 
-        [Test]
-        public void OnLoadedEmptySource()
+        var list = new List<IChangeSet<Identity<Guid>, Guid>>();
+        using var aggregator = cache.Connect()
+            .OnLoaded(x => list.Add(x))
+            .AsAggregator();
+
+        aggregator.Messages.Should().ContainSingle();
+        aggregator.Messages.Should().OnlyContain(x => x.Adds == 2);
+        list.Should().ContainSingle();
+        list.Should().OnlyContain(x => x.Adds == 2);
+    }
+
+    [Fact]
+    public void OnLoadedEmptySource_IgnoreUpdates()
+    {
+        var cache = new SourceCache<Identity<Guid>, Guid>(x => x.Key);
+        var list = new List<IChangeSet<Identity<Guid>, Guid>>();
+        using var aggregator = cache.Connect()
+            .OnLoaded(x => list.Add(x))
+            .AsAggregator();
+
+        cache.AddOrUpdate(new Identity<Guid>(Guid.NewGuid()));
+
+        aggregator.Messages.Should().ContainSingle();
+        aggregator.Messages.Should().OnlyContain(x => x.Adds == 1);
+        list.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void OnLoadedWithInitialValues_IgnoreUpdates()
+    {
+        var cache = Source.From(new[]
         {
-            var list = new List<IChangeSet<Identity<Guid>, Guid>>();
-            using (var aggregator = _cache.Connect()
-                .OnLoaded(x => list.Add(x))
-                .AsAggregator())
-            {
-                Assert.AreEqual(0, aggregator.Messages.Count);
-                Assert.AreEqual(0, list.Count);
-            }
-        }
+            new Identity<Guid>(Guid.NewGuid()),
+            new Identity<Guid>(Guid.NewGuid())
+        }, x => x.Key);
 
-        [Test]
-        public void OnLoadedWithInitialValues()
-        {
-            var items = new[]
-            {
-                new Identity<Guid>(Guid.NewGuid()),
-                new Identity<Guid>(Guid.NewGuid())
-            };
-            _cache.AddOrUpdate(items);
+        var list = new List<IChangeSet<Identity<Guid>, Guid>>();
+        using var aggregator = cache.Connect()
+            .OnLoaded(x => list.Add(x))
+            .AsAggregator();
 
-            var list = new List<IChangeSet<Identity<Guid>, Guid>>();
-            using (var aggregator = _cache.Connect()
-                .OnLoaded(x => list.Add(x))
-                .AsAggregator())
-            {
-                Assert.AreEqual(1, aggregator.Messages.Count);
-                Assert.AreEqual(2, aggregator.Messages[0].Adds);
-                Assert.AreEqual(1, list.Count);
-                Assert.AreEqual(2, list[0].Adds);
-            }
-        }
+        cache.AddOrUpdate(new Identity<Guid>(Guid.NewGuid()));
 
-        [Test]
-        public void OnLoadedEmptySource_IgnoreUpdates()
-        {
-            var list = new List<IChangeSet<Identity<Guid>, Guid>>();
-            using (var aggregator = _cache.Connect()
-                .OnLoaded(x => list.Add(x))
-                .AsAggregator())
-            {
-                _cache.AddOrUpdate(new Identity<Guid>(Guid.NewGuid()));
-
-                Assert.AreEqual(1, aggregator.Messages.Count);
-                Assert.AreEqual(1, aggregator.Messages[0].Adds);
-                Assert.AreEqual(0, list.Count);
-            }
-        }
-
-        [Test]
-        public void OnLoadedWithInitialValues_IgnoreUpdates()
-        {
-            var items = new[]
-            {
-                new Identity<Guid>(Guid.NewGuid()),
-                new Identity<Guid>(Guid.NewGuid())
-            };
-            _cache.AddOrUpdate(items);
-
-            var list = new List<IChangeSet<Identity<Guid>, Guid>>();
-            using (var aggregator = _cache.Connect()
-                .OnLoaded(x => list.Add(x))
-                .AsAggregator())
-            {
-
-                _cache.AddOrUpdate(new Identity<Guid>(Guid.NewGuid()));
-
-                Assert.AreEqual(2, aggregator.Messages.Count);
-                Assert.AreEqual(2, aggregator.Messages[0].Adds);
-                Assert.AreEqual(1, aggregator.Messages[1].Adds);
-                Assert.AreEqual(1, list.Count);
-                Assert.AreEqual(2, list[0].Adds);
-            }
-        }
+        aggregator.Messages.Should().HaveCount(2);
+        aggregator.Messages[0].Adds.Should().Be(2);
+        aggregator.Messages[1].Adds.Should().Be(1);
+        list.Should().ContainSingle();
+        list.Should().OnlyContain(x => x.Adds == 2);
     }
 }

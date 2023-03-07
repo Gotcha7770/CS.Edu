@@ -6,82 +6,82 @@ using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
 using DynamicData;
 using DynamicData.Tests;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class ExpireOnTests
 {
-    [TestFixture]
-    public class ExpireOnTests
+    private readonly Subject<Unit> _subject = new Subject<Unit>();
+
+    [Fact]
+    public void RemoveAllWithFilter()
     {
-        private readonly Subject<Unit> _subject = new Subject<Unit>();
-        private readonly SourceCache<Valuable<int>, Guid> _source = new SourceCache<Valuable<int>, Guid>(x => x.Key);
-
-        [TearDown]
-        public void TearDown()
+        var source = Source.From(new[]
         {
-            _source.Clear();
+            new Valuable<int>(0),
+            new Valuable<int>(1)
+        }, x => x.Key);
+
+        using (var aggregate = source.Connect()
+                   .Filter(_subject.Select(_ => Predicates.False<Valuable<int>>())
+                       .StartWith(Predicates.True<Valuable<int>>()))
+                   .SkipInitial()
+                   .AsAggregator())
+        {
+            _subject.OnNext(Unit.Default);
+            aggregate.Messages.Should().ContainSingle();
+            aggregate.Messages.Should().OnlyContain(x => x.Removes == 2);
         }
+    }
 
-        [Test]
-        public void RemoveAllWithFilter()
+    [Fact]
+    public void ExpireOn_Initial()
+    {
+        var source = new SourceCache<Valuable<int>, Guid>(x => x.Key);
+        using (var aggregate = source.Connect()
+                   .ExpireOn(_subject)
+                   .AsAggregator())
         {
-            _source.AddOrUpdate(new Valuable<int>(0));
-            _source.AddOrUpdate(new Valuable<int>(1));
+            source.AddOrUpdate(new Valuable<int>(0));
+            source.AddOrUpdate(new Valuable<int>(1));
 
-            using (var aggregate = _source.Connect()
-                .Filter(_subject.Select(_ => Predicates.False<Valuable<int>>()).StartWith(Predicates.True<Valuable<int>>()))
-                .SkipInitial()
-                .AsAggregator())
-            {
-                _subject.OnNext(Unit.Default);
-                Assert.AreEqual(1, aggregate.Messages.Count);
-                Assert.AreEqual(2, aggregate.Messages[0].Removes);
-            }
+            aggregate.Messages.Should().HaveCount(2);
+            aggregate.Messages.Should().OnlyContain(x => x.Adds == 1);
         }
+    }
 
-        [Test]
-        public void ExpireOn_Initial()
+    [Fact]
+    public void ExpireOn_ClearsOnEvaluation()
+    {
+        var source = Source.From(new[]
         {
-            using (var aggregate = _source.Connect()
-                .ExpireOn(_subject)
-                .AsAggregator())
-            {
-                _source.AddOrUpdate(new Valuable<int>(0));
-                _source.AddOrUpdate(new Valuable<int>(1));
+            new Valuable<int>(0),
+            new Valuable<int>(1)
+        }, x => x.Key);
 
-                Assert.AreEqual(2, aggregate.Messages.Count);
-                Assert.AreEqual(1, aggregate.Messages[0].Adds);
-                Assert.AreEqual(1, aggregate.Messages[1].Adds);
-            }
+        using (var aggregate = source.Connect()
+                   .ExpireOn(_subject)
+                   .SkipInitial()
+                   .AsAggregator())
+        {
+            _subject.OnNext(Unit.Default);
+            aggregate.Messages.Should().ContainSingle();
+            aggregate.Messages.Should().OnlyContain(x => x.Removes == 2);
         }
+    }
 
-        [Test]
-        public void ExpireOn_ClearsOnEvaluation()
+    [Fact]
+    public void ExpireOn_EmptySource_NothingToClear()
+    {
+        var source = new SourceCache<Valuable<int>, Guid>(x => x.Key);
+        using (var aggregate = source.Connect()
+                   .ExpireOn(_subject)
+                   .AsAggregator())
         {
-            _source.AddOrUpdate(new Valuable<int>(0));
-            _source.AddOrUpdate(new Valuable<int>(1));
-
-            using (var aggregate = _source.Connect()
-                .ExpireOn(_subject)
-                .SkipInitial()
-                .AsAggregator())
-            {
-                _subject.OnNext(Unit.Default);
-                Assert.AreEqual(1, aggregate.Messages.Count);
-                Assert.AreEqual(2, aggregate.Messages[0].Removes);
-            }
-        }
-
-        [Test]
-        public void ExpireOn_EmptySource_NothingToClear()
-        {
-            using (var aggregate = _source.Connect()
-                .ExpireOn(_subject)
-                .AsAggregator())
-            {
-                _subject.OnNext(Unit.Default);
-                Assert.AreEqual(0, aggregate.Messages.Count);
-            }
+            _subject.OnNext(Unit.Default);
+            aggregate.Messages.Should().BeEmpty();
         }
     }
 }

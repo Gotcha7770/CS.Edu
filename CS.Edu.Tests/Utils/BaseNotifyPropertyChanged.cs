@@ -1,17 +1,16 @@
 using System.Runtime.CompilerServices;
 using DynamicData.Binding;
 
-namespace CS.Edu.Tests.Utils
+namespace CS.Edu.Tests.Utils;
+
+class BaseNotifyPropertyChanged  : AbstractNotifyPropertyChanged
 {
-    class BaseNotifyPropertyChanged  : AbstractNotifyPropertyChanged
+    protected override void SetAndRaise<T>(ref T backingField, T newValue, [CallerMemberName] string propertyName = null)
     {
-        protected override void SetAndRaise<T>(ref T backingField, T newValue, [CallerMemberName] string propertyName = null)
+        if (!Equals(backingField, newValue))
         {
-            if (!Equals(backingField, newValue))
-            {
-                backingField = newValue;
-                OnPropertyChanged(propertyName);
-            }
+            backingField = newValue;
+            OnPropertyChanged(propertyName);
         }
     }
 }

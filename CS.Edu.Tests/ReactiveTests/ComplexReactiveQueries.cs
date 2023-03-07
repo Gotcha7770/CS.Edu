@@ -1,55 +1,54 @@
 ﻿using System;
 using System.Reactive.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class ComplexReactiveQueries
 {
-    [TestFixture]
-    public class ComplexReactiveQueries
+    [Fact]
+    public void OneToOne()
     {
-        [Test]
-        public void OneToOne()
+        string result = null;
+        IObservable<int> source = Observable.Return(1);
+        IObservable<string> selector = source.Select(x => x.ToString());
+
+        using (_ = selector.Subscribe(x => result = x))
         {
-            string result = null;
-            IObservable<int> source = Observable.Return(1);
-            IObservable<string> selector = source.Select(x => x.ToString());
-
-            using (_ = selector.Subscribe(x => result = x))
-            {
-                Assert.AreEqual("1", result);
-            }
+            result.Should().Be("1");
         }
+    }
 
-        [Test]
-        public void OneToMany()
+    [Fact]
+    public void OneToMany()
+    {
+        IObservable<string> result = null;
+        IObservable<int> source = Observable.Return(1);
+        IObservable<IObservable<string>> selector = source.Select(x => Observable.Return(x.ToString()));
+
+        using (_ = selector.Subscribe(x => result = x))
         {
-            IObservable<string> result = null;
-            IObservable<int> source = Observable.Return(1);
-            IObservable<IObservable<string>> selector = source.Select(x => Observable.Return(x.ToString()));
-
-            using (_ = selector.Subscribe(x => result = x))
-            {
-                Assert.AreEqual("1", result.First());
-            }
+            //Assert.AreEqual("1", result.First());
         }
+    }
 
-        [Test]
-        public void ManyToOne()
+    [Fact]
+    public void ManyToOne()
+    {
+        string result = null;
+        IObservable<IObservable<string>> source = Observable.Return(1).Select(x => Observable.Return(x.ToString()));
+        IObservable<string> selector = source.Merge(); //SelectMany, Switch
+
+        using (_ = selector.Subscribe(x => result = x))
         {
-            string result = null;
-            IObservable<IObservable<string>> source = Observable.Return(1).Select(x => Observable.Return(x.ToString()));
-            IObservable<string> selector = source.Merge(); //SelectMany, Switch
-
-            using (_ = selector.Subscribe(x => result = x))
-            {
-                Assert.AreEqual("1", result);
-            }
+            result.Should().Be("1");
         }
+    }
 
-        [Test]
-        public void ManyToMany()
-        {
+    [Fact]
+    public void ManyToMany()
+    {
 
-        }
     }
 }

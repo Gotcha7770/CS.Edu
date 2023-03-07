@@ -3,136 +3,132 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using DynamicData;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class SharedSourceListFact
 {
-    [TestFixture]
-    public class SharedSourceListTest
+    [Fact]
+    public void Aggregate_ReferenceTypeAccumulatorProblem()
     {
-        [Test]
-        public void Aggregate_ReferenceTypeAccumulatorProblem()
-        {
-            var source = new Subject<IChangeSet<int>>();
-            var target1 = new BehaviorSubject<IList<int>>(null);
-            var target2 = new BehaviorSubject<IList<int>>(null);
+        var source = new Subject<IChangeSet<int>>();
+        var target1 = new BehaviorSubject<IList<int>>(null);
+        var target2 = new BehaviorSubject<IList<int>>(null);
 
-            var observable = source.Aggregate(new List<int>(),
-                (acc, changes) =>
-                {
-                    acc.Clone(changes);
-                    return acc;
-                });
-
-            using var s1 = observable.Subscribe(target1);
-            using var s2 = observable.Subscribe(target2);
-
-            source.OnNext(new ChangeSet<int> {new Change<int>(ListChangeReason.Add, 1, 0)});
-            source.OnCompleted();
-
-            Assert.AreEqual(new[] {1}, target1.Value);
-        }
-
-        [Test]
-        public void Aggregate_Fix1()
-        {
-            var source = new Subject<IChangeSet<int>>();
-            var target1 = new BehaviorSubject<IList<int>>(null);
-            var target2 = new BehaviorSubject<IList<int>>(null);
-
-            var observable = Observable.Create<IList<int>>(observer =>
+        var observable = source.Aggregate(new List<int>(),
+            (acc, changes) =>
             {
-                return source.Aggregate(new List<int>(),
-                        (acc, changes) =>
-                        {
-                            acc.Clone(changes);
-                            return acc;
-                        })
-                    .Subscribe(observer);
+                acc.Clone(changes);
+                return acc;
             });
 
-            using var s1 = observable.Subscribe(target1);
-            using var s2 = observable.Subscribe(target2);
+        using var s1 = observable.Subscribe(target1);
+        using var s2 = observable.Subscribe(target2);
 
-            source.OnNext(new ChangeSet<int> {new Change<int>(ListChangeReason.Add, 1, 0)});
-            source.OnCompleted();
+        source.OnNext(new ChangeSet<int> { new Change<int>(ListChangeReason.Add, 1, 0) });
+        source.OnCompleted();
 
-            Assert.AreEqual(new[] {1}, target1.Value);
-        }
+        // we expect, target1 contains single value, but it is not
+        // because of shared list reference in observable
+        target1.Value.Should().BeEquivalentTo(new[] { 1, 1 });
+        target2.Value.Should().BeEquivalentTo(new[] { 1, 1 });
+    }
 
-        [Test]
-        public void Aggregate_Fix2()
+    [Fact]
+    public void Aggregate_Fix1()
+    {
+        var source = new Subject<IChangeSet<int>>();
+        var target1 = new BehaviorSubject<IList<int>>(null);
+        var target2 = new BehaviorSubject<IList<int>>(null);
+
+        var observable = Observable.Create<IList<int>>(observer =>
         {
-            var source = new Subject<IChangeSet<int>>();
-            var target1 = new BehaviorSubject<IList<int>>(null);
-            var target2 = new BehaviorSubject<IList<int>>(null);
+            return source.Aggregate(new List<int>(),
+                    (acc, changes) =>
+                    {
+                        acc.Clone(changes);
+                        return acc;
+                    })
+                .Subscribe(observer);
+        });
 
-            var observable = source.Aggregate(new List<int>(),
-                (acc, changes) =>
-                {
-                    var copy = acc.ToList();
-                    copy.Clone(changes);
-                    return copy;
-                });
+        using var s1 = observable.Subscribe(target1);
+        using var s2 = observable.Subscribe(target2);
 
-            using var s1 = observable.Subscribe(target1);
-            using var s2 = observable.Subscribe(target2);
+        source.OnNext(new ChangeSet<int> { new Change<int>(ListChangeReason.Add, 1, 0) });
+        source.OnCompleted();
 
-            source.OnNext(new ChangeSet<int> {new Change<int>(ListChangeReason.Add, 1, 0)});
-            source.OnCompleted();
+        target1.Value.Should().BeEquivalentTo(new[] { 1 });
+        target2.Value.Should().BeEquivalentTo(new[] { 1 });
+    }
 
-            Assert.AreEqual(new[] {1}, target1.Value);
-        }
+    [Fact]
+    public void Aggregate_Fix2()
+    {
+        var source = new Subject<IChangeSet<int>>();
+        var target1 = new BehaviorSubject<IList<int>>(null);
+        var target2 = new BehaviorSubject<IList<int>>(null);
 
-        [Test]
-        public void Scan()
-        {
-            var source = new Subject<IChangeSet<int>>();
-            var target1 = new BehaviorSubject<IList<int>>(null);
-            var target2 = new BehaviorSubject<IList<int>>(null);
+        var observable = source.Aggregate(new List<int>(),
+            (acc, changes) =>
+            {
+                var copy = acc.ToList();
+                copy.Clone(changes);
+                return copy;
+            });
 
-            var observable = source.Scan(new List<int>(),
-                (list, changes) =>
-                {
-                    list.Clone(changes);
-                    return list;
-                });
+        using var s1 = observable.Subscribe(target1);
+        using var s2 = observable.Subscribe(target2);
 
-            using var s1 = observable.Subscribe(target1);
-            using var s2 = observable.Subscribe(target2);
+        source.OnNext(new ChangeSet<int> { new Change<int>(ListChangeReason.Add, 1, 0) });
+        source.OnCompleted();
 
-            source.OnNext(new ChangeSet<int> {new Change<int>(ListChangeReason.Add, 1, 0)});
-        }
+        target1.Value.Should().BeEquivalentTo(new[] { 1 });
+        target2.Value.Should().BeEquivalentTo(new[] { 1 });
+    }
 
-        [Test]
-        public void QueryWhenChanged()
-        {
-            var source = new SourceList<int>();
-            var observable = source.Connect()
-                .QueryWhenChanged();
+    [Fact]
+    public void Scan()
+    {
+        var source = new Subject<IChangeSet<int>>();
+        var target1 = new BehaviorSubject<IList<int>>(null);
+        var target2 = new BehaviorSubject<IList<int>>(null);
 
-            var first = new BehaviorSubject<IReadOnlyCollection<int>>(null);
-            using var s1 = observable.Subscribe(first);
+        var observable = source.Scan(new List<int>(),
+            (list, changes) =>
+            {
+                list.Clone(changes);
+                return list;
+            });
 
-            var second = new BehaviorSubject<IReadOnlyCollection<int>>(null);
-            using var s2 = observable.Subscribe(second);
-        }
+        using var s1 = observable.Subscribe(target1);
+        using var s2 = observable.Subscribe(target2);
 
-        // [Test]
-        // public void ObservableQueryAreIndependentAndInvokeConnectManyTimes()
-        // {
-        //     string result1 = null;
-        //     string result2 = null;
-        //
-        //     var observable = _source.Connect()
-        //         .ToCollection()
-        //         .Select(x => string.Join('+', x));
-        //
-        //     using var s1 = observable.Subscribe(x => result1 = x);
-        //     using var s2 = observable.Subscribe(x => result2 = x);
-        //
-        //     _source.Add(4);
-        //     _source.Add(5);
-        // }
+        source.OnNext(new ChangeSet<int> { new Change<int>(ListChangeReason.Add, 1, 0) });
+
+        target1.Value.Should().BeEquivalentTo(new[] { 1, 1 });
+        target2.Value.Should().BeEquivalentTo(new[] { 1, 1 });
+    }
+
+    [Fact]
+    public void QueryWhenChanged()
+    {
+        var source = new SourceList<int>();
+        var observable = source.Connect()
+            .QueryWhenChanged();
+
+        var first = new BehaviorSubject<IReadOnlyCollection<int>>(null);
+        using var s1 = observable.Subscribe(first);
+
+        var second = new BehaviorSubject<IReadOnlyCollection<int>>(null);
+        using var s2 = observable.Subscribe(second);
+
+        source.Add(1);
+
+        // fixed
+        // first.Value.Should().BeEquivalentTo(new[] { 1, 1 });
+        // second.Value.Should().BeEquivalentTo(new[] { 1, 1 });
     }
 }

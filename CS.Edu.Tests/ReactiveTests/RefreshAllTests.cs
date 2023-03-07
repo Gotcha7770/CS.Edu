@@ -1,34 +1,35 @@
-using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
+using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
 using DynamicData;
 using DynamicData.Tests;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
-namespace CS.Edu.Tests.ReactiveTests
+namespace CS.Edu.Tests.ReactiveTests;
+
+public class RefreshAllTests
 {
-    [TestFixture]
-    public class RefreshAllTests
+    private readonly Valuable<string>[] _items = Enumerable.Range(1, 100)
+        .Select(i => new Valuable<string>(i.ToString()))
+        .ToArray();
+
+    [Fact]
+    public void RefreshAllTest()
     {
-        private Valuable<string>[] _items = Enumerable.Range(1, 100)
-                .Select(i => new Valuable<string>(i.ToString()))
-                .ToArray();
+        using var refresher = new Subject<Unit>();
+        using var cache = Source.From(_items, x => x.Key);
+        using var aggregator = cache.Connect()
+            .AutoRefreshOnObservable(_ => refresher)
+            .SkipInitial()
+            .AsAggregator();
 
-        [Test]
-        public void RefreshAllTest()
-        {
-            using(var refresher = new Subject<Unit>())
-            using (var cache = new SourceCache<Valuable<string>, Guid>(x => x.Key))
-            using (var aggregator = cache.Connect().AutoRefreshOnObservable(x => refresher).AsAggregator())
-            {
-                cache.AddOrUpdate(_items);
-                refresher.OnNext(Unit.Default);
+        refresher.OnNext(Unit.Default);
 
-                Assert.AreEqual(101, aggregator.Messages.Count);
-                EnumerableAssert.All(aggregator.Messages.SelectMany(x => x), x => x.Reason == ChangeReason.Refresh);
-            }
-        }
+        aggregator.Messages.Should().HaveCount(100);
+        aggregator.Messages.SelectMany(x => x).Should()
+            .OnlyContain(x => x.Reason == ChangeReason.Refresh);
     }
 }
