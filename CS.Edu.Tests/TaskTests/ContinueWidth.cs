@@ -2,27 +2,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using CS.Edu.Tests.Utils;
 using DynamicData.Kernel;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
+using static FluentAssertions.FluentActions;
 
 namespace CS.Edu.Tests.TaskTests;
 
 public class ContinueWidth
 {
-    [Test]
-    public void ContinueWidth_CanceledTask()
+    [Fact]
+    public async Task ContinueWidth_CanceledTask()
     {
         Optional<int> result = default;
         Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
 
-        Assert.DoesNotThrowAsync(async () =>
-        {
-            result = await current.ContinueWith(t => !t.IsCanceled ? 42 : Optional<int>.None);
-        });
+        await Invoking(() => current.ContinueWith(t => !t.IsCanceled ? 42 : default))
+            .Should().NotThrowAsync();
 
         OptionalAssert.None(result);
     }
 
-    [Test]
+    [Fact]
     public async Task Await_CanceledTask()
     {
         //Prefer await over continuation???
@@ -30,7 +30,8 @@ public class ContinueWidth
         Optional<int> result = default;
         Task<Optional<int>> current = Task.FromCanceled<Optional<int>>(new CancellationToken(true));
 
-        Assert.ThrowsAsync<TaskCanceledException>(async () => result = await current);
+        await Invoking(async () => result = await current)
+            .Should().ThrowAsync<TaskCanceledException>();
 
         OptionalAssert.None(result);
     }

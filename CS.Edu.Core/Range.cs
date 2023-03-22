@@ -14,9 +14,16 @@ public enum RangeParameters
     IncludeBoth = IncludeMinimum | IncludeMaximum
 }
 
+public interface IRange<out T>
+{
+    T Min { get; }
+
+    T Max { get; }
+}
+
 public readonly struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>, IEquatable<T>
 {
-    public static Range<T> Default { get; } = new Range<T>();
+    public static Range<T> Empty { get; } = new Range<T>();
 
     public Range(T minimum, T maximum)
     {
@@ -33,7 +40,7 @@ public readonly struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>,
 
     public T Max { get; }
 
-    public bool IsDefault => Equals(Default);
+    public bool IsDefault => Equals(Empty);
 
     public bool IsEmpty => Min.CompareTo(Max) == 0;
 
@@ -100,7 +107,7 @@ public readonly struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>,
             return new Range<T>(min, max);
         }
 
-        return Default;
+        return Empty;
     }
 
     public IEnumerable<Range<T>> Subtract(Range<T> other)

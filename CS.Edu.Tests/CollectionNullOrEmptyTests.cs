@@ -1,44 +1,52 @@
 using System.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
 namespace CS.Edu.Tests;
 
-[TestFixture]
 public class CollectionNullOrEmptyTests
 {
-    [TestCase(null, ExpectedResult = true)]
-    [TestCase(new int[0], ExpectedResult = true)]
-    [TestCase(new[] { 1 }, ExpectedResult = false)]
-    public bool EnumerableIsNullOrEmpty(int[] input)
+    [Theory]
+    [InlineData(null, true)]
+    [InlineData(new int[0], true)]
+    [InlineData(new[] { 1 }, false)]
+    public void EnumerableIsNullOrEmpty(int[] input, bool expected)
     {
-        return input is null || input.IsEmpty();
+        var result = input is null || input.IsEmpty();
+        result.Should().Be(expected);
 
         //return enumerable is null or [];
         //return enumerable is null or empty;
         //return enumerable is not (null or empty);
     }
 
-    [TestCase(null, ExpectedResult = false)]
-    [TestCase(new int[0], ExpectedResult = false)]
-    [TestCase(new[] { 1 }, ExpectedResult = true)]
-    public bool EnumerableIsNotNullOrEmpty(int[] input)
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData(new int[0], false)]
+    [InlineData(new[] { 1 }, true)]
+    public void EnumerableIsNotNullOrEmpty(int[] input, bool expected)
     {
-        return input is not null && input.Any();
+        var result = input is not null && input.Any();
+        result.Should().Be(expected);
     }
 
-    [TestCase(null, ExpectedResult = true)]
-    [TestCase(new int[0], ExpectedResult = true)]
-    [TestCase(new[] { 1 }, ExpectedResult = false)]
-    public bool ListIsNullOrEmpty(int[] input)
+    [Theory]
+    [InlineData(null, true)]
+    [InlineData(new int[0], true)]
+    [InlineData(new[] { 1 }, false)]
+    public void ListIsNullOrEmpty(int[] input, bool expected)
     {
-        return input?.ToList() is null or { Count: 0 };
+        var result = input?.ToList() is null or { Count: 0 };
+        result.Should().Be(expected);
     }
 
-    [TestCase(null, ExpectedResult = false)]
-    [TestCase(new int[0], ExpectedResult = false)]
-    [TestCase(new[] { 1 }, ExpectedResult = true)]
-    public bool ListIsNotNullOrEmpty(int[] input)
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData(new int[0], false)]
+    [InlineData(new[] { 1 }, true)]
+    public void ListIsNotNullOrEmpty(int[] input, bool expected)
     {
-        return input?.ToList() is { Count: > 0 };
+        var result = input?.ToList() is { Count: > 0 };
+        result.Should().Be(expected);
     }
 }

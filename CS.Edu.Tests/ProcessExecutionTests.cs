@@ -2,16 +2,16 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
 namespace CS.Edu.Tests;
 
-[TestFixture]
 public class ProcessExecutionTests
 {
     public record ProcessResult(int ExitCode, IList<string> Output, IList<string> Error);
 
-    [Test]
+    [Fact]
     public void Simple()
     {
         Process process = new Process
@@ -31,17 +31,17 @@ public class ProcessExecutionTests
 
         string result = process.StandardOutput.ReadToEnd();
 
-        Assert.IsNotNull(result);
-        Assert.IsNotEmpty(result);
+        result.Should().NotBeNull()
+            .And.NotBeEmpty();
     }
 
-    [Test]
-    public void ExecuteProcess()
+    [Fact]
+    public void ExecuteProcessTest()
     {
         var result = ExecuteProcess("cmd.exe", "/c dir");
 
-        Assert.IsNotNull(result);
-        Assert.IsNotEmpty(result.Output);
+        result.Should().NotBeNull();
+        result.Output.Should().NotBeEmpty();
     }
 
     public static  ProcessResult ExecuteProcess(string name, string arguments)

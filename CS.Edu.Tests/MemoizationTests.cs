@@ -1,9 +1,9 @@
 ﻿using CS.Edu.Core.Extensions;
-using NUnit.Framework;
+using FluentAssertions;
+using Xunit;
 
 namespace CS.Edu.Tests;
 
-[TestFixture]
 public class MemoizationTests
 {
     class TestClass
@@ -17,43 +17,43 @@ public class MemoizationTests
         }
     }
 
-    [Test]
+    [Fact]
     public void OneInvocation()
     {
-        var test = new TestClass();
-        var memoized = Functions.Memoize<int, int, int>((x,y) => test.Add(x, y));
-        //var memoized = Functions.Memoize<(int, int), int>(x => test.Add(x.Item1, x.Item2));
-        //var memoized = Functions.Memoize<(int, int), int>(((int a, int b) x) => test.Add(x.a, x.b));
-        //var memoized = Functions.Memoize<int, Func<int, int>>(x => y => test.Add(x, y));
+        var fact = new TestClass();
+        var memoized = Functions.Memoize<int, int, int>((x,y) => fact.Add(x, y));
+        //var memoized = Functions.Memoize<(int, int), int>(x => Fact.Add(x.Item1, x.Item2));
+        //var memoized = Functions.Memoize<(int, int), int>(((int a, int b) x) => Fact.Add(x.a, x.b));
+        //var memoized = Functions.Memoize<int, Func<int, int>>(x => y => Fact.Add(x, y));
         var result = memoized(2, 3);
 
-        Assert.AreEqual(5, result);
-        Assert.AreEqual(1, test.Counter);
+        result.Should().Be(5);
+        fact.Counter.Should().Be(1);
     }
 
-    [Test]
+    [Fact]
     public void TwoInvocations_SameValue()
     {
-        var test = new TestClass();
-        var memoized = Functions.Memoize<int, int, int>(test.Add);
+        var fact = new TestClass();
+        var memoized = Functions.Memoize<int, int, int>(fact.Add);
         var first = memoized(2, 3);
         var second = memoized(2, 3);
 
-        Assert.AreEqual(5, first);
-        Assert.AreEqual(5, second);
-        Assert.AreEqual(1, test.Counter);
+        first.Should().Be(5);
+        second.Should().Be(5);
+        fact.Counter.Should().Be(1);
     }
 
-    [Test]
+    [Fact]
     public void TwoInvocations_DifferentValues()
     {
-        var test = new TestClass();
-        var memoized = Functions.Memoize<int, int, int>(test.Add);
+        var fact = new TestClass();
+        var memoized = Functions.Memoize<int, int, int>(fact.Add);
         var first = memoized(3, 2); //тут вопрос как считать, параметры то одинаковые
         var second = memoized(2, 3);
 
-        Assert.AreEqual(5, first);
-        Assert.AreEqual(5, second);
-        Assert.AreEqual(2, test.Counter);
+        first.Should().Be(5);
+        second.Should().Be(5);
+        fact.Counter.Should().Be(2);
     }
 }

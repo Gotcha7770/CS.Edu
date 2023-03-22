@@ -1,21 +1,22 @@
-using NUnit.Framework;
 using CS.Edu.Core.Extensions;
+using FluentAssertions;
+using Xunit;
 
 namespace CS.Edu.Tests.Extensions;
 
 public class EnumerableExtTests
 {
-    [Test]
+    [Fact]
     public void ShrinkDuplicatesTest()
     {
-        var points = new[] {0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0};
+        var points = new[] { 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0 };
 
         var result = points.ShrinkDuplicates(1);
 
-        CollectionAssert.AreEqual(result, new[] {0, 1, 0, 0, 1, 0, 1, 0});
+        result.Should().BeEquivalentTo(new[] { 0, 1, 0, 0, 1, 0, 1, 0 });
     }
 
-    [Test]
+    [Fact]
     public void ShrinkDuplicatesWithKeySelectorTest()
     {
         var points = new[]
@@ -48,6 +49,6 @@ public class EnumerableExtTests
 
         var result = points.ShrinkDuplicates(x => x.Y, -9999);
 
-        CollectionAssert.AreEqual(result, standard);
+        result.Should().BeEquivalentTo(standard);
     }
 }

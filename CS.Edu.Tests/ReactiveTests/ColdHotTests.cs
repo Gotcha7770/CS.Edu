@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
-using NUnit.Framework;
 using Xunit;
 
 namespace CS.Edu.Tests.ReactiveTests;
