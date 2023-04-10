@@ -30,8 +30,8 @@ public class EnumerableEqualityComparisonTests
 
         //CollectionAssert.AreNotEqual(one, null);
         //one.Should().NotEqual(null); //doesn't handle null as argument
-        one.Should().NotBeEquivalentTo((IEnumerable<int>)null);
-        one.Should().NotBeNull();;
+        //one.Should().NotBeEquivalentTo((IEnumerable<int>)null); //doesn't handle null as argument
+        one.Should().NotBeNull();
         FluentActions.Invoking(() => one.SequenceEqual(null)).Should().Throw<ArgumentNullException>();
         EnumerableEqualityComparer<int>.Instance.Equals(one, null).Should().BeFalse();
         StructuralComparisons.StructuralEqualityComparer.Equals(one, null).Should().BeFalse();

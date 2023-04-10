@@ -35,6 +35,7 @@ public class MappingTuple
                 .IncludeMembers(x => x.Foo, x => x.Bar);
         });
         var mapper = new Mapper(configuration);
+        configuration.AssertConfigurationIsValid();
 
         var foo = new Foo { Value = 2 };
         var bar = new Bar { Name = "John" };
