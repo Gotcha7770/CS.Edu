@@ -18,12 +18,12 @@ public class ExpressionsTests
         var lambda = Expression.Lambda<Func<int>>(
             Expression.Add(
                 Expression.Constant(1),
-                Expression.Constant(2)
-            )
-        );
+                Expression.Constant(2)));
         var function = lambda.Compile();
 
-        function().Should().Be(3);
+        function()
+            .Should()
+            .Be(3);
     }
 
     [Fact]
@@ -37,7 +37,9 @@ public class ExpressionsTests
 
         var function = lambda.Compile();
 
-        function(1, 2).Should().Be(3);
+        function(1, 2)
+            .Should()
+            .Be(3);
     }
 
     [Fact]
@@ -51,15 +53,22 @@ public class ExpressionsTests
         var lambda = Expression.Lambda<Func<int, bool>>(
             Expression.AndAlso(
                 Expression.GreaterThan(parameter, Expression.Constant(0)),
-                Expression.LessThan(parameter, Expression.Constant(10))),
-            parameter);
+                Expression.LessThan(parameter, Expression.Constant(10))), parameter);
 
         var function = lambda.Compile();
 
-       function(-1).Should().BeFalse();
-       function(0).Should().BeFalse();
-       function(1).Should().BeTrue();
-       function(10).Should().BeFalse();
+        function(-1)
+            .Should()
+            .BeFalse();
+        function(0)
+            .Should()
+            .BeFalse();
+        function(1)
+            .Should()
+            .BeTrue();
+        function(10)
+            .Should()
+            .BeFalse();
     }
 
     [Fact]
@@ -77,14 +86,20 @@ public class ExpressionsTests
                 Expression.TypeIs(parameter, typeof(Identity<int>)),
                 Expression.Equal(
                     Expression.Property(
-                        Expression.Convert(parameter, typeof(Identity<int>)), nameof(Identity<int>.Key)),
-                    Expression.Constant(15))),
-            parameter);
+                        Expression.Convert(parameter, typeof(Identity<int>)),
+                        nameof(Identity<int>.Key)),
+                    Expression.Constant(15))), parameter);
 
         var function = lambda.Compile();
-        function(new object()).Should().BeFalse();
-        function(new Identity<int>(42)).Should().BeFalse();
-        function(new Identity<int>(15)).Should().BeTrue();
+        function(new object())
+            .Should()
+            .BeFalse();
+        function(new Identity<int>(42))
+            .Should()
+            .BeFalse();
+        function(new Identity<int>(15))
+            .Should()
+            .BeTrue();
     }
 
     [Fact]
@@ -109,9 +124,31 @@ public class ExpressionsTests
 
         var function = lambda.Compile();
 
-        function(new Valuable<int>(-1)).Should().BeFalse();
-        function(new Valuable<int>(0)).Should().BeFalse();
-        function(new Valuable<int>(1)).Should().BeTrue();
+        function(new Valuable<int>(-1))
+            .Should()
+            .BeFalse();
+        function(new Valuable<int>(0))
+            .Should()
+            .BeFalse();
+        function(new Valuable<int>(1))
+            .Should()
+            .BeTrue();
+    }
+
+    [Fact]
+    public void Coalesce()
+    {
+        //Expression<Func<int?, int>> e = x => x ?? 0;
+
+        var parameter = Expression.Parameter(typeof(int?), "x");
+        var lambda = Expression.Lambda<Func<int?, int>>(
+            Expression.Coalesce(parameter, Expression.Constant(0)),
+            parameter);
+
+        var function = lambda.Compile();
+
+        function(null).Should().Be(0);
+        function(42).Should().Be(42);
     }
 
     [Theory]
@@ -120,9 +157,12 @@ public class ExpressionsTests
     public void NotExpression(int value, bool expected)
     {
         Expression<Func<int, bool>> expr = x => x % 2 == 0;
-        Func<int, bool> predicate = Expressions.Not(expr).Compile();
+        Func<int, bool> predicate = Expressions.Not(expr)
+            .Compile();
 
-        predicate(value).Should().Be(expected);
+        predicate(value)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
@@ -135,9 +175,12 @@ public class ExpressionsTests
     {
         Expression<Func<int, bool>> expr1 = x => x % 3 == 0;
         Expression<Func<int, bool>> expr2 = x => x % 2 == 0;
-        Func<int, bool> predicate = Expressions.And(expr1, expr2).Compile();
+        Func<int, bool> predicate = Expressions.And(expr1, expr2)
+            .Compile();
 
-        predicate(value).Should().Be(expected);
+        predicate(value)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
@@ -150,8 +193,24 @@ public class ExpressionsTests
     {
         Expression<Func<int, bool>> expr1 = x => x % 2 == 0;
         Expression<Func<int, bool>> expr2 = x => x % 3 == 0;
-        Func<int, bool> predicate = Expressions.Or(expr1, expr2).Compile();
+        Func<int, bool> predicate = Expressions.Or(expr1, expr2)
+            .Compile();
 
-        predicate(value).Should().Be(expected);
+        predicate(value)
+            .Should()
+            .Be(expected);
+    }
+
+    [Fact]
+    public void ReplaceReturnType()
+    {
+        // Expression<Func<Valuable<int>, object>> e2 = x => (object)x.Value;
+
+        var parameter = Expression.Parameter(typeof(Valuable<int>), "x");
+        var expression1 = Expression.Lambda<Func<Valuable<int>, int>>(
+            Expression.Property(parameter, nameof(Valuable<int>.Value)), parameter);
+
+        Func<Valuable<int>, int> func1 = expression1.Compile();
+        Func<Valuable<int>, object> func2 = expression1.Convert<Valuable<int>, int, object>().Compile();
     }
 }

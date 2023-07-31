@@ -6,6 +6,12 @@ namespace CS.Edu.Core.Extensions;
 
 public static class Expressions
 {
+    public static Expression<Func<T, TConverted>> Convert<T, TResult, TConverted>(this Expression<Func<T, TResult>> expr)
+    {
+        return Expression.Lambda<Func<T, TConverted>>(
+            Expression.Convert(expr, typeof(TConverted)), expr.Parameters);
+    }
+
     public static Expression<Func<T, bool>> Not<T>(Expression<Func<T, bool>> expr)
     {
         return Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters.Single());
@@ -41,10 +47,10 @@ public static class Expressions
 
     private class ReplaceExpressionVisitor : ExpressionVisitor
     {
-        private readonly Expression _oldValue;
-        private readonly Expression _newValue;
+        private readonly ParameterExpression _oldValue;
+        private readonly ParameterExpression _newValue;
 
-        public ReplaceExpressionVisitor(Expression oldValue, Expression newValue)
+        public ReplaceExpressionVisitor(ParameterExpression oldValue, ParameterExpression newValue)
         {
             _oldValue = oldValue;
             _newValue = newValue;
