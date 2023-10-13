@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Buffers.Text;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using CS.Edu.Tests;
 
 namespace CS.Edu.Benchmarks;
 
@@ -28,6 +30,12 @@ public class Base64Bench
     public string ConvertUsingBase64()
     {
         return ConvertUsingBase64(Input);
+    }
+
+    [Benchmark]
+    public string ConvertUsingBase64Improved()
+    {
+        return ConvertUsingBase64Improved(Input);
     }
 
     private static string ConvertUsingExample(long input)
@@ -74,26 +82,29 @@ public class Base64Bench
     private static string ConvertUsingConverter(long input)
     {
         byte[] bytes = BitConverter.GetBytes(input);
-       //int firstZeroIndex = Array.IndexOf(bytes, (byte)0);
-        //string base64 = Convert.ToBase64String(bytes.AsSpan(0, firstZeroIndex));
-        string base64 = Convert.ToBase64String(bytes);
+        int firstZeroIndex = Array.IndexOf(bytes, (byte)0);
+        string base64 = Convert.ToBase64String(bytes.AsSpan(0, firstZeroIndex));
 
         var sequence = base64
             .Replace('/', '-')
-            .Replace('d', 's')
             .Replace('+', '_')
             .TakeWhile(x => x != '=');
 
         return new string(sequence.ToArray());
     }
 
+    // For dcY7 method allocates 8 + 3x8 = 32B
+    // We need extra space for object header,
+    // method table pointer and length of the array.
+    // The overhead is 3x Pointer Size
     private static string ConvertUsingBase64(long input)
     {
-        byte[] bytes = BitConverter.GetBytes(input);
-        int firstZeroIndex = Array.IndexOf(bytes, (byte)0);
+        Span<byte> bytes = stackalloc byte[sizeof(long)];
+        Unsafe.As<byte, long>(ref bytes[0]) = input;
+        int firstZeroIndex = bytes.IndexOf((byte)0);
         Span<byte> utf8 = stackalloc byte[bytes.Length];
         Base64.EncodeToUtf8(
-            bytes.AsSpan(0, firstZeroIndex),
+            bytes[..firstZeroIndex],
             utf8,
             out int _,
             out int written);
@@ -115,5 +126,17 @@ public class Base64Bench
         return firstEqualsIndex > 0
             ? chars[..firstEqualsIndex].ToString()
             : chars.ToString();
+    }
+
+    private static string ConvertUsingBase64Improved(long input)
+    {
+        Span<byte> bytes = stackalloc byte[sizeof(long)];
+        Unsafe.As<byte, long>(ref bytes[0]) = input;
+        int firstZeroIndex = bytes.IndexOf((byte)0);
+        int length = ((firstZeroIndex + 2) * 4 / 3) - 2;
+        Span<char> chars = stackalloc char[length];
+        Base64Custom.EncodeToUtf8(bytes[..firstZeroIndex], chars);
+
+        return chars.ToString();
     }
 }

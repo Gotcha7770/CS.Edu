@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Buffers.Text;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Unicode;
 using FluentAssertions;
 using Xunit;
 
@@ -37,6 +41,17 @@ public class Base64Tests
     public void ToBase64UsingBase64(long input, string output)
     {
         ConvertUsingBase64(input)
+            .Should()
+            .Be(output);
+    }
+
+    [Theory]
+    [InlineData(3917429, "dcY7")]
+    [InlineData(3900673, "AYU7")]
+    [InlineData(43900673, "Ad_dAg")]
+    public void ToBase64UsingCustomBase64(long input, string output)
+    {
+        ToBase64Custom(input)
             .Should()
             .Be(output);
     }
@@ -98,13 +113,14 @@ public class Base64Tests
 
     private static string ConvertUsingBase64(long input)
     {
-        byte[] bytes = BitConverter.GetBytes(input);
-        int firstZeroIndex = Array.IndexOf(bytes, (byte)0);
+        Span<byte> bytes = stackalloc byte[sizeof(long)];
+        Unsafe.As<byte, long>(ref bytes[0]) = input;
+        int firstZeroIndex = bytes.IndexOf((byte)0);
         Span<byte> utf8 = stackalloc byte[bytes.Length];
-        var result = Base64.EncodeToUtf8(
-            bytes.AsSpan(0, firstZeroIndex),
+        Base64.EncodeToUtf8(
+            bytes[..firstZeroIndex],
             utf8,
-            out int consumed,
+            out int _,
             out int written);
 
         Span<char> chars = stackalloc char[written];
@@ -124,5 +140,20 @@ public class Base64Tests
         return firstEqualsIndex > 0
             ? chars[..firstEqualsIndex].ToString()
             : chars.ToString();
+    }
+
+    public static string ToBase64Custom(long input)
+    {
+        Span<byte> bytes = stackalloc byte[sizeof(long)];
+        Unsafe.As<byte, long>(ref bytes[0]) = input;
+        int firstZeroIndex = bytes.IndexOf((byte)0);
+
+        // maximum length (in bytes) of the result
+        // ((length + 2) / 3) * 4
+        int length = ((firstZeroIndex + 2) * 4 / 3) - 2;
+        Span<char> chars = stackalloc char[length];
+        Base64Custom.EncodeToUtf8(bytes[..firstZeroIndex], chars);
+
+        return chars.ToString();
     }
 }
