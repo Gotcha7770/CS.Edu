@@ -48,33 +48,39 @@ public class AsyncEnumerableTests
         // But you can`t change the order of effects.
         // Reversing the order of effects would require us to put an await between the variable and the evaluation,
         // but IEnumerable doesn't know how to deal with await key word.
+        // In C# we cannot mix sync iterator and asynchronous call
+        // like in
+        // foreach (var task in items)
+        // {
+        //     yield return await task;
+        // }
         // Obviously it must be some other type
         var enumeration = items.Select(async x => (await x).ToString());
 
-        // Hoverer, we have two options
-        // Transform IEnumerable<Task<T>> to Task<IEnumerable<T>>
+        // Howerer, we have two options,
+        // transform IEnumerable<Task<T>> to Task<T[]>>
+        // so we materialize collection of tasks
         var task = Task.WhenAll(items);
 
         // or to IAsyncEnumerable<T>
-        var asyncEnumeration = items.ToAsyncEnumerable();
-    }
-
-    [Fact]
-    public async void SkipWithEnumerableOfTasks()
-    {
-        IEnumerable<Task<Order>> query = Enumerable.Range(0, 1)
-            .Select(_ => Task.FromResult(new Order(Guid.NewGuid(), _customers[1].Id)));
-
-        var singleItem = await query.Skip(5).First();
-
+        var asyncEnumeration = items.ToAsyncEnumerable()
+            .SelectAwait(async x => (await x).ToString());
     }
 
     [Fact]
     public async void PagingWithEnumerableOfTasks()
     {
-        IEnumerable<Task<Order[]>> query = _customers.Select(x => GetOrdersTask(x.Id));
+        IEnumerable<Task<Order>> ofOrders = Enumerable.Empty<Task<Order>>()
+            .Take(15..30);
 
-        foreach (var task in query)
+        foreach (Task<Order> task in ofOrders)
+        {
+            var order = await task;
+        }
+
+        IEnumerable<Task<Order[]>> ofArrays = Enumerable.Empty<Task<Order[]>>();
+
+        foreach (Task<Order[]> task in ofArrays)
         {
             var orders = await task;
             // how to paging?
