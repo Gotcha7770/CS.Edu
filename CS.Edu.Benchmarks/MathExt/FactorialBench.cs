@@ -1,8 +1,8 @@
+using System.Linq;
 using BenchmarkDotNet.Attributes;
 using CS.Edu.Core.MathExt;
-using System.Linq;
 
-namespace CS.Edu.Benchmarks.Extensions
+namespace CS.Edu.Benchmarks.MathExt
 {
     [Config(typeof(DefaultConfig))]
     public class FactorialBench

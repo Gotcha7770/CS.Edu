@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CS.Edu.Tests;
+namespace CS.Edu.Core;
 
 public static class Base64Custom
 {

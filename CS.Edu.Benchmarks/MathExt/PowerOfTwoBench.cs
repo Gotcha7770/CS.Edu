@@ -1,8 +1,8 @@
+using System;
 using BenchmarkDotNet.Attributes;
 using CS.Edu.Core.MathExt;
-using System;
 
-namespace CS.Edu.Benchmarks.Extensions
+namespace CS.Edu.Benchmarks.MathExt
 {
     [Config(typeof(DefaultConfig))]
     public class PowerOfTwoBench

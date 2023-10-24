@@ -3,7 +3,7 @@ using System.Buffers.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
-using CS.Edu.Tests;
+using CS.Edu.Core;
 
 namespace CS.Edu.Benchmarks;
 

@@ -1,9 +1,9 @@
-using BenchmarkDotNet.Attributes;
-using CS.Edu.Core.MathExt;
 using System.Linq;
 using System.Reactive.Linq;
+using BenchmarkDotNet.Attributes;
+using CS.Edu.Core.MathExt;
 
-namespace CS.Edu.Benchmarks.Extensions
+namespace CS.Edu.Benchmarks.MathExt
 {
     [Config(typeof(DefaultConfig))]
     public class FibonacciBench

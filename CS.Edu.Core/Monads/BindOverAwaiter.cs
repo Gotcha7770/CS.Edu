@@ -40,9 +40,7 @@ public static class BindOverAwaiter
     {
         public static void Create() => new BindableMethodBuilder<T>();
 
-        public BindableMethodBuilder() => Task = new Bindable<T>();
-
-        public Bindable<T> Task { get; private set; }
+        public Bindable<T> Task { get; } = new();
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine
             => stateMachine.MoveNext();

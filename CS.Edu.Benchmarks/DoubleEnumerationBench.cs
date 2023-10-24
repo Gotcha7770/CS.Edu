@@ -4,7 +4,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 
-namespace CS.Edu.Benchmarks.Extensions
+namespace CS.Edu.Benchmarks
 {
     [MemoryDiagnoser]
     [Config(typeof(DefaultConfig))]
