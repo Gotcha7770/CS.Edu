@@ -62,4 +62,19 @@ public class EnumerableEqualityComparisonTests
         EnumerableEqualityComparer<int>.Instance.Equals(one, other).Should().BeFalse();
         //StructuralComparisons.StructuralEqualityComparer.Equals(one, other).Should().BeFalse(); //doesn't handle IEnumerable<T>
     }
+
+    [Theory]
+    [InlineData(null, null, true)]
+    [InlineData(new[] { 0, 1, 2 }, null, false)]
+    [InlineData(null, new[] { 0, 1, 2 }, false)]
+    [InlineData(new[] { 0, 1, 2 }, new[] { 0, 1, 2 }, true)]
+    [InlineData(new[] { 1, 2 }, new[] { 0, 1, 2 }, false)]
+    [InlineData(new[] { 0, 2 }, new[] { 0, 1, 2 }, false)]
+    [InlineData(new[] { 2, 1, 0 }, new[] { 0, 1, 2 }, false)]
+    public void ArrayEqualityComparison(int[] one, int[] other, bool result)
+    {
+        StructuralComparisons.StructuralEqualityComparer.Equals(one, other)
+            .Should()
+            .Be(result);
+    }
 }
