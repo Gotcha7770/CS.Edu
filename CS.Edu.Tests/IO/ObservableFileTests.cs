@@ -4,18 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using CS.Edu.Core.IO;
 using CS.Edu.Tests.Utils.IO;
-using DynamicData;
-using DynamicData.Tests;
 using FluentAssertions;
 using Xunit;
 
 namespace CS.Edu.Tests.IO;
 
-public class ObservableFileWatcherTests : IClassFixture<IOTestFixture>
+public class ObservableFileTests : IClassFixture<IOTestFixture>
 {
     private readonly IOTestFixture _fixture;
 
-    public ObservableFileWatcherTests(IOTestFixture fixture)
+    public ObservableFileTests(IOTestFixture fixture)
     {
         _fixture = fixture;
     }
@@ -109,85 +107,25 @@ public class ObservableFileWatcherTests : IClassFixture<IOTestFixture>
     }
 
     [Fact]
-    public void ObservableDirectory_EmptyDirectory_NoneInitialEntries()
+    public async Task ObservableFile_InitialNames()
     {
-        using var scope = _fixture.CreateTestScope("IOTests");
-        using var aggregate = scope.Directory
-            .ToObservable()
-            .AsAggregator();
-
-        aggregate.Messages.Should()
-            .BeEmpty();
-    }
-
-    [Fact]
-    public void ObservableDirectory_HasEntries_HasInitialEntries()
-    {
-        using var scope = _fixture.CreateTestScope("IOTests");
-        scope.CreateDirectory("Subdir");
-        using var aggregate = scope.Directory
-            .ToObservable()
-            .AsAggregator();
-
-        aggregate.Messages.Should().ContainSingle();
-        aggregate.Messages[0].Should()
-            .BeEquivalentTo(new[]
-            {
-                new Change<string, string>(
-                    ChangeReason.Add,
-                    @"C:\Users\gbaka\AppData\Local\Temp\IOTests\Subdir",
-                    @"C:\Users\gbaka\AppData\Local\Temp\IOTests\Subdir")
-            });
-    }
-
-    [Fact]
-    public async Task FileCreated_NewItemAddedToDirectory()
-    {
-        using var scope = _fixture.CreateTestScope("IOTests");
-        using var aggregate = scope.Directory
-            .ToObservable()
-            .AsAggregator();
-
-        await using (var _ = scope.CreateFile("file.txt")) { }
-        await Task.Delay(150); //??? how to avoid delay
-
-        aggregate.Messages.Should().ContainSingle();
-        aggregate.Messages[0].Should()
-            .BeEquivalentTo(new[]
-            {
-                new Change<string, string>(
-                    ChangeReason.Add,
-                    @"C:\Users\gbaka\AppData\Local\Temp\IOTests\file.txt",
-                    "file.txt")
-            });
-    }
-
-    [Fact]
-    public async Task FileDeleted_ItemRemovedFromDirectory()
-    {
+        string name = null;
+        string fullPath = null;
         using var scope = _fixture.CreateTestScope("IOTests");
         await using (var _ = scope.CreateFile("file.txt")) { }
-        using var aggregate = scope.Directory
-            .ToObservable()
-            .SkipInitial()
-            .AsAggregator();
 
-        scope.DeleteFile("file.txt");
-        await Task.Delay(150); //??? how to avoid delay
+        var file = scope.Directory.EnumerateFiles().First().ToObservable();
+        using (var a = file.Name.Subscribe(x => name = x))
+        using (var b = file.FullPath.Subscribe(x => fullPath = x)) { }
 
-        aggregate.Messages.Should().ContainSingle();
-        aggregate.Messages[0].Should()
-            .BeEquivalentTo(new[]
-            {
-                new Change<string, string>(
-                    ChangeReason.Remove,
-                    @"C:\Users\gbaka\AppData\Local\Temp\IOTests\file.txt",
-                    "file.txt")
-            });
+        name.Should()
+            .Be("file.txt");
+        fullPath.Should()
+            .Be(scope.Directory.FullName + "\\file.txt");
     }
 
     [Fact]
-    public async Task FileRenamed_FileNameChanged()
+    public async Task FileRenamed_ObservableFileNameChanged()
     {
         string name = null;
         string fullPath = null;
@@ -209,7 +147,7 @@ public class ObservableFileWatcherTests : IClassFixture<IOTestFixture>
     }
 
     [Fact]
-    public async Task File_InitialPropertyValues()
+    public async Task ObservableFile_InitialPropertyValues()
     {
         long length = -1;
         DateTime lastWriteTime = DateTime.MinValue;
@@ -228,7 +166,7 @@ public class ObservableFileWatcherTests : IClassFixture<IOTestFixture>
     }
 
     [Fact]
-    public async Task FileContentChanged_PropertiesChanged()
+    public async Task FileContentChanged_ObservableFilePropertiesChanged()
     {
         long length = -1;
         DateTime lastWriteTime = DateTime.MinValue;
