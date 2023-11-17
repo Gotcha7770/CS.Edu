@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.IO.Abstractions;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using CS.Edu.Core.IO;
 using CS.Edu.Tests.Utils.IO;
@@ -11,20 +9,20 @@ using Xunit;
 
 namespace CS.Edu.Tests.IO;
 
-public class ObservableFileTests : IClassFixture<IOTestFixture>
+public class ObservableFileIntegrationTests : IClassFixture<IOTestFixture>
 {
     private readonly IOTestFixture _fixture;
 
-    public ObservableFileTests(IOTestFixture fixture)
+    public ObservableFileIntegrationTests(IOTestFixture fixture)
     {
         _fixture = fixture;
     }
 
     [Fact]
-    public async Task FileSystemWatcher_FileCreated()
+    public void FileSystemWatcher_FileCreated()
     {
         using var scope = _fixture.CreateTestScope("IOTests");
-        await using var _ = ScheduleAction(() => { using var _ = scope.CreateFile("file.txt"); }, 30);
+        scope.ScheduleAction(x => x.CreateFile("file.txt").Dispose(), 30);
         var result = scope.Watcher.WaitForChanged(WatcherChangeTypes.Created, 150);
 
         result.Should()
@@ -36,62 +34,52 @@ public class ObservableFileTests : IClassFixture<IOTestFixture>
     }
 
     [Fact]
-    public async Task FileSystemWatcher_FileRenamed()
+    public void FileSystemWatcher_FileRenamed()
     {
         using var scope = _fixture.CreateTestScope("IOTests");
-        using var monitor = scope.Watcher.Monitor();
-        await using (var _ = scope.CreateFile("file.txt")) { }
-        scope.Watcher.EnableRaisingEvents = true;
+        scope.CreateFile("file.txt").Dispose();
+        scope.ScheduleAction(x => x.MoveFile("file.txt", "new file.txt"), 30);
+        var result = scope.Watcher.WaitForChanged(WatcherChangeTypes.Renamed, 150);
 
-        scope.MoveFile("file.txt", "new file.txt");
-        await Task.Yield(); //??? how to avoid yield
-
-        monitor.Should()
-            .Raise(nameof(IFileSystemWatcher.Renamed))
-            .WithArgs<RenamedEventArgs>(args =>
-                args.ChangeType == WatcherChangeTypes.Renamed
-                && args.OldFullPath == scope.Directory + "\\file.txt"
-                && args.FullPath == scope.Directory + "\\new file.txt");
+        result.Should()
+            .BeEquivalentTo(new
+            {
+                ChangeType = WatcherChangeTypes.Renamed,
+                OldName = "file.txt",
+                Name = "new file.txt"
+            });
     }
 
     [Fact]
-    public async Task FileSystemWatcher_FileChanged()
+    public void FileSystemWatcher_FileChanged()
     {
         using var scope = _fixture.CreateTestScope("IOTests");
-        using var monitor = scope.Watcher.Monitor();
-        await using (var _ = scope.CreateFile("file.txt")) { }
-        scope.Watcher.EnableRaisingEvents = true;
+        scope.CreateFile("file.txt").Dispose();
+        scope.ScheduleAction(x => x.Write("file.txt", new byte[10]), 30);
+        var result = scope.Watcher.WaitForChanged(WatcherChangeTypes.Changed, 150);
 
-        await using (var stream = _fixture.FileSystem.File.OpenWrite("file.txt"))
-        {
-            await stream.WriteAsync(new byte[10]);
-        }
-
-        monitor.Should()
-            .Raise(nameof(IFileSystemWatcher.Changed))
-            .WithArgs<FileSystemEventArgs>(args =>
-                args.ChangeType == WatcherChangeTypes.Changed
-                && args.FullPath == scope.Directory + "\\file.txt"
-                && args.Name == "file.txt");
+        result.Should()
+            .BeEquivalentTo(new
+            {
+                ChangeType = WatcherChangeTypes.Changed,
+                Name = "file.txt"
+            });
     }
 
     [Fact]
-    public async Task FileSystemWatcher_FileDeleted()
+    public void FileSystemWatcher_FileDeleted()
     {
         using var scope = _fixture.CreateTestScope("IOTests");
-        using var monitor = scope.Watcher.Monitor();
-        await using (var _ = scope.CreateFile("file.txt")) { }
-        scope.Watcher.EnableRaisingEvents = true;
+        scope.CreateFile("file.txt").Dispose();
+        scope.ScheduleAction(x => x.DeleteFile("file.txt"), 30);
+        var result = scope.Watcher.WaitForChanged(WatcherChangeTypes.Deleted, 150);
 
-        scope.DeleteFile("file.txt");
-        await Task.Yield(); //??? how to avoid yield
-
-        monitor.Should()
-            .Raise(nameof(IFileSystemWatcher.Deleted))
-            .WithArgs<FileSystemEventArgs>(args =>
-                args.ChangeType == WatcherChangeTypes.Deleted
-                && args.FullPath == scope.Directory + "\\file.txt"
-                && args.Name == "file.txt");
+        result.Should()
+            .BeEquivalentTo(new
+            {
+                ChangeType = WatcherChangeTypes.Deleted,
+                Name = "file.txt"
+            });
     }
 
     [Fact]
@@ -177,10 +165,5 @@ public class ObservableFileTests : IClassFixture<IOTestFixture>
         lastWriteTime.Should()
             .BeWithin(TimeSpan.FromSeconds(1))
             .Before(DateTime.Now);
-    }
-
-    private static IAsyncDisposable ScheduleAction(Action action, int dueTime)
-    {
-        return new Timer(_ => action(), null, dueTime, Timeout.Infinite);
     }
 }
