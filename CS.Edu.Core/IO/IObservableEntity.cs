@@ -6,4 +6,5 @@ public interface IObservableEntity : IDisposable
 {
     IObservable<string> FullPath { get; }
     IObservable<string> Name { get; }
+    IObservable<DateTime> LastWriteTime { get; }
 }
