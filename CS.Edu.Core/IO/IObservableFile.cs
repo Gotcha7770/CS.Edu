@@ -2,7 +2,7 @@
 
 namespace CS.Edu.Core.IO;
 
-public interface IObservableFile : IObservableEntity
+public interface IObservableFile : IObservableEntry
 {
     IObservable<long> Length { get; }
 }
