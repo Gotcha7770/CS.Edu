@@ -24,8 +24,9 @@ internal class ObservableDirectoryWrapper : ObservableEntryWrapper, IObservableD
 
     public IDisposable Subscribe(IObserver<IChangeSet<string, string>> observer)
     {
-        var changeSet = FileSystem.Directory.EnumerateFileSystemEntries(EntryFullPath)
-            .Select(x => new Change<string, string>(ChangeReason.Add, x, x))
+        var changeSet = FileSystem.DirectoryInfo.New(EntryFullPath)
+            .EnumerateFileSystemInfos()
+            .Select(x => new Change<string, string>(ChangeReason.Add, x.FullName, x.Name))
             .ToChangeSet();
 
         if(changeSet.Count > 0)
