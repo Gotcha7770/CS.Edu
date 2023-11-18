@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Reactive.Disposables;
 using System.Threading;
+using CS.Edu.Core.IO;
 
 namespace CS.Edu.Tests.Utils.IO;
 
@@ -11,7 +12,7 @@ public class IOTestScope : IDisposable
     private readonly CompositeDisposable _cleanup;
     private readonly IFileSystem _fileSystem;
 
-    public IOTestScope(IFileSystem fileSystem, string directory)
+    public IOTestScope(string directory, IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
         var tmpFolder = _fileSystem.Path.GetTempPath();
@@ -34,11 +35,14 @@ public class IOTestScope : IDisposable
     public IDirectoryInfo Directory { get; }
     public IFileSystemWatcher Watcher { get; }
 
-    public Stream CreateFile(string file)
+    public Stream CreateFile(string fileName, out IFileInfo file)
     {
-        DeleteFile(file);
+        DeleteFile(fileName);
 
-        return _fileSystem.File.Create(file);
+        var stream = _fileSystem.File.Create(fileName);
+        file = _fileSystem.FileInfo.New(fileName);
+
+        return stream;
     }
 
     public void Write(string file, byte[] bytes)

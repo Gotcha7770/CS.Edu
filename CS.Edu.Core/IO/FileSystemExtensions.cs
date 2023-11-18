@@ -10,12 +10,12 @@ public static class FileSystemExtensions
 {
     public static IObservableFile ToObservable(this IFileInfo file)
     {
-        return new ObservableFileWrapper(file);
+        return new ObservableFile(file);
     }
 
     public static IObservableDirectory ToObservable(this IDirectoryInfo directory)
     {
-        return new ObservableDirectoryWrapper(directory);
+        return new ObservableDirectory(directory);
     }
 
     internal static ChangeReason ToChangeReason(this WatcherChangeTypes changeType)

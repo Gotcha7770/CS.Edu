@@ -8,12 +8,12 @@ namespace CS.Edu.Core.IO;
 
 internal record FileNames(string Name, string FullPath);
 
-internal abstract class ObservableEntryWrapper : IObservableEntry
+internal abstract class ObservableEntry : IObservableEntry
 {
     private readonly BehaviorSubject<FileNames> _fileNames;
     protected readonly IFileSystemWatcher Watcher;
 
-    protected ObservableEntryWrapper(IFileSystemInfo fileSystemInfo, string path)
+    protected ObservableEntry(IFileSystemInfo fileSystemInfo, string path)
     {
         // optimize
         // Notifications are only raised for entries inside the directory you are watching.

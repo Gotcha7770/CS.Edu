@@ -7,9 +7,9 @@ using DynamicData;
 
 namespace CS.Edu.Core.IO;
 
-internal class ObservableDirectoryWrapper : ObservableEntryWrapper, IObservableDirectory
+internal class ObservableDirectory : ObservableEntry, IObservableDirectory
 {
-    public ObservableDirectoryWrapper(IDirectoryInfo directoryInfo)
+    public ObservableDirectory(IDirectoryInfo directoryInfo)
         : base(directoryInfo, directoryInfo.FullName)
     {
         var changeObserver = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(

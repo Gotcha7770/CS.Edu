@@ -4,10 +4,8 @@ namespace CS.Edu.Tests.Utils.IO;
 
 public class IOTestFixture
 {
-    public IFileSystem FileSystem { get; } = new FileSystem();
-
-    public IOTestScope CreateTestScope(string directory)
+    public IOTestScope CreateTestScope(string directory, IFileSystem fileSystem)
     {
-        return new IOTestScope(FileSystem, directory);
+        return new IOTestScope(directory, fileSystem);
     }
 }

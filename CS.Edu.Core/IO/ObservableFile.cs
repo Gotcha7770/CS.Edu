@@ -5,9 +5,9 @@ using System.Reactive.Linq;
 
 namespace CS.Edu.Core.IO;
 
-internal class ObservableFileWrapper : ObservableEntryWrapper, IObservableFile
+internal class ObservableFile : ObservableEntry, IObservableFile
 {
-    public ObservableFileWrapper(IFileInfo fileInfo)
+    public ObservableFile(IFileInfo fileInfo)
         : base(fileInfo, fileInfo.DirectoryName)
     {
         var changeObserver = Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
@@ -16,8 +16,12 @@ internal class ObservableFileWrapper : ObservableEntryWrapper, IObservableFile
             .Where(x => x.EventArgs.FullPath == EntryFullPath)
             .Select(x => FileSystem.FileInfo.New(x.EventArgs.FullPath));
 
-        Length = changeObserver.Select(x => x.Length).StartWith(fileInfo.Length);
-        LastWriteTime = changeObserver.Select(x => x.LastWriteTime).StartWith(fileInfo.LastWriteTime);
+        Length = changeObserver.Select(x => x.Length)
+            .DistinctUntilChanged()
+            .StartWith(fileInfo.Length);
+        LastWriteTime = changeObserver.Select(x => x.LastWriteTime)
+            .DistinctUntilChanged()
+            .StartWith(fileInfo.LastWriteTime);
         Watcher.EnableRaisingEvents = true;
     }
 

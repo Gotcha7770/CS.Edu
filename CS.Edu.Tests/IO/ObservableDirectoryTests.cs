@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.IO.Abstractions;
 using System.Threading.Tasks;
 using CS.Edu.Core.IO;
 using CS.Edu.Tests.Utils.IO;
@@ -11,6 +11,7 @@ namespace CS.Edu.Tests.IO;
 
 public class ObservableDirectoryTests : IClassFixture<IOTestFixture>
 {
+    private readonly IFileSystem _fileSystem = new FileSystem();
     private readonly IOTestFixture _fixture;
 
     public ObservableDirectoryTests(IOTestFixture fixture)
@@ -21,7 +22,7 @@ public class ObservableDirectoryTests : IClassFixture<IOTestFixture>
     [Fact]
     public void ObservableDirectory_EmptyDirectory_NoneInitialEntries()
     {
-        using var scope = _fixture.CreateTestScope("IOTests");
+        using var scope = _fixture.CreateTestScope("IOTests", _fileSystem);
         using var aggregate = scope.Directory
             .ToObservable()
             .AsAggregator();
@@ -33,14 +34,15 @@ public class ObservableDirectoryTests : IClassFixture<IOTestFixture>
     [Fact]
     public void ObservableDirectory_HasEntries_HasInitialEntries()
     {
-        using var scope = _fixture.CreateTestScope("IOTests");
+        using var scope = _fixture.CreateTestScope("IOTests", _fileSystem);
         scope.CreateDirectory("Subdir");
         using var aggregate = scope.Directory
             .ToObservable()
             .AsAggregator();
 
-        aggregate.Messages.Should().ContainSingle();
-        aggregate.Messages[0].Should()
+        aggregate.Messages.Should()
+            .ContainSingle()
+            .Which.Should()
             .BeEquivalentTo(new[]
             {
                 new Change<string, string>(
@@ -53,16 +55,17 @@ public class ObservableDirectoryTests : IClassFixture<IOTestFixture>
     [Fact]
     public async Task FileCreated_NewItemAddedToDirectory()
     {
-        using var scope = _fixture.CreateTestScope("IOTests");
+        using var scope = _fixture.CreateTestScope("IOTests", _fileSystem);
         using var aggregate = scope.Directory
             .ToObservable()
             .AsAggregator();
 
-        await using (var _ = scope.CreateFile("file.txt")) { }
+        await scope.CreateFile("file.txt", out _).DisposeAsync();
         await Task.Delay(150); //??? how to avoid delay
 
-        aggregate.Messages.Should().ContainSingle();
-        aggregate.Messages[0].Should()
+        aggregate.Messages.Should()
+            .ContainSingle()
+            .Which.Should()
             .BeEquivalentTo(new[]
             {
                 new Change<string, string>(
@@ -92,8 +95,8 @@ public class ObservableDirectoryTests : IClassFixture<IOTestFixture>
     [Fact]
     public async Task FileDeleted_ItemRemovedFromDirectory()
     {
-        using var scope = _fixture.CreateTestScope("IOTests");
-        await using (var _ = scope.CreateFile("file.txt")) { }
+        using var scope = _fixture.CreateTestScope("IOTests", _fileSystem);
+        await scope.CreateFile("file.txt", out _).DisposeAsync();
         using var aggregate = scope.Directory
             .ToObservable()
             .SkipInitial()
@@ -102,8 +105,9 @@ public class ObservableDirectoryTests : IClassFixture<IOTestFixture>
         scope.DeleteFile("file.txt");
         await Task.Delay(150); //??? how to avoid delay
 
-        aggregate.Messages.Should().ContainSingle();
-        aggregate.Messages[0].Should()
+        aggregate.Messages.Should()
+            .ContainSingle()
+            .Which.Should()
             .BeEquivalentTo(new[]
             {
                 new Change<string, string>(
