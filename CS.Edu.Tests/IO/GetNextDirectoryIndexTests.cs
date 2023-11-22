@@ -14,7 +14,7 @@ public class GetNextDirectoryIndexTests
     [Fact]
     public void GetIndexForNewFolder_FirstDirectory_ReturnsZero()
     {
-        int index = _fileSystem.GetNextDirectoryIndex(".");
+        int index = _fileSystem.GetNextDirectoryIndex2(".");
 
         index.Should()
             .Be(0);
@@ -28,17 +28,19 @@ public class GetNextDirectoryIndexTests
     {
         _fileSystem.AddDirectory(NewDirectoryName);
         indices.ForEach(x => _fileSystem.AddDirectory($"{NewDirectoryName} ({x})"));
-        int index = _fileSystem.GetNextDirectoryIndex(".");
+        int index = _fileSystem.GetNextDirectoryIndex2(".");
 
         index.Should()
             .Be(expected);
     }
 
-    [Fact]
-    public void GetIndexForNewFolder_ContainsFolderInWrongFormat_ReturnsNextInt()
+    [Theory]
+    [InlineData("Новая папка1")]
+    [InlineData("Новая папка (a)")]
+    public void GetIndexForNewFolder_ContainsFolderInWrongFormat_ReturnsNextInt(string directory)
     {
-        _fileSystem.AddDirectory($"{NewDirectoryName}{1}");
-        int index = _fileSystem.GetNextDirectoryIndex(".");
+        _fileSystem.AddDirectory(directory);
+        int index = _fileSystem.GetNextDirectoryIndex2(".");
 
         index.Should()
             .Be(0);
@@ -55,5 +57,12 @@ internal static class FileSystemExtensions
                         && !s.Equals("Новая папка")
                         && int.TryParse(s[(s.IndexOf('(') + 1)..s.IndexOf(')')], out _))
             .Select(s => int.Parse(s[(s.IndexOf('(') + 1)..s.IndexOf(')')]))?.Max() ?? 1;
+    }
+
+    public static int GetNextDirectoryIndex2(this IFileSystem fileSystem, string directory)
+    {
+        int index = fileSystem.Directory.Exists("Новая папка") ? 1 : 0;
+        return index + fileSystem.Directory.EnumerateDirectories(directory, "Новая папка (*)")
+            .Count();
     }
 }
