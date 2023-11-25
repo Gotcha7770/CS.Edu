@@ -2,12 +2,26 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
+using System.Text.RegularExpressions;
 using DynamicData;
 
 namespace CS.Edu.Core.IO;
 
 public static class FileSystemExtensions
 {
+    public static int GetNextDirectoryIndex(this IFileSystem fileSystem, string directory)
+    {
+        //var tmp = fileSystem.Path.DirectorySeparatorChar;
+        //var regex = new Regex(@"(\\|/)Новая папка( \(\d+\))?$");
+        var regex = new Regex(@"^Новая папка( \(\d+\))?$");
+        return fileSystem.DirectoryInfo.New(directory)
+            .EnumerateDirectories()
+            .Count(x => regex.IsMatch(x.Name));
+        // return fileSystem.Directory.EnumerateDirectories(directory)
+        //     .Count(x => regex.IsMatch(x));
+    }
+
     public static IObservableFile ToObservable(this IFileInfo file)
     {
         return new ObservableFile(file);

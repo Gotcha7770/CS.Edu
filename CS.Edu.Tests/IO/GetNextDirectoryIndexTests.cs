@@ -1,6 +1,7 @@
-﻿using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
+﻿using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Text.RegularExpressions;
+using CS.Edu.Core.IO;
 using FluentAssertions;
 using Xunit;
 
@@ -14,7 +15,7 @@ public class GetNextDirectoryIndexTests
     [Fact]
     public void GetIndexForNewFolder_FirstDirectory_ReturnsZero()
     {
-        int index = _fileSystem.GetNextDirectoryIndex2(".");
+        int index = _fileSystem.GetNextDirectoryIndex(".");
 
         index.Should()
             .Be(0);
@@ -28,41 +29,32 @@ public class GetNextDirectoryIndexTests
     {
         _fileSystem.AddDirectory(NewDirectoryName);
         indices.ForEach(x => _fileSystem.AddDirectory($"{NewDirectoryName} ({x})"));
-        int index = _fileSystem.GetNextDirectoryIndex2(".");
+        int index = _fileSystem.GetNextDirectoryIndex(".");
 
         index.Should()
             .Be(expected);
     }
 
     [Theory]
-    [InlineData("Новая папка1")]
-    [InlineData("Новая папка (a)")]
-    public void GetIndexForNewFolder_ContainsFolderInWrongFormat_ReturnsNextInt(string directory)
+    [InlineData("Новаяпапка", false)]
+    [InlineData("Новая папка1", false)]
+    [InlineData("Новая папка 1", false)]
+    [InlineData("Новая папка (1", false)]
+    [InlineData("Новая папка 1)", false)]
+    [InlineData("Новая папка (a)", false)]
+    [InlineData("Новая папка (a1)", false)]
+    [InlineData("яНовая папка (1)", false)]
+    [InlineData("Новая папка ((1)", false)]
+    [InlineData("Новая папка (1)a", false)]
+    [InlineData("Новая папка", true)]
+    [InlineData("Новая папка (1)", true)]
+    [InlineData("Новая папка (12)", true)]
+    public void MatchNewDirectoryPattern(string path, bool expected)
     {
-        _fileSystem.AddDirectory(directory);
-        int index = _fileSystem.GetNextDirectoryIndex2(".");
+        var regex = new Regex(@"^Новая папка( \(\d+\))?$");
 
-        index.Should()
-            .Be(0);
-    }
-}
-
-internal static class FileSystemExtensions
-{
-    public static int GetNextDirectoryIndex(this IFileSystem fileSystem, string directory)
-    {
-        return fileSystem.Directory.GetDirectories(directory)
-            .Select(s => s[s.LastIndexOf('\\')..][1..])
-            .Where(s => s.Contains("Новая папка")
-                        && !s.Equals("Новая папка")
-                        && int.TryParse(s[(s.IndexOf('(') + 1)..s.IndexOf(')')], out _))
-            .Select(s => int.Parse(s[(s.IndexOf('(') + 1)..s.IndexOf(')')]))?.Max() ?? 1;
-    }
-
-    public static int GetNextDirectoryIndex2(this IFileSystem fileSystem, string directory)
-    {
-        int index = fileSystem.Directory.Exists("Новая папка") ? 1 : 0;
-        return index + fileSystem.Directory.EnumerateDirectories(directory, "Новая папка (*)")
-            .Count();
+        regex.IsMatch(path)
+            .Should()
+            .Be(expected);
     }
 }
