@@ -156,9 +156,11 @@ public class ObservableFileTests : IClassFixture<IOTestFixture>
         //var testObserver = _scheduler.Start(() => file.ToObservable().LastWriteTime, 0, 0, ReactiveTest.Disposed);
         var testObserver = _scheduler.CreateObserver<DateTime>();
         using var subscription = file.ToObservable().LastWriteTime.Subscribe(testObserver);
+        await Task.Delay(150); //??? how to avoid delay
         scope.Write("file.txt", new byte[10]);
         await Task.Delay(150); //??? how to avoid delay
 
+        file = _fileSystem.FileInfo.New(file.FullName);
         testObserver.Messages.Should()
             .BeEquivalentTo(new[]
             {

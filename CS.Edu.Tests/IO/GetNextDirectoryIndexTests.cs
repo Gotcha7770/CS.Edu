@@ -28,6 +28,7 @@ public class GetNextDirectoryIndexTests
     public void GetIndexForNextFolder_ReturnsNextInt(int[] indices, int expected)
     {
         _fileSystem.AddDirectory(NewDirectoryName);
+
         indices.ForEach(x => _fileSystem.AddDirectory($"{NewDirectoryName} ({x})"));
         int index = _fileSystem.GetNextDirectoryIndex(".");
 

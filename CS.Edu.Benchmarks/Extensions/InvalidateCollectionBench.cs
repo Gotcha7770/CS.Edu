@@ -12,16 +12,16 @@ namespace CS.Edu.Benchmarks.Extensions
     [Config(typeof(DefaultConfig))]
     public class InvalidateCollectionBench
     {
-        List<(int, DateTime)> _source = new List<(int, DateTime)>()
-        {
+        private readonly List<(int, DateTime)> _source =
+        [
             (0, new DateTime(2012, 2, 1)),
             (10, new DateTime(2013, 3, 1)),
             (20, new DateTime(2014, 5, 1)),
             (30, new DateTime(2015, 7, 1)),
             (40, new DateTime(2016, 11, 1))
-        };
+        ];
 
-        (int, DateTime)[] _update = new[]
+        private readonly (int, DateTime)[] _update =
         {
             (0, new DateTime(2012, 2, 2)),
             (12, new DateTime(2013, 3, 3)),
@@ -29,11 +29,11 @@ namespace CS.Edu.Benchmarks.Extensions
             (30, new DateTime(2015, 5, 2))
         };
 
-        Dictionary<int, (int, DateTime)> _dic;
+        private Dictionary<int, (int, DateTime)> _dic;
 
-        readonly Merge<(int, DateTime)> _mergeFunc = (x, y) => (x.Item1, y.Item2);
-        readonly Func<(int, DateTime), int> _keySelector = (x) => x.Item1;
-        readonly Consumer _consumer = new Consumer();
+        private readonly Merge<(int, DateTime)> _mergeFunc = (x, y) => (x.Item1, y.Item2);
+        private readonly Func<(int, DateTime), int> _keySelector = x => x.Item1;
+        private readonly Consumer _consumer = new Consumer();
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -56,14 +56,14 @@ namespace CS.Edu.Benchmarks.Extensions
         }
 
         [Benchmark]
-        public void MergeWithoutMaterialzie()
+        public void MergeWithoutMaterialize()
         {
             var result = _source.Merge(_update, _mergeFunc, _keySelector);
             result.Consume(_consumer);
         }
 
         [Benchmark]
-        public void MergeOnDictionaryWithoutMaterialzie()
+        public void MergeOnDictionaryWithoutMaterialize()
         {
             var result = _dic.Merge(_update, _mergeFunc, _keySelector);
             result.Consume(_consumer);

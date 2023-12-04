@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace CS.Edu.Core.Extensions;
 
@@ -52,13 +53,18 @@ public static class Collections
         return patch.Select(x => source.TryGetValue(keySelector(x), out TValue value) ? mergeFunc(value, x) : x);
     }
 
-    public static void Swap<T>(ref T first, ref T second) => (first, second) = (second, first);
-
-    public static T[] Copy<T>(this T[] source)
+    public static bool SequenceEqual<T>(this IReadOnlyCollection<T> source, ReadOnlySpan<T> span)
     {
-        T[] result = new T[source.Length];
-        Array.Copy(source, result, source.Length);
+        return source switch
+        {
+            List<T> list => CollectionsMarshal.AsSpan(list).SequenceEqual(span),
+            T[] array => array.AsSpan().SequenceEqual(span),
+            _ => false
+        };
+    }
 
-        return result;
+    public static bool SequenceEqual<T>(this IReadOnlyCollection<T> source, ReadOnlyMemory<T> memory)
+    {
+        return source.SequenceEqual(memory.Span);
     }
 }
