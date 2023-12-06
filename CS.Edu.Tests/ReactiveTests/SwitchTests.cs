@@ -88,32 +88,32 @@ public class SwitchTests
     [Fact]
     public void SwitchOnTest()
     {
-        ISourceList<int> one = Source.From(new[] { 1, 3 });
-        ISourceList<int> other = Source.From(new[] { 2, 4 });
+        ISourceList<int> one = Source.From([1, 3]);
+        ISourceList<int> other = Source.From([2, 4]);
 
         using var switcher = new BehaviorSubject<Unit>(Unit.Default);
         using var aggregate = switcher.Scan(other, (agg, _) => agg == one ? other : one).Switch().AsAggregator();
 
-        aggregate.Data.Items.Should().BeEquivalentTo(new [] { 1, 3 });
+        aggregate.Data.Items.Should().BeEquivalentTo([1, 3]);
 
         switcher.OnNext(Unit.Default);
 
-        aggregate.Data.Items.Should().BeEquivalentTo(new [] { 2, 4 });
+        aggregate.Data.Items.Should().BeEquivalentTo([2, 4]);
 
         one.Add(5);
 
-        aggregate.Data.Items.Should().BeEquivalentTo(new [] { 2, 4 });
+        aggregate.Data.Items.Should().BeEquivalentTo([2, 4]);
 
         switcher.OnNext(Unit.Default);
 
-        aggregate.Data.Items.Should().BeEquivalentTo(new [] { 1, 3, 5 });
+        aggregate.Data.Items.Should().BeEquivalentTo([1, 3, 5]);
 
         other.Remove(4);
 
-        aggregate.Data.Items.Should().BeEquivalentTo(new [] { 1, 3, 5 });
+        aggregate.Data.Items.Should().BeEquivalentTo([1, 3, 5]);
 
         one.Remove(3);
 
-        aggregate.Data.Items.Should().BeEquivalentTo(new [] { 1, 5 });
+        aggregate.Data.Items.Should().BeEquivalentTo([1, 5]);
     }
 }

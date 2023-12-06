@@ -32,8 +32,8 @@ public class SharedSourceListFact
 
         // we expect, target1 contains single value, but it is not
         // because of shared list reference in observable
-        target1.Value.Should().BeEquivalentTo(new[] { 1, 1 });
-        target2.Value.Should().BeEquivalentTo(new[] { 1, 1 });
+        target1.Value.Should().BeEquivalentTo([1, 1]);
+        target2.Value.Should().BeEquivalentTo([1, 1]);
     }
 
     [Fact]
@@ -60,8 +60,8 @@ public class SharedSourceListFact
         source.OnNext(new ChangeSet<int> { new Change<int>(ListChangeReason.Add, 1, 0) });
         source.OnCompleted();
 
-        target1.Value.Should().BeEquivalentTo(new[] { 1 });
-        target2.Value.Should().BeEquivalentTo(new[] { 1 });
+        target1.Value.Should().BeEquivalentTo([1]);
+        target2.Value.Should().BeEquivalentTo([1]);
     }
 
     [Fact]
@@ -85,8 +85,8 @@ public class SharedSourceListFact
         source.OnNext(new ChangeSet<int> { new Change<int>(ListChangeReason.Add, 1, 0) });
         source.OnCompleted();
 
-        target1.Value.Should().BeEquivalentTo(new[] { 1 });
-        target2.Value.Should().BeEquivalentTo(new[] { 1 });
+        target1.Value.Should().BeEquivalentTo([1]);
+        target2.Value.Should().BeEquivalentTo([1]);
     }
 
     [Fact]
@@ -108,8 +108,8 @@ public class SharedSourceListFact
 
         source.OnNext(new ChangeSet<int> { new Change<int>(ListChangeReason.Add, 1, 0) });
 
-        target1.Value.Should().BeEquivalentTo(new[] { 1, 1 });
-        target2.Value.Should().BeEquivalentTo(new[] { 1, 1 });
+        target1.Value.Should().BeEquivalentTo([1, 1]);
+        target2.Value.Should().BeEquivalentTo([1, 1]);
     }
 
     [Fact]

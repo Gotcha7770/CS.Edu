@@ -29,7 +29,7 @@ public class TernarySplitTests
     [Fact]
     public void Split_TwoElements_ReturnsTheseElements()
     {
-        var items = new[] { 1, 2 };
+        int[] items = [1, 2];
         var result = items.Split(_isMonotone);
 
         result.Should().BeEquivalentTo(new[] { new[] { 1, 2 } });
@@ -38,7 +38,7 @@ public class TernarySplitTests
     [Fact]
     public void Split_WhilePrevLessThenNext_Returns3Groups()
     {
-        var items = new[] { 1, 3, 5, 4, 3, 4, 5 };
+        int[] items = [1, 3, 5, 4, 3, 4, 5];
         var result = items.Split(_isMonotone);
 
         result.Should()
@@ -53,7 +53,7 @@ public class TernarySplitTests
     [Fact]
     public void Split_WhilePrevLessThenNext_Returns3GroupsWithBordersIncluded()
     {
-        var items = new[] { 1, 3, 5, 4, 3, 4, 5 };
+        int[] items = [1, 3, 5, 4, 3, 4, 5];
         var result = items.Split(_isMonotone, SplitOptions.IncludeBorders);
 
         result.Should()

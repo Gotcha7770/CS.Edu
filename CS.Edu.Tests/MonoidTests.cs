@@ -54,7 +54,7 @@ public class MonoidTests
         var comparer = EnumerableEqualityComparer<int>.Instance;
         MonoidLaws.HasIdentity<SeqType<int>, IEnumerable<int>>(Enumerable.Range(0, 2), comparer)
             .Should().BeTrue();
-        MonoidLaws.IsAssociative<SeqType<int>, IEnumerable<int>>(new[] { 1, 2 }, new[] { 3 }, new[] { 4, 5 }, comparer)
+        MonoidLaws.IsAssociative<SeqType<int>, IEnumerable<int>>([1, 2], [3], [4, 5], comparer)
             .Should().BeTrue();
     }
 }

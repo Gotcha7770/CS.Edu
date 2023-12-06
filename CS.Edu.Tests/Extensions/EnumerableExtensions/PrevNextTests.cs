@@ -27,7 +27,7 @@ public class PrevNextTests
         var items = EnumerableEx.Return(0).ToPrevNextIterator();
 
         items.Should()
-            .BeEquivalentTo(new[] { new PrevNextValue<int>(Optional<int>.None, 0, Optional<int>.None) });
+            .BeEquivalentTo([new PrevNextValue<int>(Optional<int>.None, 0, Optional<int>.None)]);
     }
 
     [Fact]

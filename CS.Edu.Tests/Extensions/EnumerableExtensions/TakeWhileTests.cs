@@ -13,10 +13,10 @@ public class TakeWhileTests
     [Fact]
     public void TakeWhile_PrevLessThenNext_ReturnsFirst3Elements()
     {
-        var items = new[] { 1, 2, 3, 2, 1 };
+        int[] items = [1, 2, 3, 2, 1];
         var result = items.TakeWhile(_lessThan);
 
-        result.Should().BeEquivalentTo(new[] { 1, 2, 3 });
+        result.Should().BeEquivalentTo([1, 2, 3]);
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public class TakeWhileTests
     {
         var result = EnumerableEx.Return(1).TakeWhile(_lessThan);
 
-        result.Should().BeEquivalentTo(new[] { 1 });
+        result.Should().BeEquivalentTo([1]);
     }
 
     [Fact]

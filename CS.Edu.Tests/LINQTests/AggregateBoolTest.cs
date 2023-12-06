@@ -16,22 +16,22 @@ public class AggregateBoolTest
             return source.Skip(1).Aggregate<bool, bool?>(source.First(), (acc, cur) => acc == cur ? cur : null);
         });
 
-        var items = new [] { true };
+        bool[] items = [true];
         func(items).Should().BeTrue();
 
-        items = new [] { false };
+        items = [false];
         func(items).Should().BeFalse();
 
-        items = new [] { true, false, true };
+        items = [true, false, true];
         func(items).Should().BeNull();
 
-        items = new [] { false, true, false };
+        items = [false, true, false];
         func(items).Should().BeNull();
 
-        items = new [] { false, false, false };
+        items = [false, false, false];
         func(items).Should().BeFalse();
 
-        items = new [] { true, true, true };
+        items = [true, true, true];
         func(items).Should().BeTrue();
     }
 
@@ -43,22 +43,22 @@ public class AggregateBoolTest
             return source.Aggregate((acc, cur) => acc.HasValue && acc.Value == cur ? cur : null);
         });
 
-        var items = new bool?[] { true };
+        bool?[] items = [true];
         func(items).Should().BeTrue();
 
-        items = new bool?[] { false };
+        items = [false];
         func(items).Should().BeFalse();
 
-        items = new bool?[] { true, false, true };
+        items = [true, false, true];
         func(items).Should().BeNull();
 
-        items = new bool?[] { false, false, false };
+        items = [false, false, false];
         func(items).Should().BeFalse();
 
-        items = new bool?[] { true, true, true };
+        items = [true, true, true];
         func(items).Should().BeTrue();
 
-        items = new bool?[] { true, true, null };
+        items = [true, true, null];
         func(items).Should().BeNull();
     }
 }

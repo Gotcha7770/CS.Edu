@@ -20,10 +20,10 @@ public class FunctionsTests
     [Fact]
     public void Curry()
     {
-        Func<int, int, int, int[]> func = (a, b, c) => new[] { a, b, c };
+        Func<int, int, int, int[]> func = (a, b, c) => [a, b, c];
         var curried = func.Curry();
 
         curried.Should().BeOfType<Func<int, Func<int, Func<int, int[]>>>>();
-        curried(12)(13)(14).Should().BeEquivalentTo(new [] { 12, 13, 14 });
+        curried(12)(13)(14).Should().BeEquivalentTo([12, 13, 14]);
     }
 }

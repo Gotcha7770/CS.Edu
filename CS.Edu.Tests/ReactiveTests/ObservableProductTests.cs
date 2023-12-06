@@ -78,11 +78,11 @@ public class ObservableProductTests
 
         right.OnNext(0);
 
-        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0) });
+        cartesian.Should().BeEquivalentTo([(0, 0), (1, 0)]);
 
         right.OnNext(1);
 
-        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+        cartesian.Should().BeEquivalentTo([(0, 0), (1, 0), (0, 1), (1, 1)]);
     }
 
     [Fact]
@@ -115,21 +115,21 @@ public class ObservableProductTests
 
         cartesian.Should().BeEmpty();
 
-        left.AddRange(new [] {0, 1});
+        left.AddRange([0, 1]);
 
         cartesian.Should().BeEmpty();
 
         right.Add(0);
 
-        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0) });
+        cartesian.Should().BeEquivalentTo([(0, 0), (1, 0)]);
 
         right.Add(1);
 
-        cartesian.Should().BeEquivalentTo(new[] { (0, 0), (1, 0), (0, 1), (1, 1) });
+        cartesian.Should().BeEquivalentTo([(0, 0), (1, 0), (0, 1), (1, 1)]);
 
         left.Remove(0);
 
-        cartesian.Should().BeEquivalentTo(new[] { (1, 0), (1, 1) });
+        cartesian.Should().BeEquivalentTo([(1, 0), (1, 1)]);
 
         right.Clear();
 

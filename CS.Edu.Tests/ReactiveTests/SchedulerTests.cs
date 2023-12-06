@@ -42,7 +42,7 @@ public class SchedulerTests
             return Disposable.Empty;
         });
 
-        WaitHandle.WaitAll(new WaitHandle[] {state1.Reset, state2.Reset});
+        WaitHandle.WaitAll([state1.Reset, state2.Reset]);
         state1.Id.Should().NotBe(state2.Id);
     }
 
@@ -64,7 +64,7 @@ public class SchedulerTests
             st.Reset.Set();
         });
 
-        WaitHandle.WaitAll(new WaitHandle[] {state1.Reset, state2.Reset});
+        WaitHandle.WaitAll([state1.Reset, state2.Reset]);
         state1.Id.Should().NotBe(state2.Id);
     }
 

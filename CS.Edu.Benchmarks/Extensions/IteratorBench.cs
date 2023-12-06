@@ -13,8 +13,8 @@ namespace CS.Edu.Benchmarks.Extensions
     [Config(typeof(DefaultConfig))]
     public class IteratorBench
     {
-        public IEnumerable<int> items = new[] { 1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1 };
-        public Relation<int> relation = (x, y) => x == 0 ? y == 0 : y != 0;
+        private readonly IEnumerable<int> items = [1, 3, 0, 0, 0, 7, 0, 0, 9, 0, 1];
+        private readonly Relation<int> relation = (x, y) => x == 0 ? y == 0 : y != 0;
         private readonly Consumer _consumer = new Consumer();
 
         [Benchmark]

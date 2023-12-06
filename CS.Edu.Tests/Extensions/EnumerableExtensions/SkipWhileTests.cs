@@ -14,10 +14,10 @@ public class SkipWhileTests
     [Fact]
     public void SkipWhile_PrevLessThenNext_SkipFirst2Elements()
     {
-        var items = new[] { 1, 2, 3, 2, 1 };
+        int[] items = [1, 2, 3, 2, 1];
         var result = items.SkipWhile(_lessThan);
 
-        result.Should().BeEquivalentTo(new[] { 2, 1 });
+        result.Should().BeEquivalentTo([2, 1]);
     }
 
     [Fact]

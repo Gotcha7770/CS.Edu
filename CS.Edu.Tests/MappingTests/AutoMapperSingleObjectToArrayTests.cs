@@ -34,7 +34,7 @@ public class AutoMapperSingleObjectToArrayTests
     {
         public TDest[] Convert(TSource source, TDest[] destination, ResolutionContext context)
         {
-            return new[] { context.Mapper.Map<TDest>(source) };
+            return [context.Mapper.Map<TDest>(source)];
         }
     }
 
@@ -77,7 +77,7 @@ public class AutoMapperSingleObjectToArrayTests
             .BeEquivalentTo(new Destination
             {
                 Id = 42,
-                Items = new[] { new DestinationData() }
+                Items = [new DestinationData()]
             });
     }
 }

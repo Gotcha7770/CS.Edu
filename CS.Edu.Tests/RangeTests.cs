@@ -223,23 +223,23 @@ public class RangeTests
         {
             var standard = new Range<int>(5, 9);
 
-            yield return new object[] { standard, new Range<int>(0, 4), new[] { new Range<int>(5, 9) } };
-            yield return new object[] { standard, new Range<int>(0, 5), new[] { new Range<int>(5, 9) } };
-            yield return new object[] { standard, new Range<int>(0, 6), new[] { new Range<int>(6, 9) } };
-            yield return new object[] { standard, new Range<int>(0, 8), new[] { new Range<int>(8, 9) } };
+            yield return [standard, new Range<int>(0, 4), new[] { new Range<int>(5, 9) }];
+            yield return [standard, new Range<int>(0, 5), new[] { new Range<int>(5, 9) }];
+            yield return [standard, new Range<int>(0, 6), new[] { new Range<int>(6, 9) }];
+            yield return [standard, new Range<int>(0, 8), new[] { new Range<int>(8, 9) }];
 
-            yield return new object[] { standard, new Range<int>(0, 9), Array.Empty<Range<int>>() };
-            yield return new object[] { standard, new Range<int>(0, 10), Array.Empty<Range<int>>() };
-            yield return new object[] { standard, new Range<int>(5, 9), Array.Empty<Range<int>>() };
-            yield return new object[] { standard, new Range<int>(5, 10), Array.Empty<Range<int>>() };
+            yield return [standard, new Range<int>(0, 9), Array.Empty<Range<int>>()];
+            yield return [standard, new Range<int>(0, 10), Array.Empty<Range<int>>()];
+            yield return [standard, new Range<int>(5, 9), Array.Empty<Range<int>>()];
+            yield return [standard, new Range<int>(5, 10), Array.Empty<Range<int>>()];
 
-            yield return new object[] { standard, new Range<int>(6, 8), new[] { new Range<int>(5, 6), new Range<int>(8, 9) } };
-            yield return new object[] { standard, new Range<int>(7, 7), new[] { new Range<int>(5, 7), new Range<int>(7, 9) } };
+            yield return [standard, new Range<int>(6, 8), new[] { new Range<int>(5, 6), new Range<int>(8, 9) }];
+            yield return [standard, new Range<int>(7, 7), new[] { new Range<int>(5, 7), new Range<int>(7, 9) }];
 
-            yield return new object[] { standard, new Range<int>(6, 10), new[] { new Range<int>(5, 6) } };
-            yield return new object[] { standard, new Range<int>(8, 10), new[] { new Range<int>(5, 8) } };
-            yield return new object[] { standard, new Range<int>(9, 10), new[] { new Range<int>(5, 9) } };
-            yield return new object[] { standard, new Range<int>(10, 11), new[] { new Range<int>(5, 9) } };
+            yield return [standard, new Range<int>(6, 10), new[] { new Range<int>(5, 6) }];
+            yield return [standard, new Range<int>(8, 10), new[] { new Range<int>(5, 8) }];
+            yield return [standard, new Range<int>(9, 10), new[] { new Range<int>(5, 9) }];
+            yield return [standard, new Range<int>(10, 11), new[] { new Range<int>(5, 9) }];
         }
     }
 
@@ -247,12 +247,12 @@ public class RangeTests
     {
         get
         {
-            yield return new object[] { new Range<int>(0, 4), new Range<int>(5, 9), new[] { new Range<int>(0, 4), new Range<int>(5, 9) } };
-            yield return new object[] { new Range<int>(0, 5), new Range<int>(5, 9), new[] { new Range<int>(0, 5), new Range<int>(5, 9) } };
-            yield return new object[] { new Range<int>(0, 6), new Range<int>(5, 9), new[] { new Range<int>(0, 5), new Range<int>(6, 9) } };
-            yield return new object[] { new Range<int>(5, 9), new Range<int>(0, 6), new[] { new Range<int>(6, 9), new Range<int>(0, 5) } };
-            yield return new object[] { new Range<int>(0, 10), new Range<int>(3, 7), new[] { new Range<int>(0, 3), new Range<int>(7, 10) } };
-            yield return new object[] { new Range<int>(3, 7), new Range<int>(0, 10), new[] { new Range<int>(7, 10), new Range<int>(0, 3) } };
+            yield return [new Range<int>(0, 4), new Range<int>(5, 9), new[] { new Range<int>(0, 4), new Range<int>(5, 9) }];
+            yield return [new Range<int>(0, 5), new Range<int>(5, 9), new[] { new Range<int>(0, 5), new Range<int>(5, 9) }];
+            yield return [new Range<int>(0, 6), new Range<int>(5, 9), new[] { new Range<int>(0, 5), new Range<int>(6, 9) }];
+            yield return [new Range<int>(5, 9), new Range<int>(0, 6), new[] { new Range<int>(6, 9), new Range<int>(0, 5) }];
+            yield return [new Range<int>(0, 10), new Range<int>(3, 7), new[] { new Range<int>(0, 3), new Range<int>(7, 10) }];
+            yield return [new Range<int>(3, 7), new Range<int>(0, 10), new[] { new Range<int>(7, 10), new Range<int>(0, 3) }];
         }
     }
 }

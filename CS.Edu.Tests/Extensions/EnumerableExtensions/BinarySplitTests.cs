@@ -22,16 +22,16 @@ public class BinarySplitTests
     [Fact]
     public void Split_OneElement_ReturnsThatElement()
     {
-        var items = new[] { 1 };
+        int[] items = [1];
         var result = items.Split(_lessThan);
 
-        result.Should().BeEquivalentTo(new[] { items });
+        result.Should().BeEquivalentTo([items]);
     }
 
     [Fact]
     public void Split_WhilePrevLessThenNext_Returns2Groups()
     {
-        var items = new[] { 1, 2, 3, 2, 3 };
+        int[] items = [1, 2, 3, 2, 3];
         var result = items.Split(_lessThan)
             .ToArray();
 

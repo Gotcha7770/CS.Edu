@@ -44,9 +44,9 @@ namespace CS.Edu.Benchmarks
             return (left, right) switch
             {
                 (true, true) => A.Equals(B) ? Array.Empty<Range<int>>() : SubtractFromCenter(A, B),
-                (true, false) => new[] { new Range<int>(A.Min, B.Min) },
-                (false, true) => new[] { new Range<int>(B.Max, A.Max) },
-                _ => B.Contains(A) ? Array.Empty<Range<int>>() : new [] { A }
+                (true, false) => [new Range<int>(A.Min, B.Min)],
+                (false, true) => [new Range<int>(B.Max, A.Max)],
+                _ => B.Contains(A) ? Array.Empty<Range<int>>() : [A]
             };
         }
 

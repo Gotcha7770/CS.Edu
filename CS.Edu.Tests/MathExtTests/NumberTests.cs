@@ -17,27 +17,27 @@ public class NumberTests
     public void DigitsTest_Zero_ReturnsZero(int @base)
     {
         Number.Digits(0, @base).Should()
-            .BeEquivalentTo(new[] { 0 });
+            .BeEquivalentTo([0]);
     }
 
     [Fact]
     public void DigitsTest_BaseIs2()
     {
         Number.Digits(0b1011, 2).Should()
-            .BeEquivalentTo(new[] { 1, 1, 0, 1 });
+            .BeEquivalentTo([1, 1, 0, 1]);
     }
 
     [Fact]
     public void DigitsTest_BaseIs10()
     {
         Number.Digits(123, 10).Should()
-            .BeEquivalentTo(new[] { 3, 2, 1 });
+            .BeEquivalentTo([3, 2, 1]);
     }
 
     [Fact]
     public void ReductionTest()
     {
-        var array = new[] { 3, 2, 1 };
+        int[] array = [3, 2, 1];
 
         long number = array.Select((x, i) => x * 10.Power(i)).Sum();
 

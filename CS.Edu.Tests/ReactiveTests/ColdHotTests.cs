@@ -58,8 +58,8 @@ public class ColdHotTests
         using var s2 = observable.Subscribe(result2.Add);
         scheduler.AdvanceBy(TimeSpan.FromSeconds(3).Ticks);
 
-        result1.Should().BeEquivalentTo(new long[] { 0, 1, 2, 3, 4 });
-        result2.Should().BeEquivalentTo(new long[] { 0, 1, 2 });
+        result1.Should().BeEquivalentTo([0, 1, 2, 3, 4]);
+        result2.Should().BeEquivalentTo([0, 1, 2]);
     }
 
     [Fact]
@@ -78,8 +78,8 @@ public class ColdHotTests
         using var s2 = hotObject.Subscribe(result2.Add);
         scheduler.AdvanceBy(TimeSpan.TicksPerSecond);
 
-        result1.Should().BeEquivalentTo(new long[] { 1, 2 });
-        result2.Should().BeEquivalentTo(new long[] { 2 });
+        result1.Should().BeEquivalentTo([1, 2]);
+        result2.Should().BeEquivalentTo([2]);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class ColdHotTests
         using var s2 = connectable.Subscribe(result2.Add);
         scheduler.AdvanceBy(TimeSpan.FromSeconds(3).Ticks);
 
-        result1.Should().BeEquivalentTo(new long[] { 0, 1, 2, 3, 4 });
-        result2.Should().BeEquivalentTo(new long[] { 3, 4 });
+        result1.Should().BeEquivalentTo([0, 1, 2, 3, 4]);
+        result2.Should().BeEquivalentTo([3, 4]);
     }
 }

@@ -10,7 +10,7 @@ namespace CS.Edu.Benchmarks.Extensions
         [ParamsSource(nameof(Numbers))]
         public int Number { get; set; }
 
-        public IEnumerable<int> Numbers => new[] { 0, 1, 2, 3, 4, 5, 10, 11, 122, 123, 1234, 1235, 12344, 12345, 123456, 123457 };
+        public IEnumerable<int> Numbers => [0, 1, 2, 3, 4, 5, 10, 11, 122, 123, 1234, 1235, 12344, 12345, 123456, 123457];
 
         [Benchmark]
         public bool StandardCheck()

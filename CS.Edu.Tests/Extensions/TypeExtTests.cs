@@ -76,7 +76,7 @@ public class TypeExtTests
         var type = new GenericType(typeof(IEnumerable<int>));
 
         type.GenericTypeDefinition.Should().Be(typeof(IEnumerable<>));
-        type.GenericParameterTypes.Should().BeEquivalentTo(new[] { typeof(int) });
+        type.GenericParameterTypes.Should().BeEquivalentTo([typeof(int)]);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class TypeExtTests
         var type = new GenericType(typeof(IDictionary<int, Array>));
 
         type.GenericTypeDefinition.Should().Be(typeof(IDictionary<,>));
-        type.GenericParameterTypes.Should().BeEquivalentTo(new[] { typeof(int), typeof(Array) });
+        type.GenericParameterTypes.Should().BeEquivalentTo([typeof(int), typeof(Array)]);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class TypeExtTests
         var type = (GenericType)typeof(IEnumerable<int>);
 
         type.GenericTypeDefinition.Should().Be(typeof(IEnumerable<>));
-        type.GenericParameterTypes.Should().BeEquivalentTo(new[] { typeof(int) });
+        type.GenericParameterTypes.Should().BeEquivalentTo([typeof(int)]);
     }
 
     [Fact]

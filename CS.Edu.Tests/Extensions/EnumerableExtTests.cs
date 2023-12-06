@@ -9,11 +9,11 @@ public class EnumerableExtTests
     [Fact]
     public void ShrinkDuplicatesTest()
     {
-        var points = new[] { 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0 };
+        int[] points = [0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0];
 
         var result = points.ShrinkDuplicates(1);
 
-        result.Should().BeEquivalentTo(new[] { 0, 1, 0, 0, 1, 0, 1, 0 });
+        result.Should().BeEquivalentTo([0, 1, 0, 0, 1, 0, 1, 0]);
     }
 
     [Fact]

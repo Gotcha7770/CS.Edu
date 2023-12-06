@@ -37,7 +37,7 @@ public class ExceptTests
         var items = Enumerable.Range(0, 3);
         var result = items.Except(1);
 
-        result.Should().BeEquivalentTo(new[] { 0, 2 });
+        result.Should().BeEquivalentTo([0, 2]);
     }
 
     [Fact]
@@ -46,6 +46,6 @@ public class ExceptTests
         var items = Enumerable.Range(0, 5);
         var result = items.Except(10);
 
-        result.Should().BeEquivalentTo(new[] { 0, 1, 2, 3, 4 });
+        result.Should().BeEquivalentTo([0, 1, 2, 3, 4]);
     }
 }

@@ -39,7 +39,7 @@ public class LastChangedTests
         var second = new Selectable<object>();
         var third = new Selectable<object>();
 
-        var source = Source.From(new[] { first, third }, x => x.Key);
+        var source = Source.From([first, third], x => x.Key);
 
         using var autoSelector = source.Connect()
             .AutoRefresh(x => x.IsSelected)
