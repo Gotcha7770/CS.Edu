@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using CS.Edu.Benchmarks.Helpers;
+using MathNet.Numerics.Random;
 
 namespace CS.Edu.Benchmarks;
 
@@ -14,21 +15,29 @@ public class HashsetVsContainsBench
     private readonly Consumer _consumer = new Consumer();
     private readonly Random _random = new Random((int)DateTime.Now.Ticks);
 
-    public record Item(int Id);
+    public record Item(byte Id);
 
     [Benchmark]
     [ArgumentsSource(nameof(Data))]
-    public void ArrayContainsBench(int[] indexes, Item[] items)
+    public void ArrayContainsBench(byte[] indexes, Item[] items)
     {
         items.Where(x => indexes.Contains(x.Id)).Consume(_consumer);
     }
 
     [Benchmark]
     [ArgumentsSource(nameof(Data))]
-    public void HashSetContainsBench(int[] indexes, Item[] items)
+    public void HashSetContainsBench(byte[] indexes, Item[] items)
     {
         var set = indexes.ToHashSet();
         items.Where(x => set.Contains(x.Id)).Consume(_consumer);
+    }
+
+    [Benchmark]
+    [ArgumentsSource(nameof(Data))]
+    public void SearchValuesContainsBench(byte[] indexes, Item[] items)
+    {
+        var values = SearchValues.Create(indexes);
+        items.Where(x => values.Contains(x.Id)).Consume(_consumer);
     }
 
     public IEnumerable<object[]> Data()
@@ -45,28 +54,25 @@ public class HashsetVsContainsBench
         };
         yield return new object[]
         {
-            GetNumbers(1000),
-            GetItems(1000)
+            GetNumbers(1_000),
+            GetItems(1_000)
+        };
+        yield return new object[]
+        {
+            GetNumbers(10_000),
+            GetItems(10_000)
         };
     }
 
-    public int[] GetNumbers(int count)
+    private byte[] GetNumbers(int count)
     {
-        var array = Enumerable.Range(0, count).ToArray();
-        _random.Shuffle(array);
-
-        return array;
+        return _random.NextBytes(count);
     }
 
-    public Item[] GetItems(int count)
+    private Item[] GetItems(int count)
     {
-        var array = Enumerable.Range(0, count)
-            .Where(x => x % 3 == 0)
+        return _random.NextBytes(count)
             .Select(x => new Item(x))
             .ToArray();
-
-        _random.Shuffle(array);
-
-        return array;
     }
 }
