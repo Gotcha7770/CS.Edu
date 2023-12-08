@@ -15,7 +15,9 @@ public class RangeTests
     [MemberData(nameof(RangesForEqualsTests))]
     public void EqualsTest(Range<int> one, Range<int> other, bool expected)
     {
-        Equals(one, other).Should().Be(expected);
+        Equals(one, other)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
@@ -28,7 +30,9 @@ public class RangeTests
     {
         var range = new Range<int>(5, 9);
 
-        range.Contains(value).Should().Be(expected);
+        range.Contains(value)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
@@ -41,7 +45,9 @@ public class RangeTests
     {
         var range = new Range<int>(5, 9);
 
-        range.Contains(value, RangeParameters.None).Should().Be(expected);
+        range.Contains(value, RangeParameters.None)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
@@ -54,7 +60,9 @@ public class RangeTests
     {
         var range = new Range<int>(5, 9);
 
-        range.Contains(value, RangeParameters.IncludeMaximum).Should().Be(expected);
+        range.Contains(value, RangeParameters.IncludeMaximum)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
@@ -67,46 +75,54 @@ public class RangeTests
     {
         var range = new Range<int>(5, 9);
 
-        range.Contains(value, RangeParameters.IncludeMinimum).Should().Be(expected);
+        range.Contains(value, RangeParameters.IncludeMinimum)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
     [MemberData(nameof(RangesForContainsTests))]
     public void ContainsRangeTests(Range<int> one, Range<int> other, bool expected)
     {
-        one.Contains(other).Should().Be(expected);
+        one.Contains(other)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
     [MemberData(nameof(RangesForIntersectsTests))]
     public void IntersectsTests(Range<int> one, Range<int> other, bool expected)
     {
-        one.Intersects(other).Should().Be(expected);
+        one.Intersects(other)
+            .Should()
+            .Be(expected);
     }
 
     [Theory]
     [MemberData(nameof(RangesForIntersectionTests))]
     public void IntersectionTests(Range<int> one, Range<int> other, Range<int> expected)
     {
-        one.Intersection(other).Should().BeEquivalentTo(expected);
+        one.Intersection(other)
+            .Should()
+            .BeEquivalentTo(expected);
     }
 
     [Theory]
     [MemberData(nameof(RangesForSubtractionTests))]
     public void SubtractionTests(Range<int> one, Range<int> other, Range<int>[] expected)
     {
-        one.Subtract(other).Should().BeEquivalentTo(expected);
+        one.Subtract(other)
+            .Should()
+            .BeEquivalentTo(expected);
     }
 
     [Theory]
     [MemberData(nameof(RangesForSymmetricDifferenceTests))]
     public void SymmetricDifferenceTest(Range<int> one, Range<int> other, Range<int>[] expected)
     {
-        Range<int>.SymmetricDifference(one, other).Should().BeEquivalentTo(expected);
-        // var one = new Range<int>(0, 6);
-        // var other = new Range<int>(4, 10);
-        //
-        // var result = Range<int>.SymmetricDifference(one, other).ToArray();
+        Range<int>.SymmetricDifference(one, other)
+            .Should()
+            .BeEquivalentTo(expected);
     }
 
     public static IEnumerable<object[]> RangesForEqualsTests
@@ -115,17 +131,17 @@ public class RangeTests
         {
             var standard = new Range<int>(5, 9);
 
-            yield return new object[] { Range<int>.Empty, Range<int>.Empty, true };
-            yield return new object[] { standard, null, false };
-            yield return new object[] { standard, Range<int>.Empty, false };
-            yield return new object[] { standard, new Range<int>(4, 9), false };
-            yield return new object[] { standard, new Range<int>(6, 9), false };
-            yield return new object[] { standard, new Range<int>(5, 8), false };
-            yield return new object[] { standard, new Range<int>(5, 10), false };
-            yield return new object[] { standard, new Range<int>(4, 10), false };
-            yield return new object[] { standard, new Range<int>(6, 8), false };
-            yield return new object[] { standard, new Range<int>(5, 9), true };
-            yield return new object[] { standard, standard, true };
+            yield return [Range<int>.Empty, Range<int>.Empty, true];
+            yield return [standard, null, false];
+            yield return [standard, Range<int>.Empty, false];
+            yield return [standard, new Range<int>(4, 9), false];
+            yield return [standard, new Range<int>(6, 9), false];
+            yield return [standard, new Range<int>(5, 8), false];
+            yield return [standard, new Range<int>(5, 10), false];
+            yield return [standard, new Range<int>(4, 10), false];
+            yield return [standard, new Range<int>(6, 8), false];
+            yield return [standard, new Range<int>(5, 9), true];
+            yield return [standard, standard, true];
         }
     }
 
@@ -135,23 +151,23 @@ public class RangeTests
         {
             var standard = new Range<int>(5, 9);
 
-            yield return new object[] { standard, new Range<int>(5, 9), true };
-            yield return new object[] { standard, new Range<int>(5, 8), true };
-            yield return new object[] { standard, new Range<int>(6, 9), true };
-            yield return new object[] { standard, new Range<int>(6, 8), true };
+            yield return [standard, new Range<int>(5, 9), true];
+            yield return [standard, new Range<int>(5, 8), true];
+            yield return [standard, new Range<int>(6, 9), true];
+            yield return [standard, new Range<int>(6, 8), true];
 
-            yield return new object[] { standard, new Range<int>(0, 4), false };
-            yield return new object[] { standard, new Range<int>(0, 5), false };
-            yield return new object[] { standard, new Range<int>(0, 6), false };
-            yield return new object[] { standard, new Range<int>(0, 8), false };
-            yield return new object[] { standard, new Range<int>(0, 9), false };
-            yield return new object[] { standard, new Range<int>(0, 10), false };
-            yield return new object[] { standard, new Range<int>(4, 11), false };
-            yield return new object[] { standard, new Range<int>(5, 11), false };
-            yield return new object[] { standard, new Range<int>(6, 11), false };
-            yield return new object[] { standard, new Range<int>(8, 11), false };
-            yield return new object[] { standard, new Range<int>(9, 11), false };
-            yield return new object[] { standard, new Range<int>(10, 11), false };
+            yield return [standard, new Range<int>(0, 4), false];
+            yield return [standard, new Range<int>(0, 5), false];
+            yield return [standard, new Range<int>(0, 6), false];
+            yield return [standard, new Range<int>(0, 8), false];
+            yield return [standard, new Range<int>(0, 9), false];
+            yield return [standard, new Range<int>(0, 10), false];
+            yield return [standard, new Range<int>(4, 11), false];
+            yield return [standard, new Range<int>(5, 11), false];
+            yield return [standard, new Range<int>(6, 11), false];
+            yield return [standard, new Range<int>(8, 11), false];
+            yield return [standard, new Range<int>(9, 11), false];
+            yield return [standard, new Range<int>(10, 11), false];
         }
     }
 
@@ -161,26 +177,26 @@ public class RangeTests
         {
             var standard = new Range<int>(5, 9);
 
-            yield return new object[] { standard, new Range<int>(0, 5), true };
-            yield return new object[] { standard, new Range<int>(0, 6), true };
-            yield return new object[] { standard, new Range<int>(0, 8), true };
-            yield return new object[] { standard, new Range<int>(0, 9), true };
-            yield return new object[] { standard, new Range<int>(0, 10), true };
-            yield return new object[] { standard, new Range<int>(4, 8), true };
-            yield return new object[] { standard, new Range<int>(4, 9), true };
-            yield return new object[] { standard, new Range<int>(4, 10), true };
-            yield return new object[] { standard, new Range<int>(5, 8), true };
-            yield return new object[] { standard, new Range<int>(5, 9), true };
-            yield return new object[] { standard, new Range<int>(5, 10), true };
-            yield return new object[] { standard, new Range<int>(6, 8), true };
-            yield return new object[] { standard, new Range<int>(6, 9), true };
-            yield return new object[] { standard, new Range<int>(6, 10), true };
-            yield return new object[] { standard, new Range<int>(8, 9), true };
-            yield return new object[] { standard, new Range<int>(8, 10), true };
-            yield return new object[] { standard, new Range<int>(9, 10), true };
+            yield return [standard, new Range<int>(0, 5), true];
+            yield return [standard, new Range<int>(0, 6), true];
+            yield return [standard, new Range<int>(0, 8), true];
+            yield return [standard, new Range<int>(0, 9), true];
+            yield return [standard, new Range<int>(0, 10), true];
+            yield return [standard, new Range<int>(4, 8), true];
+            yield return [standard, new Range<int>(4, 9), true];
+            yield return [standard, new Range<int>(4, 10), true];
+            yield return [standard, new Range<int>(5, 8), true];
+            yield return [standard, new Range<int>(5, 9), true];
+            yield return [standard, new Range<int>(5, 10), true];
+            yield return [standard, new Range<int>(6, 8), true];
+            yield return [standard, new Range<int>(6, 9), true];
+            yield return [standard, new Range<int>(6, 10), true];
+            yield return [standard, new Range<int>(8, 9), true];
+            yield return [standard, new Range<int>(8, 10), true];
+            yield return [standard, new Range<int>(9, 10), true];
 
-            yield return new object[] { standard, new Range<int>(0, 4), false };
-            yield return new object[] { standard, new Range<int>(10, 15), false };
+            yield return [standard, new Range<int>(0, 4), false];
+            yield return [standard, new Range<int>(10, 15), false];
         }
     }
 
@@ -190,30 +206,30 @@ public class RangeTests
         {
             var standard = new Range<int>(5, 9);
 
-            yield return new object[] { standard, new Range<int>(0, 5), new Range<int>(5, 5) };
-            yield return new object[] { standard, new Range<int>(0, 6), new Range<int>(5, 6) };
-            yield return new object[] { standard, new Range<int>(0, 8), new Range<int>(5, 8) };
-            yield return new object[] { standard, new Range<int>(0, 9), new Range<int>(5, 9) };
-            yield return new object[] { standard, new Range<int>(0, 10), new Range<int>(5, 9) };
+            yield return [standard, new Range<int>(0, 5), new Range<int>(5, 5)];
+            yield return [standard, new Range<int>(0, 6), new Range<int>(5, 6)];
+            yield return [standard, new Range<int>(0, 8), new Range<int>(5, 8)];
+            yield return [standard, new Range<int>(0, 9), new Range<int>(5, 9)];
+            yield return [standard, new Range<int>(0, 10), new Range<int>(5, 9)];
 
-            yield return new object[] { standard, new Range<int>(4, 8), new Range<int>(5, 8) };
-            yield return new object[] { standard, new Range<int>(4, 9), new Range<int>(5, 9) };
-            yield return new object[] { standard, new Range<int>(4, 10), new Range<int>(5, 9) };
+            yield return [standard, new Range<int>(4, 8), new Range<int>(5, 8)];
+            yield return [standard, new Range<int>(4, 9), new Range<int>(5, 9)];
+            yield return [standard, new Range<int>(4, 10), new Range<int>(5, 9)];
 
-            yield return new object[] { standard, new Range<int>(5, 8), new Range<int>(5, 8) };
-            yield return new object[] { standard, new Range<int>(5, 9), new Range<int>(5, 9) };
-            yield return new object[] { standard, new Range<int>(5, 10), new Range<int>(5, 9) };
+            yield return [standard, new Range<int>(5, 8), new Range<int>(5, 8)];
+            yield return [standard, new Range<int>(5, 9), new Range<int>(5, 9)];
+            yield return [standard, new Range<int>(5, 10), new Range<int>(5, 9)];
 
-            yield return new object[] { standard, new Range<int>(6, 8), new Range<int>(6, 8) };
-            yield return new object[] { standard, new Range<int>(6, 9), new Range<int>(6, 9) };
-            yield return new object[] { standard, new Range<int>(6, 10), new Range<int>(6, 9) };
+            yield return [standard, new Range<int>(6, 8), new Range<int>(6, 8)];
+            yield return [standard, new Range<int>(6, 9), new Range<int>(6, 9)];
+            yield return [standard, new Range<int>(6, 10), new Range<int>(6, 9)];
 
-            yield return new object[] { standard, new Range<int>(8, 9), new Range<int>(8, 9) };
-            yield return new object[] { standard, new Range<int>(8, 10), new Range<int>(8, 9) };
-            yield return new object[] { standard, new Range<int>(9, 10), new Range<int>(9, 9) };
+            yield return [standard, new Range<int>(8, 9), new Range<int>(8, 9)];
+            yield return [standard, new Range<int>(8, 10), new Range<int>(8, 9)];
+            yield return [standard, new Range<int>(9, 10), new Range<int>(9, 9)];
 
-            yield return new object[] { standard, new Range<int>(0, 4), Range<int>.Empty };
-            yield return new object[] { standard, new Range<int>(10, 15), Range<int>.Empty };
+            yield return [standard, new Range<int>(0, 4), Range<int>.Empty];
+            yield return [standard, new Range<int>(10, 15), Range<int>.Empty];
         }
     }
 
