@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Resources\document.html" />
     <EmbeddedResource Include="Resources\document.html" />
   </ItemGroup>
 
