@@ -3,7 +3,6 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Reactive.Disposables;
 using System.Threading;
-using CS.Edu.Core.IO;
 
 namespace CS.Edu.Tests.Utils.IO;
 
@@ -27,7 +26,7 @@ public class IOTestScope : IDisposable
 
         _cleanup = new CompositeDisposable
         {
-            Disposable.Create(() => Watcher.EnableRaisingEvents = false),
+            Disposable.Create(Watcher, x => x.EnableRaisingEvents = false),
             Watcher
         };
     }

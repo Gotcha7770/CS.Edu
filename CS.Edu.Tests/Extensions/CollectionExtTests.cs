@@ -13,7 +13,7 @@ public class CollectionExtTests
     [Fact]
     public void InvalidateCollection()
     {
-        var source = new List<KeyValue>()
+        var source = new List<KeyValue>
         {
             new KeyValue(0, "Zero"),
             new KeyValue(1, "One"),

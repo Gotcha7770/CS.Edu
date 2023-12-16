@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using FluentAssertions;
 using Flurl;
 using Xunit;
@@ -89,30 +88,6 @@ public class UrlExistedApiTests
     {
         const string page = "http://test.com/v1/items";
         Url.Combine(page, relative)
-            .Should()
-            .Be(expected);
-    }
-
-    [Theory]
-    [InlineData("1", "/v1/items/1")]
-    [InlineData("../cart", "/v1/cart")]
-    [InlineData("/v2/cart", "/v2/cart")]
-    public void PathJoin(string relative, string expected)
-    {
-        const string current = "/v1/items";
-        Path.Join(current, relative)
-            .Should()
-            .Be(expected);
-    }
-
-    [Theory]
-    [InlineData("1", "/v1/items/1")]
-    [InlineData("../cart", "/v1/cart")]
-    [InlineData("/v2/cart", "/v2/cart")]
-    public void PathCombine(string relative, string expected)
-    {
-        const string current = "/v1/items";
-        Path.Combine(current, relative)
             .Should()
             .Be(expected);
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Xunit;
@@ -10,7 +11,7 @@ public class CollectionNullOrEmptyTests
     [InlineData(null, true)]
     [InlineData(new int[0], true)]
     [InlineData(new[] { 1 }, false)]
-    public void EnumerableIsNullOrEmpty(int[] input, bool expected)
+    public void EnumerableIsNullOrEmpty(IEnumerable<int> input, bool expected)
     {
         var result = input is null || input.IsEmpty();
         result.Should().Be(expected);
@@ -24,7 +25,7 @@ public class CollectionNullOrEmptyTests
     [InlineData(null, false)]
     [InlineData(new int[0], false)]
     [InlineData(new[] { 1 }, true)]
-    public void EnumerableIsNotNullOrEmpty(int[] input, bool expected)
+    public void EnumerableIsNotNullOrEmpty(IEnumerable<int> input, bool expected)
     {
         var result = input is not null && input.Any();
         result.Should().Be(expected);
