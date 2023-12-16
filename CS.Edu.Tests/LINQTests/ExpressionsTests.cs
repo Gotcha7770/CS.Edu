@@ -105,9 +105,9 @@ public class ExpressionsTests
     [Fact]
     public void ReplaceLambda()
     {
-        Func<Identity<int>, bool> func = x => x.Key is > 15 and < 35;
-        Expression<Func<Identity<int>, bool>> expression1 = x => func(x);
-        Expression<Func<object, bool>> expression2 = x => x.GetType() == typeof(Identity<int>) && func((Identity<int>)x);
+        Func<Item, bool> func = x => x.Key is > 15 and < 35;
+        Expression<Func<Item, bool>> expression1 = x => func(x);
+        Expression<Func<object, bool>> expression2 = x => x.GetType() == typeof(Item) && func((Item)x);
     }
 
     [Fact]

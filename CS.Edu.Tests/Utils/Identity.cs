@@ -2,7 +2,7 @@
 
 namespace CS.Edu.Tests.Utils;
 
-class Identity<T> : BaseNotifyPropertyChanged, IKey<T>
+internal class Identity<T> : BaseNotifyPropertyChanged, IKey<T>
 {
     public Identity(T key) => Key = key;
 

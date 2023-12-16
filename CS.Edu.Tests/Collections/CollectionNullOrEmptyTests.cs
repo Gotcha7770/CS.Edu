@@ -3,7 +3,7 @@ using System.Linq;
 using FluentAssertions;
 using Xunit;
 
-namespace CS.Edu.Tests;
+namespace CS.Edu.Tests.Collections;
 
 public class CollectionNullOrEmptyTests
 {

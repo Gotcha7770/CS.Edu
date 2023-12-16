@@ -2,7 +2,7 @@
 
 namespace CS.Edu.Tests.Utils;
 
-class Valuable<T, TKey> : Identity<TKey>
+internal class Valuable<T, TKey> : Identity<TKey>
 {
     private T _value;
 
@@ -13,11 +13,6 @@ class Valuable<T, TKey> : Identity<TKey>
         get => _value;
         set => SetAndRaise(ref _value, value);
     }
-}
-
-static class Valuable
-{
-    public static Valuable<T> From<T>(T value) => new Valuable<T>(value);
 }
 
 class Valuable<T> : Valuable<T, Guid>
