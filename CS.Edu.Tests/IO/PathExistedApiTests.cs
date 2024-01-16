@@ -49,6 +49,7 @@ public class PathExistedApiTests
     public void Path_GetFullPath(string relative, string expected)
     {
         // works based on OS parameters
+        // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System.Private.CoreLib.Shared.projitems#L1569C3-L1569C56
         const string current = @"C:\v1\items";
         //const string current = "/v1/items";
         _fileSystem.Path.GetFullPath(relative, current)
