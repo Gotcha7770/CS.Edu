@@ -53,14 +53,20 @@ public static class Collections
         return patch.Select(x => source.TryGetValue(keySelector(x), out TValue value) ? mergeFunc(value, x) : x);
     }
 
-    public static bool SequenceEqual<T>(this IReadOnlyCollection<T> source, ReadOnlySpan<T> span)
+    public static ReadOnlySpan<T> ToSpan<T>(this IReadOnlyCollection<T> source)
     {
         return source switch
         {
-            List<T> list => CollectionsMarshal.AsSpan(list).SequenceEqual(span),
-            T[] array => array.AsSpan().SequenceEqual(span),
-            _ => false
+            List<T> list => CollectionsMarshal.AsSpan(list),
+            T[] array => array.AsSpan(),
+            _ => Span<T>.Empty
         };
+    }
+
+    public static bool SequenceEqual<T>(this IReadOnlyCollection<T> source, ReadOnlySpan<T> span)
+    {
+        return source.ToSpan()
+            .SequenceEqual(span);
     }
 
     public static bool SequenceEqual<T>(this IReadOnlyCollection<T> source, ReadOnlyMemory<T> memory)
