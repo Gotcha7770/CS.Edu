@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using CS.Edu.Core.Extensions;
-using CS.Edu.Core;
+using CS.Edu.Tests.TestCases;
+using CS.Edu.Tests.Utils;
+using DynamicData;
 using FluentAssertions;
 using Xunit;
 
@@ -8,38 +10,34 @@ namespace CS.Edu.Tests.Extensions;
 
 public class CollectionExtTests
 {
-    private record KeyValue(int Key, string Value);
-
-    [Fact]
-    public void InvalidateCollection()
+    [Theory]
+    [ClassData(typeof(InvalidateTestCases))]
+    public void Invalidate(IList<KeyValue> source, IEnumerable<KeyValue> patch, IEnumerable<KeyValue> expected)
     {
-        var source = new List<KeyValue>
-        {
-            new KeyValue(0, "Zero"),
-            new KeyValue(1, "One"),
-            new KeyValue(2, "Two"),
-            new KeyValue(3, "Three"),
-            new KeyValue(4, "Four")
-        };
+        source.Invalidate(patch, MergeItems, x => x.Key);
 
-        var patch = new[]
-        {
-            new KeyValue(0, "Changed"),
-            new KeyValue(1, "Changed"),
-            new KeyValue(5, "Five"),
-            new KeyValue(6, "Six")
-        };
-
-        Merge<KeyValue> mergeFunc = (x, y) => x with { Value = $"{x.Value}/{y.Value}" };
-
-        source.Invalidate(patch, mergeFunc, x => x.Key);
-
-        source.Should().BeEquivalentTo(new[]
-        {
-            new KeyValue(0, "Zero/Changed"),
-            new KeyValue(1, "One/Changed"),
-            patch[2],
-            patch[3]
-        });
+        source.Should()
+            .BeEquivalentTo(expected);
     }
+
+    [Theory]
+    [ClassData(typeof(AddOrUpdateTestCases))]
+    public void AddOrUpdate(IList<KeyValue> source, KeyValue item, IEnumerable<KeyValue> expected)
+    {
+        source.AddOrUpdate(item, MergeItems);
+
+        source.Should()
+            .BeEquivalentTo(expected);
+    }
+
+    [Theory]
+    [ClassData(typeof(InvalidateTestCases))]
+    public void Merge(IList<KeyValue> source, IEnumerable<KeyValue> patch, IEnumerable<KeyValue> expected)
+    {
+        source.Merge(patch, MergeItems, x => x.Key)
+            .Should()
+            .BeEquivalentTo(expected);
+    }
+
+    private static KeyValue MergeItems(KeyValue x, KeyValue y) => x with { Value = $"{x.Value}/{y.Value}" };
 }

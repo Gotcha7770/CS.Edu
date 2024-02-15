@@ -9,9 +9,14 @@ public static class Collections
 {
     public static void Invalidate<TKey, TValue>(this IList<TValue> source,
         IEnumerable<TValue> patch,
-        Merge<TValue> mergeFunc,
+        Func<TValue, TValue, TValue> mergeFunc,
         Func<TValue, TKey> keySelector)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(patch);
+        ArgumentNullException.ThrowIfNull(mergeFunc);
+        ArgumentNullException.ThrowIfNull(keySelector);
+
         Dictionary<TKey, TValue> dic = patch.ToDictionary(keySelector);
 
         for (int i = source.Count - 1; i >= 0; i--)
@@ -36,9 +41,26 @@ public static class Collections
         }
     }
 
+    public static void AddOrUpdate<T>(this IList<T> source, T item, Func<T, T, T> mergeFunc)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(mergeFunc);
+
+        var index = source.IndexOf(item);
+        if (index == -1)
+        {
+            source.Add(item);
+        }
+        else
+        {
+            source[index] = mergeFunc(source[index], item);
+        }
+    }
+
     public static IEnumerable<TValue> Merge<TKey, TValue>(this IEnumerable<TValue> source,
         IEnumerable<TValue> patch,
-        Merge<TValue> mergeFunc,
+        Func<TValue, TValue, TValue> mergeFunc,
         Func<TValue, TKey> keySelector)
     {
         return source.ToDictionary(keySelector)
@@ -47,9 +69,14 @@ public static class Collections
 
     public static IEnumerable<TValue> Merge<TKey, TValue>(this IDictionary<TKey, TValue> source,
         IEnumerable<TValue> patch,
-        Merge<TValue> mergeFunc,
+        Func<TValue, TValue, TValue> mergeFunc,
         Func<TValue, TKey> keySelector)
     {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(patch);
+        ArgumentNullException.ThrowIfNull(mergeFunc);
+        ArgumentNullException.ThrowIfNull(keySelector);
+
         return patch.Select(x => source.TryGetValue(keySelector(x), out TValue value) ? mergeFunc(value, x) : x);
     }
 
