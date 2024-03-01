@@ -11,14 +11,14 @@ namespace CS.Edu.Tests.Extensions.EnumerableExtensions;
 public class ExceptTests
 {
     [Fact]
-    public void Except_Null_ThrowsArgumentNullException()
+    public void SourceIsNull_ThrowsArgumentNullException()
     {
-        IEnumerable<int> empty = null;
-        Invoking(() => empty.Except(0)).Should().Throw<ArgumentNullException>();
+        IEnumerable<int> none = null;
+        Invoking(() => none.Except(0)).Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public void Except_Empty_ReturnsEmpty()
+    public void SourceIsEmpty_ReturnsEmpty()
     {
         var items = Enumerable.Empty<int>();
         items.Except(0).Should().BeEmpty();

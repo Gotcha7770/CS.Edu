@@ -5,19 +5,14 @@ using System.Linq;
 
 namespace CS.Edu.Core;
 
-interface IContext {}
+internal interface IContext {}
 
-interface IRepository
+internal interface IRepository<out T>
 {
-    IEnumerable<int> All();
+    IEnumerable<T> All();
 }
 
-interface IWorker
-{
-    void Work();
-}
-
-class Repository : IRepository
+internal class Repository : IRepository<int>
 {
     private readonly IContext _context;
 
@@ -25,24 +20,34 @@ class Repository : IRepository
     {
         _context = context;
     }
-        
+
     public IEnumerable<int> All()
     {
         return Enumerable.Range(0, 1000);
     }
 }
 
-class Worker : IWorker
+internal class Context : IContext
 {
-    private readonly IRepository _repository;
+    public Options Options { get; } = new Options();
+
+    public string GetRootDirectory()
+    {
+        return Options.GetDirectory().Root.Name;
+    }
+}
+
+internal class Worker
+{
+    private readonly IRepository<int> _repository;
 
     internal Worker()
-    { 
+    {
         var context = new Context();
         _repository = new Repository(context);
     }
 
-    internal Worker(IRepository repository)
+    internal Worker(IRepository<int> repository)
     {
         _repository = repository;
     }
@@ -70,19 +75,9 @@ class CompositionWithDI
     void Main()
     {
         IContext context = new Context();
-        IRepository repository = new Repository(context);
-        IWorker worker = new Worker(repository);
+        IRepository<int> repository = new Repository(context);
+        var worker = new Worker(repository);
         worker.Work();
-    }
-}
-
-class Context : IContext
-{
-    public Options Options { get; } = new Options();
-
-    public string GetRootDirectory()
-    {
-        return Options.GetDirectory().Root.Name;
     }
 }
 
