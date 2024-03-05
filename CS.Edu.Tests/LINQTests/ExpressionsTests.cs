@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
+using CS.Edu.Tests.Utils.Models;
 using FluentAssertions;
 using Xunit;
 

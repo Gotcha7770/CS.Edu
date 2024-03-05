@@ -1,6 +1,6 @@
 using System;
 
-namespace CS.Edu.Tests.Utils;
+namespace CS.Edu.Tests.Utils.Models;
 
 class Orderable<T> : Valuable<T>
 {

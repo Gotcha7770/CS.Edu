@@ -1,6 +1,6 @@
 ﻿using DynamicData;
 
-namespace CS.Edu.Tests.Utils;
+namespace CS.Edu.Tests.Utils.Models;
 
 internal class Identity<T> : BaseNotifyPropertyChanged, IKey<T>
 {

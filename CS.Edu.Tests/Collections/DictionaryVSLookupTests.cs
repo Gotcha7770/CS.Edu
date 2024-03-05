@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Tests.Utils;
+using CS.Edu.Tests.Utils.Models;
 using FluentAssertions;
 using Xunit;
 using static FluentAssertions.FluentActions;

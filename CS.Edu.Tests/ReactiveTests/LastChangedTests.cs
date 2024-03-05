@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Tests.Utils;
+using CS.Edu.Tests.Utils.Models;
 using DynamicData;
 using FluentAssertions;
 using Xunit;

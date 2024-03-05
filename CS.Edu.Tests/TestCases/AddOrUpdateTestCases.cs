@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CS.Edu.Tests.Utils;
+using CS.Edu.Tests.Utils.Models;
 using Xunit;
 
 namespace CS.Edu.Tests.TestCases;

@@ -1,4 +1,4 @@
-namespace CS.Edu.Tests.Utils;
+namespace CS.Edu.Tests.Utils.Models;
 
 class Selectable<T> : Valuable<T>
 {

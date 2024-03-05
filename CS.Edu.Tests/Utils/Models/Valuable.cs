@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CS.Edu.Tests.Utils;
+namespace CS.Edu.Tests.Utils.Models;
 
 internal class Valuable<T, TKey> : Identity<TKey>
 {
