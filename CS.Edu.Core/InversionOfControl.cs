@@ -16,6 +16,11 @@ internal class Repository : IRepository<int>
 {
     private readonly IContext _context;
 
+    public Repository()
+    {
+        _context = new Context();
+    }
+
     public Repository(IContext context)
     {
         _context = context;
@@ -43,8 +48,7 @@ internal class Worker
 
     internal Worker()
     {
-        var context = new Context();
-        _repository = new Repository(context);
+        _repository = new Repository();
     }
 
     internal Worker(IRepository<int> repository)
