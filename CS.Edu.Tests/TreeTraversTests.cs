@@ -1,4 +1,5 @@
-﻿using CS.Edu.Core;
+﻿using System.Linq;
+using CS.Edu.Core;
 using CS.Edu.Core.Extensions;
 using FluentAssertions;
 using Xunit;
@@ -35,6 +36,12 @@ public class TreeTraversTests
         tree.SequenceLevelOrder()
             .Should()
             .BeEquivalentTo([1, 2, 3, 4, 5, 6]);
+
+        // System.Interactive.Expand is level order sequence
+        tree.SequenceLevelOrder()
+            .Should()
+            .BeEquivalentTo(EnumerableEx.Return(tree)
+                .Expand(x => x.Children).Select(x => x.Value));
     }
 
     [Fact]
@@ -47,7 +54,7 @@ public class TreeTraversTests
             new TreeNode<int>(3,
                 new TreeNode<int>(6)));
 
-        tree.SequenceLevelOrder()
+        tree.SequencePostOrder()
             .Should()
             .BeEquivalentTo([4, 5, 2, 6, 3, 1]);
     }
