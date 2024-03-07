@@ -24,14 +24,13 @@ public class ExpandTests
 
         flatElements.Select(x => x.Name.LocalName)
             .Should()
-            .BeEquivalentTo(new[]
-            {
+            .BeEquivalentTo([
                 "firstLevel",
                 "firstLevel",
                 "secondLevel",
                 "secondLevel",
                 "secondLevel",
                 "secondLevel"
-            });
+            ]);
     }
 }
