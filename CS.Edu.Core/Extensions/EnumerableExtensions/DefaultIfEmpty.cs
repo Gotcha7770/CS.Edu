@@ -8,15 +8,8 @@ public static partial class EnumerableExtensions
 {
     public static IEnumerable<T> DefaultIfEmpty<T>(this IEnumerable<T> source, Func<T> defaultProvider)
     {
-        if (source is null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        if (defaultProvider is null)
-        {
-            throw new ArgumentNullException(nameof(defaultProvider));
-        }
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(defaultProvider);
 
         return Iterator(source, defaultProvider);
     }

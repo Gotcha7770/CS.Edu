@@ -74,11 +74,11 @@ public class JoinTests
         result1.Should()
             .BeEquivalentTo(result2);
 
-        //outer join
+        //left join
         result1 = Employees
             .Select(x => dictionary.GetValueOrDefault(x.Department));
 
-        result2 = Employees.LeftOuterJoin(Departments,
+        result2 = Employees.LeftJoin(Departments,
             l => l.Department,
             r => r.Name,
             (_, r) => r?.City);
