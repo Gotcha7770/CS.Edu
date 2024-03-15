@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using CS.Edu.Core.Extensions;
-using FluentAssertions;
 using Xunit;
 
 namespace CS.Edu.Tests.LINQTests;
@@ -11,60 +10,39 @@ namespace CS.Edu.Tests.LINQTests;
 public class SelectTests
 {
     [Fact]
-    public void SelectManyTest()
+    public async Task AsyncSelector()
     {
-        //SelectMany is just: source.Select(selector).Concat()
-
-        int[][] source =
-        [
-            [0, 1, 2],
-            [3, 4, 5]
-        ];
-
-        Func<IEnumerable<int>, IEnumerable<string>> selector = x => x.Select(i => i.ToString());
-
-        source.SelectMany(selector)
-            .Should()
-            .BeEquivalentTo(source.Select(selector)
-                .Concat());
-    }
-
-    [Fact]
-    public void SelectManyTest2()
-    {
-        var result1 = from x in Enumerable.Range(0, 2)
-                      from y in Enumerable.Range(0, 2)
-                      from z in Enumerable.Range(0, 2)
-                      select x + y + z;
-
-        var result2 = Enumerable.Range(0, 2)
-            .SelectMany(_ => Enumerable.Range(0, 2), (x, y) => new { x, y })
-            .SelectMany(_ => Enumerable.Range(0, 2), (t, z) => t.x + t.y + z);
-
-        result1.Should()
-            .BeEquivalentTo(result2);
-    }
-
-    [Fact]
-    public async Task CombineSyncAndAsyncInQuery()
-    {
-        var query = from x in Enumerable.Range(0, 2)
-                    from y in AsyncEnumerable.Range(0, 2)
-                    select x + y;
-
-        var result1 = await Enumerable.Range(0, 2)
-            .SelectMany(_ => AsyncEnumerable.Range(0, 2), (x, y) => x + y)
+        var result = await Enumerable.Range(0, 10)
+            .Select(ValueTask.FromResult)
             .ToArrayAsync();
 
-        query = from x in AsyncEnumerable.Range(0, 2)
-                from y in Enumerable.Range(0, 2)
-                select x + y;
+        var syncQuery = from i in Enumerable.Range(0, 10)
+                        let r = 10
+                        select (i, r);
 
-        var result2 = await AsyncEnumerable.Range(0, 2)
-            .SelectMany(_ => Enumerable.Range(0, 2), (x, y) => x + y)
-            .ToArrayAsync();
+        // lack of await word in async LINQ query
+        // var asyncQuery = from i in Enumerable.Range(0, 10).ToAsyncEnumerable()
+        //                  let r = await ValueTask.FromResult(i)
+        //                  select (r, i);
+    }
+}
 
-        result1.Should()
-            .BeEquivalentTo(result2);
+public static partial class AdHocExtensions
+{
+    //??? How to pass CancellationToken
+    public static IAsyncEnumerable<TResult> Select<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, ValueTask<TResult>> selector)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(selector);
+
+        return SelectManyIterator(source, selector);
+    }
+
+    private static async IAsyncEnumerable<TResult> SelectManyIterator<TSource, TResult>(IEnumerable<TSource> source, Func<TSource, ValueTask<TResult>> selector)
+    {
+        foreach (TSource element in source)
+        {
+            yield return await selector(element);
+        }
     }
 }
