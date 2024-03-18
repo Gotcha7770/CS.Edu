@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="Bogus" Version="35.4.1" />
     <PackageReference Include="DynamicData" Version="7.4.3" />
     <PackageReference Include="FastMember" Version="1.5.0" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.26.0">
@@ -33,6 +34,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CS.Edu.Core\CS.Edu.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DesignProplems\" />
   </ItemGroup>
 
 </Project>
