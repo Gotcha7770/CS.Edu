@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 // ReSharper disable once CheckNamespace
 namespace CS.Edu.Core.Extensions;
@@ -28,11 +31,12 @@ public static partial class EnumerableExtensions
         IAsyncEnumerable<TRight> inner,
         Func<TLeft, TKey> outerKeySelector,
         Func<TRight, TKey> innerKeySelector,
-        Func<TLeft, TRight, TResult> resultSelector)
+        Func<TLeft, TRight, TResult> resultSelector,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var lookup = outer.ToLookup(outerKeySelector);
 
-        await foreach(var right in inner)
+        await foreach(var right in inner.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             var key = innerKeySelector(right);
 
@@ -64,9 +68,10 @@ public static partial class EnumerableExtensions
         IEnumerable<TRight> inner,
         Func<TLeft, TKey> outerKeySelector,
         Func<TRight, TKey> innerKeySelector,
-        Func<TLeft, TRight, TResult> resultSelector)
+        Func<TLeft, TRight, TResult> resultSelector,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var lookup = await outer.ToLookupAsync(outerKeySelector);
+        var lookup = await outer.ToLookupAsync(outerKeySelector, cancellationToken);
 
         foreach(var right in inner)
         {
