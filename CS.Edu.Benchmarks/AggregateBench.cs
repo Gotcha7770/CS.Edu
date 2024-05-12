@@ -41,7 +41,7 @@ namespace CS.Edu.Benchmarks
             var query = _source.Aggregate((HashSet<int>)null, (agg, cur) =>
             {
                 if (agg == null)
-                    agg = new HashSet<int>(cur);
+                    agg = [..cur];
                 else
                     agg.IntersectWith(cur);
 

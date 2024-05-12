@@ -6,9 +6,9 @@ namespace CS.Edu.Core.Extensions;
 
 public static partial class EnumerableExtensions
 {
-    public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item)
+    public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T item, EqualityComparer<T> comparer = null)
     {
-        var comparer = EqualityComparer<T>.Default;
+        comparer ??= EqualityComparer<T>.Default;
         return source.Where(x => !comparer.Equals(x, item));
     }
 }
