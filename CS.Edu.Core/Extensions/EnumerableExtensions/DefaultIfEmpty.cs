@@ -18,17 +18,14 @@ public static partial class EnumerableExtensions
     {
         using var enumerator = source.GetEnumerator();
 
-        if (!enumerator.MoveNext())
+        if(enumerator.MoveNext())
+        {
+            do yield return enumerator.Current;
+            while (enumerator.MoveNext());
+        }
+        else
         {
             yield return defaultProvider();
-            yield break;
-        }
-
-        yield return enumerator.Current;
-
-        while (enumerator.MoveNext())
-        {
-            yield return enumerator.Current;
         }
     }
 }

@@ -24,7 +24,8 @@ public static partial class AsyncEnumerableExtensions
         return AsyncEnumerable.Create(ct => Iterator(source, defaultProvider, ct));
     }
 
-    public static IAsyncEnumerable<T> DefaultIfEmptyAwait<T>(this IAsyncEnumerable<T> source, Func<ValueTask<T>> defaultProvider)
+    public static IAsyncEnumerable<T> DefaultIfEmptyAwait<T>(this IAsyncEnumerable<T> source,
+        Func<ValueTask<T>> defaultProvider)
     {
         if (source is null)
         {
@@ -46,35 +47,30 @@ public static partial class AsyncEnumerableExtensions
     {
         await using var enumerator = source.GetAsyncEnumerator(cancellationToken);
 
-        if (! await enumerator.MoveNextAsync(cancellationToken))
+        if (await enumerator.MoveNextAsync(cancellationToken))
+        {
+            do yield return enumerator.Current;
+            while (await enumerator.MoveNextAsync(cancellationToken));
+        }
+        else
         {
             yield return defaultProvider();
-            yield break;
-        }
-
-        yield return enumerator.Current;
-
-        while (await enumerator.MoveNextAsync(cancellationToken))
-        {
-            yield return enumerator.Current;
         }
     }
 
-    private static async IAsyncEnumerator<T> Iterator<T>(IAsyncEnumerable<T> source, Func<ValueTask<T>> defaultProvider, CancellationToken cancellationToken)
+    private static async IAsyncEnumerator<T> Iterator<T>(IAsyncEnumerable<T> source, Func<ValueTask<T>> defaultProvider,
+        CancellationToken cancellationToken)
     {
         await using var enumerator = source.GetAsyncEnumerator(cancellationToken);
 
-        if (! await enumerator.MoveNextAsync(cancellationToken))
+        if (await enumerator.MoveNextAsync(cancellationToken))
+        {
+            do yield return enumerator.Current;
+            while (await enumerator.MoveNextAsync(cancellationToken));
+        }
+        else
         {
             yield return await defaultProvider();
-            yield break;
-        }
-
-        yield return enumerator.Current;
-
-        while (await enumerator.MoveNextAsync(cancellationToken))
-        {
-            yield return enumerator.Current;
         }
     }
 }

@@ -11,21 +11,21 @@ public static partial class EnumerableExtensions
     {
         using (var enumerator = source.GetEnumerator())
         {
-            if (!enumerator.MoveNext())
-                yield break;
-
-            Optional<T> previous = Optional<T>.None;
-            T current = enumerator.Current;
-
-            while (enumerator.MoveNext())
+            if (enumerator.MoveNext())
             {
-                T next = enumerator.Current;
-                yield return new PrevNextValue<T>(previous, current, next);
-                previous = current;
-                current = next;
-            }
+                Optional<T> previous = Optional<T>.None;
+                T current = enumerator.Current;
 
-            yield return new PrevNextValue<T>(previous, current, Optional<T>.None);
+                while (enumerator.MoveNext())
+                {
+                    T next = enumerator.Current;
+                    yield return new PrevNextValue<T>(previous, current, next);
+                    previous = current;
+                    current = next;
+                }
+
+                yield return new PrevNextValue<T>(previous, current, Optional<T>.None);
+            }
         }
     }
 }
