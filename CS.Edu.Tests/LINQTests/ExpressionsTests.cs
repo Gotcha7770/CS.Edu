@@ -137,6 +137,22 @@ public class ExpressionsTests
     }
 
     [Fact]
+    public void PropertyAccessor_Multiple_Expression()
+    {
+        // Expression<Func<Range, int>> e = x => x.Start.Value;
+
+        var parameter = Expression.Parameter(typeof(Range), "x");
+        var lambda = Expression.Lambda<Func<Range, int>>(
+            Expression.Property(
+                Expression.Property(parameter, nameof(Range.Start)),
+                nameof(Index.Value)),
+            parameter);
+
+        var function = lambda.Compile();
+        function(new Range(new Index(2), new Index(5))).Should().Be(2);
+    }
+
+    [Fact]
     public void Coalesce()
     {
         //Expression<Func<int?, int>> e = x => x ?? 0;
