@@ -88,6 +88,43 @@ public class JoinTests
     }
 
     [Fact]
+    public void FullOuterJoinQuery()
+    {
+        var result = Employees.FullOuterJoin(
+            Departments,
+            l => l.Department,
+            r => r.Name,
+            (l, r, _) => (l, r));
+    }
+
+    [Fact]
+    public void All_Joins_With_LINQ_Expressions()
+    {
+        // https://habr.com/ru/articles/504854/
+
+        // LEFT OUTER JOIN
+        var result =
+            from left in Employees.Outer()
+            join right in Departments
+                on left.Department equals right.Name
+            select (left, right);
+
+        // RIGHT OUTER JOIN
+        result =
+            from left in Employees.Inner()
+            join right in Departments.Outer()
+                on left.Department equals right.Name
+            select (left, right);
+
+        // FULL OUTER JOIN
+        result =
+            from left in Employees.Outer()
+            join right in Departments.Outer()
+                on left.Department equals right.Name
+            select (left, right);
+    }
+
+    [Fact]
     public async Task CombineSyncAndAsyncInQuery()
     {
         var query = from employee in Employees
