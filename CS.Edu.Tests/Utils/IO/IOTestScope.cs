@@ -24,11 +24,7 @@ public class IOTestScope : IDisposable
         Directory = _fileSystem.DirectoryInfo.New(path);
         Watcher = _fileSystem.FileSystemWatcher.New(Directory.FullName);
 
-        _cleanup = new CompositeDisposable
-        {
-            Disposable.Create(Watcher, x => x.EnableRaisingEvents = false),
-            Watcher
-        };
+        _cleanup = new CompositeDisposable { Watcher };
     }
 
     public IDirectoryInfo Directory { get; }
