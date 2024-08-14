@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace CS.Edu.Core.Monads;
 
@@ -8,7 +9,7 @@ public static class BindOverAwaiter
     //async/await — это способ последовательно вызвать некий набор функций внутри некоторого контекста
 
     [AsyncMethodBuilder(typeof(BindableMethodBuilder<>))]
-    class Bindable<T> : INotifyCompletion
+    public class Bindable<T> : INotifyCompletion
     {
         public Bindable(T value) => Value = value;
 
@@ -33,12 +34,13 @@ public static class BindOverAwaiter
         internal void SetResult(T result)
         {
             Value = result;
+            IsCompleted = true;
         }
     }
 
-    class BindableMethodBuilder<T>
+    public sealed class BindableMethodBuilder<T>
     {
-        public static void Create() => new BindableMethodBuilder<T>();
+        public static BindableMethodBuilder<T> Create() => new();
 
         public Bindable<T> Task { get; } = new();
 
@@ -46,7 +48,8 @@ public static class BindOverAwaiter
             => stateMachine.MoveNext();
 
         public void SetStateMachine(IAsyncStateMachine stateMachine) { }
-        public void SetException(Exception exception) {}
+
+        public void SetException(Exception exception) { }
 
         public void SetResult(T result) => Task.SetResult(result);
 
@@ -61,7 +64,8 @@ public static class BindOverAwaiter
             where TStateMachine : IAsyncStateMachine
             => GenericAwaitOnCompleted(ref awaiter, ref stateMachine);
 
-        private void GenericAwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+        private void GenericAwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter,
+            ref TStateMachine stateMachine)
             where TAwaiter : INotifyCompletion
             where TStateMachine : IAsyncStateMachine
         {
@@ -75,6 +79,12 @@ public static class BindOverAwaiter
 
         var b1 = (await bindable).ToString();
         var b2 = (await bindable).ToString();
-        var result = b1 + b2;
+        //return b1 + b2;
     }
+
+    public static Bindable<int> BindableExample() => new(42);
+    public static async Bindable<int> BindableExampleAsync() => await new Bindable<int>(42);
+
+    public static Task<int> TaskExample() => Task.FromResult(42);
+    public static async Task<int> TaskExampleAsync() => await Task.FromResult(42);
 }

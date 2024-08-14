@@ -8,7 +8,7 @@ using static FluentAssertions.FluentActions;
 
 namespace CS.Edu.Tests.TaskTests;
 
-public class ContinueWidth
+public class ContinueWith
 {
     [Fact]
     public async Task ContinueWidth_CanceledTask()
