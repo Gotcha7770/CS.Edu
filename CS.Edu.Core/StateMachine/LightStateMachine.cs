@@ -7,8 +7,7 @@ public class LightStateMachine<TState, TTrigger>
     where TState : Enum
     where TTrigger : Enum
 {
-    private readonly Dictionary<TState, StateConfiguration<TState, TTrigger>> _configurations
-        = new Dictionary<TState, StateConfiguration<TState, TTrigger>>();
+    private readonly Dictionary<TState, StateConfiguration<TState, TTrigger>> _configurations = new();
 
     public TState State { get; protected set; }
 

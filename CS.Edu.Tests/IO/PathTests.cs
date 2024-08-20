@@ -18,7 +18,7 @@ public class PathTests
         private const char PosixSeparator = '/';
         private readonly Segment[] _segments;
 
-        public static Path Empty { get; } = new Path(Array.Empty<Segment>(), false);
+        public static Path Empty { get; } = new(Array.Empty<Segment>(), false);
 
         public Path(string value)
             :this(value.Split(PosixSeparator, StringSplitOptions.RemoveEmptyEntries).Select(x => new Segment(x)), value.StartsWith('/'))

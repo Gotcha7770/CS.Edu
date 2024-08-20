@@ -18,8 +18,6 @@ public static class FileSystemExtensions
         return fileSystem.DirectoryInfo.New(directory)
             .EnumerateDirectories()
             .Count(x => regex.IsMatch(x.Name));
-        // return fileSystem.Directory.EnumerateDirectories(directory)
-        //     .Count(x => regex.IsMatch(x));
     }
 
     public static IObservableFile ToObservable(this IFileInfo file)
@@ -54,7 +52,7 @@ public static class FileSystemExtensions
 
     internal static ChangeSet<string, string> ToChangeSet(this FileSystemEventArgs eventArgs)
     {
-        return new ChangeSet<string, string> { eventArgs.ToChange() };
+        return [eventArgs.ToChange()];
     }
 
     internal static ChangeSet<TValue, TKey> ToChangeSet<TValue, TKey>(this IEnumerable<Change<TValue, TKey>> source)

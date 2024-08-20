@@ -8,7 +8,7 @@ namespace CS.Edu.Tests.IO;
 
 public class PathExistedApiTests
 {
-    private readonly MockFileSystem _fileSystem = new MockFileSystem(
+    private readonly MockFileSystem _fileSystem = new(
         new Dictionary<string, MockFileData>
         {
             ["user"] = new MockDirectoryData(),

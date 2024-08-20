@@ -34,7 +34,7 @@ internal class Repository : IRepository<int>
 
 internal class Context : IContext
 {
-    public Options Options { get; } = new Options();
+    public Options Options { get; } = new();
 
     public string GetRootDirectory()
     {
@@ -97,7 +97,7 @@ class DisclosureOfStructure
 {
     public void Main()
     {
-        Context context = new Context();
+        Context context = new();
         Options options = context.Options;
         DirectoryInfo directory = options.GetDirectory();
         string path = directory.Root.Name;
@@ -108,7 +108,7 @@ class HidingStructure
 {
     public void Main()
     {
-        Context context = new Context();
+        Context context = new();
         string path = context.GetRootDirectory();
     }
 }

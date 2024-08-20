@@ -83,7 +83,6 @@ public static class Trees
             var node = stack.Pop();
             resultStack.Push(node.Value);
 
-            // Push children in reverse order to maintain correct order during traversal
             foreach (var child in node.Children)
             {
                 stack.Push(child);

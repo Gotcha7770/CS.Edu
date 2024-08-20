@@ -19,7 +19,7 @@ public class StringReplaceTests
 
     private static string ReplaceToken1(string input)
     {
-        Range range = new Range(new Index(3), new Index(6));
+        Range range = new(new Index(3), new Index(6));
         return input.AsSpan(range) switch
         {
             "Янв" => Replace(input, range, "Jan"),

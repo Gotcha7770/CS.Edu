@@ -30,7 +30,7 @@ public class GenericType
 
     public Type[] GenericParameterTypes { get; }
 
-    public static explicit operator GenericType(Type type) => new GenericType(type);
+    public static explicit operator GenericType(Type type) => new(type);
 
     public static bool CanConvertFrom(Type type)
     {

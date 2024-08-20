@@ -23,7 +23,7 @@ public interface IRange<out T>
 
 public readonly struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>, IEquatable<T>
 {
-    public static Range<T> Empty { get; } = new Range<T>();
+    public static Range<T> Empty { get; } = new();
 
     public Range(T minimum, T maximum)
     {
@@ -69,7 +69,7 @@ public readonly struct Range<T> : IEquatable<Range<T>> where T : IComparable<T>,
         return one.Subtract(other);
     }
 
-    public static explicit operator Range<T>((T Min, T Max) tuple) => new Range<T>(tuple);
+    public static explicit operator Range<T>((T Min, T Max) tuple) => new(tuple);
 
     public static IEnumerable<Range<T>> SymmetricDifference(Range<T> one, Range<T> other)
     {

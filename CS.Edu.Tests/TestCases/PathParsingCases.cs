@@ -8,9 +8,9 @@ public class PathParsingCases :TheoryData<string, bool, Segment[]>
 {
     public PathParsingCases()
     {
-        Add("", false, Array.Empty<Segment>());
-        Add("/", true, Array.Empty<Segment>());
-        Add("//", true, Array.Empty<Segment>());
+        Add("", false, []);
+        Add("/", true, []);
+        Add("//", true, []);
         Add("/home", true, [new Segment("home")]);
         Add("//home", true, [new Segment("home")]);
         Add("user", false, [new Segment("user")]);

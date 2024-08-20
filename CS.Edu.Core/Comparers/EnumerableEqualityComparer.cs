@@ -6,7 +6,7 @@ namespace CS.Edu.Core.Comparers;
 
 public class EnumerableEqualityComparer<T> : IEqualityComparer<IEnumerable<T>>
 {
-    public static EnumerableEqualityComparer<T> Instance => new EnumerableEqualityComparer<T>();
+    public static EnumerableEqualityComparer<T> Instance => new();
 
     public bool Equals(IEnumerable<T> one, IEnumerable<T> other)
     {
