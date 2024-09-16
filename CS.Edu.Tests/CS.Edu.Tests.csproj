@@ -36,8 +36,4 @@
     <ProjectReference Include="..\CS.Edu.Core\CS.Edu.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DesignProplems\" />
-  </ItemGroup>
-
 </Project>
