@@ -12,6 +12,18 @@ public class AnyAllTests
         var result = Enumerable.Empty<int>().All(x => x % 2 == 0);
 
         result.Should().BeTrue();
+
+        var items = Enumerable.Empty<int>();
+        result = items.Any() && items.All(x => x % 2 == 0);
+
+        result.Should().BeFalse();
+
+        result = Enumerable.Empty<int>()
+            .Select(x => x % 2 == 0)
+            .DefaultIfEmpty(false)
+            .All(x => x);
+
+        result.Should().BeFalse();
     }
 
     [Fact]
