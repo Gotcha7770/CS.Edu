@@ -21,22 +21,4 @@ public static partial class EnumerableExtensions
                 from item in cur
                 select prevProductItem.Append(item));
     }
-
-    private static IEnumerable<IEnumerable<T>> Iterator<T>(IEnumerable<IEnumerable<T>> source)
-    {
-        using var enumerator = source.GetEnumerator();
-        if(!enumerator.MoveNext())
-            return Enumerable.Empty<IEnumerable<T>>();
-
-        var product = enumerator.Current.Select(EnumerableEx.Return);
-        while (enumerator.MoveNext())
-        {
-            var current = enumerator.Current;
-            product = from prevProductItem in product
-                      from item in current
-                      select prevProductItem.Append(item);
-        }
-
-        return product;
-    }
 }
