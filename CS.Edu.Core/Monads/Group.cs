@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,30 +23,30 @@ public class Group<TKey, T> : Either<IReadOnlyDictionary<TKey, Group<TKey, T>>, 
 
     public TKey Key { get; }
 
-    // public Optional<Group<TKey, T>> this[TKey key] => Match(
-    //     l => l[key],
-    //     _ => Optional.None<Group<TKey, T>>());
-
     public Group<TKey, T> this[TKey key] => Match(
-        l => l[key],
-        _ => new Group<TKey, T>(key));
+        l => l.GetValueOrDefault(key, Empty),
+        _ => Empty);
 }
 
 public static class Groups
 {
-    public static Group<TKey, TResult> Select<TKey, T, TResult>(
+    public static TResult SelectMany<TKey, T, TCollection, TResult>(
         this Group<TKey, T> source,
-        Func<Group<TKey, T>, Group<TKey, TResult>> selector)
+        Func<Group<TKey, T>, Group<TKey, TCollection>> groupSelector,
+        Func<Group<TKey, T>, Group<TKey, TCollection>, TResult> resultSelector)
     {
-        return selector(source);
+        var intermediate = groupSelector(source);
+
+        return resultSelector(source, intermediate);
     }
 
-    public static Group<TKey, TResult> SelectMany<TKey, T, TCollection, TResult>(
-        this Group<TKey, T> source,
-        Func<Group<TKey, T>, Group<TKey, TCollection>> collectionSelector,
-        Func<Group<TKey, T>, Group<TKey, TCollection>, Group<TKey, TResult>> resultSelector)
+    public static TResult SelectMany<TInput, TKey, T, TResult>(
+        this TInput source,
+        Func<TInput, Group<TKey, T>> groupSelector,
+        Func<TInput, Group<TKey, T>, TResult> resultSelector)
+
     {
-        var intermediate = collectionSelector(source);
+        var intermediate = groupSelector(source);
 
         return resultSelector(source, intermediate);
     }

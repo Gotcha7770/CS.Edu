@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CS.Edu.Core.Extensions;
 using CS.Edu.Core.Monads;
-using DynamicData.Kernel;
 using FluentAssertions;
 using Xunit;
 
@@ -122,22 +120,25 @@ public class ThenGroupByTests
             .ThenBy(p => p.LastName)
             .ToDictionary(x => x.Key);
 
-        var brownsFromItDepartment = grouped["IT"]
-                .Match(
-                    l => l["Brown"],
-                    _ => Optional.None<Group<string, Person>>())
-                .SelectMany(x => x.Match(
-                    _ => Optional.None<Person[]>(),
-                    r => r))
-                .ValueOr(Array.Empty<Person>);
-
-        // var tmp1 = grouped["IT"]
-        //     .SelectMany(x => x["Brown"], (x, y) => new { x, y })
-        //     .Match(_ => [], r => r);
-
-        var tmp2 =
+        var brownsFromItDepartment =
             from itStaff in grouped["IT"]
             from browns in itStaff["Brown"]
-            select browns;
+            select browns.Match(_ => [], r => r);
+
+        brownsFromItDepartment
+            .Should()
+            .BeEquivalentTo(
+            [
+                new Person("Bob", "Brown", "IT"),
+                new Person("Charlie", "Brown", "IT"),
+            ]);
+
+        var invalidGroup =
+            from itStaff in grouped["IT"]
+            from invalid in itStaff["Invalid"]
+            select invalid;
+
+        invalidGroup
+            .Should().Be(Group<string, Person>.Empty);
     }
 }
