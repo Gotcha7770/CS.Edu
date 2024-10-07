@@ -1,4 +1,5 @@
-﻿using CS.Edu.Tests.TestCases;
+﻿using CS.Edu.Core.Extensions;
+using CS.Edu.Tests.TestCases;
 using DynamicData.Kernel;
 using FluentAssertions;
 using Xunit;

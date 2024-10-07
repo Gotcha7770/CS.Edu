@@ -26,7 +26,7 @@ public static partial class EnumerableExtensions
     public static IEnumerable<Group<TKey, T>> ThenBy<TKey, T>(this IEnumerable<Group<TKey, T>> source, Func<T, TKey> keySelector)
     {
         return source.Select(x => x.Match(
-            l => new Group<TKey, T>(x.Key, l.ThenBy(keySelector)),
+            l => new Group<TKey, T>(x.Key, l.Values.ThenBy(keySelector)),
             r => new Group<TKey, T>(x.Key, r.GroupBy(keySelector).Select(y => y.ToGroup()))));
     }
 }

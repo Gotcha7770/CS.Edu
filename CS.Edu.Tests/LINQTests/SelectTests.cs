@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
-using DynamicData.Kernel;
 using Xunit;
 
 namespace CS.Edu.Tests.LINQTests;
