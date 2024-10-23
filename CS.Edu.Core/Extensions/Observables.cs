@@ -82,7 +82,7 @@ public static partial class Observables
                               from y in rightCache
                               select productSelector(x, y);
 
-                    var comparer = new GenericEqualityComparer<TOut, TOutKey>(keySelector);
+                    var comparer = EqualityComparer.Create(keySelector);
                     cache.EditDiff(all, comparer);
                 });
 
