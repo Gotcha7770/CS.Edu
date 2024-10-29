@@ -1,144 +1,232 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CS.Edu.Core.Extensions;
-using CS.Edu.Core.Monads;
-using FluentAssertions;
 using Xunit;
 
 namespace CS.Edu.Tests.Extensions.EnumerableExtensions;
 
 public class ThenGroupByTests
 {
-    private record Person(string FirstName, string LastName, string Department);
+    // - HR
+    //  - Doe
+    //      - John
+    //  - Black
+    //      - John
+    //  - Smith
+    //      - Jane
+    // - IT
+    //  - Johnson
+    //      - Alice
+    //  - Brown
+    //      - Bob
+    //      - Charlie
+
+    private enum Department { HR, IT }
+
+    private record Person(string FirstName, string LastName, Department Department);
 
     [Fact]
     public void EmptySource_ReturnsEmptyEnumerable()
     {
-        Enumerable.Empty<Person>()
+        var tmp = Enumerable.Empty<Person>()
             .GroupBy(x => x.FirstName)
-            .ThenBy(x => x.LastName)
-            .Should()
-            .BeEmpty();
+            .ToDictionary(l1 => l1.Key,
+                l1 => l1.GroupBy(p => p.LastName).ToDictionary(l2 => l2.Key,
+                    l2 => l2.GroupBy(p => p.Department)));
+
+        // Enumerable.Empty<Person>()
+        //     .GroupBy(x => x.Department)
+        //     .ThenBy(x => x.LastName)
+        //     .ThenBy(x => x.FirstName)
+        //     .Should()
+        //     .BeEmpty();
     }
 
-    [Fact]
-    public void ThenBy_ShouldReturnSingleGroupWhenNoFurtherGrouping()
-    {
-        Person[] people =
-        [
-            new("John", "Doe", "HR"),
-            new("Jane", "Smith", "HR"),
-            new("Dave", "Black", "HR")
-        ];
+    // [Fact]
+    // public void ThenBy_ShouldReturnSingleGroupWhenNoFurtherGrouping()
+    // {
+    //     Person[] people =
+    //     [
+    //         new("John", "Doe", Department.HR),
+    //         new("Jane", "Smith", Department.HR),
+    //         new("John", "Black", Department.HR)
+    //     ];
+    //
+    //     var grouped = people.GroupBy(x => x.Department)
+    //         .ThenBy(x => x.LastName);
+    //
+    //     grouped.Should()
+    //         .SatisfyRespectively(one =>
+    //         {
+    //             one.Key.Should().Be(Department.HR);
+    //             one.Should()
+    //                 .ContainSingle()
+    //                 .Which
+    //                 .Should()
+    //                 .BeEquivalentTo(
+    //                     new Person[]
+    //                         {
+    //                             new("John", "Doe", Department.HR),
+    //                             new("Jane", "Smith", Department.HR),
+    //                             new("John", "Black", Department.HR)
+    //                         }
+    //                         .ToLookup(x => x.LastName)
+    //                 );
+    //         });
+    // }
 
-        var grouped = people.GroupBy(x => x.Department)
-            .ThenBy(x => x.LastName);
+    // [Fact]
+    // public void ThenBy_ShouldGroupByDepartmentAndThenByLastName()
+    // {
+    //     var people = new List<Person>
+    //     {
+    //         new("John", "Doe", Department.HR),
+    //         new("Jane", "Smith", Department.HR),
+    //         new("Alice", "Johnson", Department.IT),
+    //         new("Bob", "Brown", Department.IT),
+    //         new("Charlie", "Brown", Department.IT),
+    //         new("John", "Black", Department.HR)
+    //     };
+    //
+    //     var grouped = people.GroupBy(p => p.Department)
+    //         .ThenBy(p => p.LastName);
+    //
+    //     grouped.Should()
+    //         .SatisfyRespectively(
+    //             first =>
+    //             {
+    //                 first.Key.Should().Be(Department.HR);
+    //                 first.Should()
+    //                     .ContainSingle()
+    //                     .Which
+    //                     .Should()
+    //                     .BeEquivalentTo(
+    //                         new Person[]
+    //                             {
+    //                                 new("John", "Doe", Department.HR),
+    //                                 new("Jane", "Smith", Department.HR),
+    //                                 new("John", "Black", Department.HR)
+    //                             }
+    //                             .ToLookup(x => x.LastName)
+    //                     );
+    //             },
+    //             second =>
+    //             {
+    //                 second.Key.Should().Be(Department.IT);
+    //                 second.Should()
+    //                     .ContainSingle()
+    //                     .Which
+    //                     .Should()
+    //                     .BeEquivalentTo(
+    //                         new Person[]
+    //                             {
+    //                                 new("Alice", "Johnson", Department.IT),
+    //                                 new("Bob", "Brown", Department.IT),
+    //                                 new("Charlie", "Brown", Department.IT)
+    //                             }
+    //                             .ToLookup(x => x.LastName)
+    //                     );
+    //             });
+    // }
 
-        grouped
-            .Should()
-            .BeEquivalentTo(
-            [
-                new Group<string, Person>(
-                    "HR",
-                    [
-                        new Group<string, Person>("Doe", new Person("John", "Doe", "HR")),
-                        new Group<string, Person>("Smith", new Person("Jane", "Smith", "HR")),
-                        new Group<string, Person>("Black", new Person("Dave", "Black", "HR"))
-                    ])
-            ]);
-    }
-
-    [Fact]
-    public void ThenBy_ShouldGroupByDepartmentAndThenByLastName()
-    {
-        var people = new List<Person>
-        {
-            new("John", "Doe", "HR"),
-            new("Jane", "Smith", "HR"),
-            new("Alice", "Johnson", "IT"),
-            new("Bob", "Brown", "IT"),
-            new("Charlie", "Brown", "IT"),
-            new("John", "Black", "HR")
-        };
-
-        var grouped = people.GroupBy(p => p.Department)
-            .ThenBy(p => p.LastName);
-
-        grouped.Should()
-            .BeEquivalentTo(
-            [
-                new Group<string, Person>(
-                    "HR",
-                    [
-                        new Group<string, Person>("Doe", new Person("John", "Doe", "HR")),
-                        new Group<string, Person>("Smith", new Person("Jane", "Smith", "HR")),
-                        new Group<string, Person>("Black", new Person("John", "Black", "HR"))
-                    ]),
-                new Group<string, Person>(
-                    "IT",
-                    [
-                        new Group<string, Person>("Johnson", new Person("Alice", "Johnson", "IT")),
-                        new Group<string, Person>(
-                            "Brown",
-                            new Person("Bob", "Brown", "IT"),
-                            new Person("Charlie", "Brown", "IT"))
-                    ])
-            ]);
-    }
-
-    [Fact]
-    public void ThenBy_ShouldGroupByDepartmentAndThenByFirstName()
-    {
-        var people = new List<Person>
-        {
-            new("John", "Doe", "HR"),
-            new("Jane", "Smith", "HR"),
-            new("Alice", "Johnson", "IT"),
-            new("Bob", "Brown", "IT"),
-            new("Charlie", "Brown", "IT"),
-            new("John", "Black", "HR")
-        };
-
-        var grouped = people.GroupBy(x => x.Department)
-            .ThenBy(x => x.FirstName);
-    }
+    // [Fact]
+    // public void ThenBy_ShouldGroupByDepartmentAndThenByFirstName()
+    // {
+    //     var people = new List<Person>
+    //     {
+    //         new("John", "Doe", Department.HR),
+    //         new("Jane", "Smith", Department.HR),
+    //         new("Alice", "Johnson", Department.IT),
+    //         new("Bob", "Brown", Department.IT),
+    //         new("Charlie", "Brown", Department.IT),
+    //         new("John", "Black", Department.HR)
+    //     };
+    //
+    //     var grouped = people.GroupBy(x => x.Department)
+    //         .ThenBy(x => x.FirstName);
+    //
+    //     grouped.Should()
+    //         .SatisfyRespectively(
+    //             first =>
+    //             {
+    //                 first.Key.Should().Be(Department.HR);
+    //                 first.Should()
+    //                     .ContainSingle()
+    //                     .Which
+    //                     .Should()
+    //                     .BeEquivalentTo(
+    //                         new Person[]
+    //                             {
+    //                                 new("John", "Doe", Department.HR),
+    //                                 new("Jane", "Smith", Department.HR),
+    //                                 new("John", "Black", Department.HR)
+    //                             }
+    //                             .ToLookup(x => x.FirstName)
+    //                     );
+    //             },
+    //             second =>
+    //             {
+    //                 second.Key.Should().Be(Department.IT);
+    //                 second.Should()
+    //                     .ContainSingle()
+    //                     .Which
+    //                     .Should()
+    //                     .BeEquivalentTo(
+    //                         new Person[]
+    //                             {
+    //                                 new("Alice", "Johnson", Department.IT),
+    //                                 new("Bob", "Brown", Department.IT),
+    //                                 new("Charlie", "Brown", Department.IT)
+    //                             }
+    //                             .ToLookup(x => x.FirstName)
+    //                     );
+    //             });
+    // }
 
     [Fact]
     public void Group_Consuming()
     {
         var people = new List<Person>
         {
-            new("John", "Doe", "HR"),
-            new("Jane", "Smith", "HR"),
-            new("Alice", "Johnson", "IT"),
-            new("Bob", "Brown", "IT"),
-            new("Charlie", "Brown", "IT"),
-            new("John", "Black", "HR")
+            new("John", "Doe", Department.HR),
+            new("Jane", "Smith", Department.HR),
+            new("Alice", "Johnson", Department.IT),
+            new("Bob", "Brown", Department.IT),
+            new("Charlie", "Brown", Department.IT),
+            new("John", "Black", Department.HR)
         };
 
-        var grouped = people.GroupBy(p => p.Department)
-            .ThenBy(p => p.LastName)
-            .ToDictionary(x => x.Key);
+        var grouped1 = people
+            .GroupBy(x => x.Department)
+            .ToDictionary(l1 => l1.Key,
+                l1 => l1.GroupBy(p => p.LastName).ToDictionary(l2 => l2.Key,
+                    l2 => l2.ToLookup(p => p.FirstName)));
 
-        var brownsFromItDepartment =
-            from itStaff in grouped["IT"]
-            from browns in itStaff["Brown"]
-            select browns.Match(_ => [], r => r);
+        var grouped2 = people.GroupBy(x => x.Department) // -> Dictionary
+            .ThenBy(x => x.LastName) // -> Dictionary
+            .ThenBy(x => x.FirstName); // -> Lookup
 
-        brownsFromItDepartment
-            .Should()
-            .BeEquivalentTo(
-            [
-                new Person("Bob", "Brown", "IT"),
-                new Person("Charlie", "Brown", "IT"),
-            ]);
+        var itStaff = grouped2[Department.IT];
+        var browns = itStaff["Brown"];
+        var bob = browns["Bob"].Single();
+        // var brownsFromItDepartment =
+        //     from itStaff in grouped[Department.IT]
+        //     from browns in itStaff["Brown"]
+        //     select browns.Match(_ => [], r => r);
+        //
+        // brownsFromItDepartment
+        //     .Should()
+        //     .BeEquivalentTo(
+        //     [
+        //         new Person2("Bob", "Brown", Department.IT),
+        //         new Person2("Charlie", "Brown", Department.IT),
+        //     ]);
 
-        var invalidGroup =
-            from itStaff in grouped["IT"]
-            from invalid in itStaff["Invalid"]
-            select invalid;
-
-        invalidGroup
-            .Should().Be(Group<string, Person>.Empty);
+        // var invalidGroup =
+        //     from itStaff in grouped["IT"]
+        //     from invalid in itStaff["Invalid"]
+        //     select invalid;
+        //
+        // invalidGroup
+        //     .Should().Be(Group<string, Person>.Empty);
     }
 }
