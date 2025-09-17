@@ -82,6 +82,12 @@ class CompositionWithDI
         IRepository<int> repository = new Repository(context);
         var worker = new Worker(repository);
         worker.Work();
+
+        for (int i = 0; i < 10; i++)
+        {
+            repository = new Repository(context);
+            worker = new Worker(repository);
+        }
     }
 }
 

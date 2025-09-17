@@ -27,8 +27,8 @@ public static class Numbers
 
         return number switch
         {
-            0 => Enumerable.Empty<long>(),
-            1 => EnumerableEx.Return(1L),
+            0 => [],
+            1 => [1L],
             _ => FactorizeIterator(number)
         };
     }

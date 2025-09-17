@@ -27,8 +27,25 @@ public class ExpressionsTests
             .Be(3);
     }
 
+    [Theory]
+    [InlineData(1, 2)]
+    public void BinaryOperator_VariableParameters(int x, int y)
+    {
+        //Expression<Func<int>> sum = () => x + y;
+
+        var lambda = Expression.Lambda<Func<int>>(
+            Expression.Add(
+                Expression.Constant(x),
+                Expression.Constant(y)));
+        var function = lambda.Compile();
+
+        function()
+            .Should()
+            .Be(3);
+    }
+
     [Fact]
-    public void BinaryOperator_VariableParameters()
+    public void BinaryOperator_ArgumentParameters()
     {
         //Expression<Func<int, int, int>> sum = (x, y) => x + y;
 

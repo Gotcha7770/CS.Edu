@@ -6,23 +6,76 @@ namespace CS.Edu.Tests.Extensions.EnumerableExtensions;
 
 public class ThenGroupByTests
 {
-    // - HR
-    //  - Doe
-    //      - John
-    //  - Black
-    //      - John
-    //  - Smith
-    //      - Jane
-    // - IT
-    //  - Johnson
-    //      - Alice
-    //  - Brown
-    //      - Bob
-    //      - Charlie
-
     private enum Department { HR, IT }
 
     private record Person(string FirstName, string LastName, Department Department);
+
+    [Fact]
+    public void Group_Consuming()
+    {
+        var people = new List<Person>
+        {
+            new("John", "Doe", Department.HR),
+            new("Jane", "Smith", Department.HR),
+            new("Alice", "Johnson", Department.IT),
+            new("Bob", "Brown", Department.IT),
+            new("Charlie", "Brown", Department.IT),
+            new("John", "Black", Department.HR)
+        };
+
+        // - HR
+        //   - Doe
+        //     - John
+        //   - Smith
+        //     - Jane
+        //   - Black
+        //     - John
+        // - IT
+        //   - Johnson
+        //     - Alice
+        //   - Brown
+        //     - Bob
+        //     - Charlie
+
+        var usingBuiltInTools = people
+            .GroupBy(x => x.Department)
+            .ToDictionary(l1 => l1.Key,
+                l1 => l1.GroupBy(p => p.LastName).ToDictionary(l2 => l2.Key,
+                    l2 => l2.ToLookup(p => p.FirstName)));
+
+        var usingStronglyTypedParameters = people.GroupBy(x => x.Department) // -> Dictionary
+            .ThenBy(x => x.LastName) // -> Dictionary
+            .ThenBy(x => x.FirstName); // -> Lookup
+
+        var usingNestedGrouping = people.GroupBy(x => x.Department) // -> Dictionary
+            .ThenByEx(x => x.LastName) // -> Dictionary
+            .ThenByEx(x => x.FirstName); // -> Lookup
+
+        // var itStaff = usingNestedGrouping.GetSubGroup<string>(Department.IT);
+        // var browns = itStaff["Brown"];
+        // var bob = browns["Bob"].Single();
+
+        // var brownsFromItDepartment =
+        //     from itStaff in grouped[Department.IT]
+        //     from browns in itStaff["Brown"]
+        //     select browns.Match(_ => [], r => r);
+        //
+        // brownsFromItDepartment
+        //     .Should()
+        //     .BeEquivalentTo(
+        //     [
+        //         new Person2("Bob", "Brown", Department.IT),
+        //         new Person2("Charlie", "Brown", Department.IT),
+        //     ]);
+
+        // var invalidGroup =
+        //     from itStaff in grouped["IT"]
+        //     from invalid in itStaff["Invalid"]
+        //     select invalid;
+        //
+        // invalidGroup
+        //     .Should().Be(Group<string, Person>.Empty);
+    }
 
     [Fact]
     public void EmptySource_ReturnsEmptyEnumerable()
@@ -181,52 +234,4 @@ public class ThenGroupByTests
     //                     );
     //             });
     // }
-
-    [Fact]
-    public void Group_Consuming()
-    {
-        var people = new List<Person>
-        {
-            new("John", "Doe", Department.HR),
-            new("Jane", "Smith", Department.HR),
-            new("Alice", "Johnson", Department.IT),
-            new("Bob", "Brown", Department.IT),
-            new("Charlie", "Brown", Department.IT),
-            new("John", "Black", Department.HR)
-        };
-
-        var grouped1 = people
-            .GroupBy(x => x.Department)
-            .ToDictionary(l1 => l1.Key,
-                l1 => l1.GroupBy(p => p.LastName).ToDictionary(l2 => l2.Key,
-                    l2 => l2.ToLookup(p => p.FirstName)));
-
-        var grouped2 = people.GroupBy(x => x.Department) // -> Dictionary
-            .ThenBy(x => x.LastName) // -> Dictionary
-            .ThenBy(x => x.FirstName); // -> Lookup
-
-        var itStaff = grouped2[Department.IT];
-        var browns = itStaff["Brown"];
-        var bob = browns["Bob"].Single();
-        // var brownsFromItDepartment =
-        //     from itStaff in grouped[Department.IT]
-        //     from browns in itStaff["Brown"]
-        //     select browns.Match(_ => [], r => r);
-        //
-        // brownsFromItDepartment
-        //     .Should()
-        //     .BeEquivalentTo(
-        //     [
-        //         new Person2("Bob", "Brown", Department.IT),
-        //         new Person2("Charlie", "Brown", Department.IT),
-        //     ]);
-
-        // var invalidGroup =
-        //     from itStaff in grouped["IT"]
-        //     from invalid in itStaff["Invalid"]
-        //     select invalid;
-        //
-        // invalidGroup
-        //     .Should().Be(Group<string, Person>.Empty);
-    }
 }

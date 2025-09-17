@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 // ReSharper disable once CheckNamespace
 namespace CS.Edu.Core.Extensions;
 
-public static partial class AsyncEnumerableExtensions
+public static partial class AsyncEnumerableEx
 {
     public static IAsyncEnumerable<T> DefaultIfEmpty<T>(this IAsyncEnumerable<T> source, Func<T> defaultProvider)
     {
@@ -21,7 +20,7 @@ public static partial class AsyncEnumerableExtensions
             throw new ArgumentNullException(nameof(defaultProvider));
         }
 
-        return AsyncEnumerable.Create(ct => Iterator(source, defaultProvider, ct));
+        return Create(ct => Iterator(source, defaultProvider, ct));
     }
 
     public static IAsyncEnumerable<T> DefaultIfEmptyAwait<T>(this IAsyncEnumerable<T> source,
@@ -37,7 +36,7 @@ public static partial class AsyncEnumerableExtensions
             throw new ArgumentNullException(nameof(defaultProvider));
         }
 
-        return AsyncEnumerable.Create(ct => Iterator(source, defaultProvider, ct));
+        return Create(ct => Iterator(source, defaultProvider, ct));
     }
 
     private static async IAsyncEnumerator<T> Iterator<T>(
@@ -47,10 +46,10 @@ public static partial class AsyncEnumerableExtensions
     {
         await using var enumerator = source.GetAsyncEnumerator(cancellationToken);
 
-        if (await enumerator.MoveNextAsync(cancellationToken))
+        if (await enumerator.MoveNextAsync())
         {
             do yield return enumerator.Current;
-            while (await enumerator.MoveNextAsync(cancellationToken));
+            while (await enumerator.MoveNextAsync());
         }
         else
         {
@@ -63,10 +62,10 @@ public static partial class AsyncEnumerableExtensions
     {
         await using var enumerator = source.GetAsyncEnumerator(cancellationToken);
 
-        if (await enumerator.MoveNextAsync(cancellationToken))
+        if (await enumerator.MoveNextAsync())
         {
             do yield return enumerator.Current;
-            while (await enumerator.MoveNextAsync(cancellationToken));
+            while (await enumerator.MoveNextAsync());
         }
         else
         {

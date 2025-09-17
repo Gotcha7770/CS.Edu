@@ -14,8 +14,8 @@ public static partial class EnumerableExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
 
-        return source.Aggregate(
-            EnumerableEx.Return(Enumerable.Empty<T>()),
+        return source.Aggregate<IEnumerable<T>, IEnumerable<IEnumerable<T>>>(
+            [[]],
             (acc, cur) =>
                 from prevProductItem in acc
                 from item in cur

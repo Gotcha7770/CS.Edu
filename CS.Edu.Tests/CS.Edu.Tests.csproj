@@ -1,35 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>12</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="11.0.1" />
-    <PackageReference Include="Bogus" Version="35.4.1" />
-    <PackageReference Include="DynamicData" Version="7.4.3" />
-    <PackageReference Include="FastMember" Version="1.5.0" />
-    <PackageReference Include="FluentAssertions.Analyzers" Version="0.26.0">
+    <PackageReference Include="AwesomeAssertions" Version="9.1.0" />
+    <PackageReference Include="AwesomeAssertions.Analyzers" Version="9.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Bogus" Version="35.6.3" />
+    <PackageReference Include="FastMember" Version="1.5.0" />
     <PackageReference Include="FluentAssertions.FileSystem" Version="1.0.1" />
-    <PackageReference Include="Flurl" Version="3.0.7" />
-    <PackageReference Include="Microsoft.Reactive.Testing" Version="4.4.1" />
-    <PackageReference Include="Moq" Version="4.12.0" />
-    <PackageReference Include="NSubstitute" Version="4.2.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.16">
+    <PackageReference Include="Flurl" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Reactive.Testing" Version="6.0.2" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Interactive" Version="5.0.0" />
-    <PackageReference Include="System.Interactive.Async" Version="6.0.1" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
-    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit" Version="2.8.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

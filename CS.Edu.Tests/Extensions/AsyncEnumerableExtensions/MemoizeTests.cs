@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AwesomeAssertions;
 using CS.Edu.Core.Extensions;
-using FluentAssertions;
 using Xunit;
+using AsyncEnumerable = System.Linq.AsyncEnumerable;
 
 namespace CS.Edu.Tests.Extensions.AsyncEnumerableExtensions;
 

@@ -71,7 +71,7 @@ public static partial class EnumerableExtensions
         Func<TLeft, TRight, TResult> resultSelector,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var lookup = await outer.ToLookupAsync(outerKeySelector, cancellationToken);
+        var lookup = await outer.ToLookupAsync(outerKeySelector, cancellationToken: cancellationToken);
 
         foreach(var right in inner)
         {

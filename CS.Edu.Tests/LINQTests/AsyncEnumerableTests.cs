@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using CS.Edu.Core.Extensions;
 using Xunit;
 
 namespace CS.Edu.Tests.LINQTests;
@@ -64,7 +66,7 @@ public class AsyncEnumerableTests
 
         // or to IAsyncEnumerable<T>
         var asyncEnumeration = items.ToAsyncEnumerable()
-            .SelectAwait(async x => (await x).ToString());
+            .Select(async x => (await x).ToString());
     }
 
     [Fact]
@@ -90,12 +92,30 @@ public class AsyncEnumerableTests
     [Fact]
     public async Task PagingWithAsyncEnumerable()
     {
-        var query = _customers.ToAsyncEnumerable()
+        var query = GetCustomers()
             .SelectMany(x => GetOrdersAsyncEnumerable(x.Id));
 
         await foreach (var order in query)
         {
             // we can get exactly as much as we want
+        }
+    }
+
+    private IAsyncEnumerable<Customer> GetCustomers()
+    {
+        return AsyncEnumerableEx.Create(Iterator);
+    }
+
+    private async IAsyncEnumerator<Customer> Iterator(CancellationToken cancellationToken)
+    {
+        await Task.Yield();
+
+        foreach (var customer in _customers)
+        {
+            if(cancellationToken.IsCancellationRequested)
+                break;
+
+            yield return customer;
         }
     }
 }

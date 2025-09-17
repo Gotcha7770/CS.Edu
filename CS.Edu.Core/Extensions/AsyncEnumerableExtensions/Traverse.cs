@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 // ReSharper disable once CheckNamespace
 namespace CS.Edu.Core.Extensions;
 
-public static partial class AsyncEnumerableExtensions
+public static partial class AsyncEnumerableEx
 {
     public static async Task<IEnumerable<T>> Sequence<T>(this IEnumerable<Task<T>> source)
     {

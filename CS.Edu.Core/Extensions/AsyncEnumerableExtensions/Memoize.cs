@@ -4,7 +4,7 @@ using System.Collections.Generic;
 // ReSharper disable once CheckNamespace
 namespace CS.Edu.Core.Extensions;
 
-public static partial class AsyncEnumerableExtensions
+public static partial class AsyncEnumerableEx
 {
     public static IAsyncEnumerable<T> Memoize<T>(this IAsyncEnumerable<T> source)
     {
