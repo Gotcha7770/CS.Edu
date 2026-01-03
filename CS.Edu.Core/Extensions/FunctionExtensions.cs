@@ -3,28 +3,8 @@ using System.Collections.Concurrent;
 
 namespace CS.Edu.Core.Extensions;
 
-public static class Functions
+public static class FunctionExtensions
 {
-    public static Func<T, bool> ToFunc<T>(this Predicate<T> predicate)
-    {
-        return x => predicate(x);
-    }
-
-    public static Func<T, T, bool> ToFunc<T>(this Relation<T> relation)
-    {
-        return (x, y) => relation(x, y);
-    }
-
-    public static Func<T1, T2, bool> ToFunc<T1, T2>(this Relation<T1, T2> relation)
-    {
-        return (x, y) => relation(x, y);
-    }
-
-    public static Func<T, T, T> ToFunc<T>(this Merge<T> mergeFunc)
-    {
-        return (x, y) => mergeFunc(x, y);
-    }
-
     public static Func<T2, TResult> ApplyPartial<T1, T2, TResult>(this Func<T1, T2, TResult> function, T1 arg)
     {
         return x => function(arg, x);
@@ -35,12 +15,14 @@ public static class Functions
         return x => action(arg, x);
     }
 
-    public static Func<T1, Func<T2, Func<T3, TResult>>> Curry<T1, T2, T3, TResult>(this Func<T1, T2, T3, TResult> function)
+    public static Func<T1, Func<T2, Func<T3, TResult>>> Curry<T1, T2, T3, TResult>(
+        this Func<T1, T2, T3, TResult> function)
     {
         return a => b => c => function(a, b, c);
     }
 
-    public static Func<T1, Func<T2, Func<T3, Func<T4, TResult>>>> Curry<T1, T2, T3, T4, TResult>(this Func<T1, T2, T3, T4, TResult> function)
+    public static Func<T1, Func<T2, Func<T3, Func<T4, TResult>>>> Curry<T1, T2, T3, T4, TResult>(
+        this Func<T1, T2, T3, T4, TResult> function)
     {
         return a => b => c => d => function(a, b, c, d);
     }
@@ -60,12 +42,38 @@ public static class Functions
         return (x, y) => cache.GetOrAdd((x, y), new Lazy<TOut>(() => function(x, y))).Value;
     }
 
-    public static Func<T, T> Identity<T>() => IdentityFunc<T>.Value;
+    extension<T>(Func<T>)
+    {
+        public static Func<T, bool> True => Cache<T>.True;
+        public static Func<T, bool> False => Cache<T>.False;
+    }
 
-    private static class IdentityFunc<T>
+    extension<T>(Func<T, bool> target)
+    {
+        public Func<T, bool> And(Func<T, bool> other)
+        {
+            return x => target(x) && other(x);
+        }
+
+        public Func<T, bool> Or(Func<T, bool> other)
+        {
+            return x => target(x) || other(x);
+        }
+    }
+
+    extension<T>(Func<T, T> target)
+    {
+        public static Func<T, T> Identity => Cache<T>.Value;
+    }
+
+    private static class Cache<T>
     {
         internal static readonly Func<T, T> Value = Id;
+        internal static readonly Func<T, bool> True = GetTrue;
+        internal static readonly Func<T, bool> False = GetFalse;
 
         private static T Id(T value) => value;
+        private static bool GetTrue(T value) => true;
+        private static bool GetFalse(T value) => false;
     }
 }

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace CS.Edu.Tests.Extensions;
 
-public class PredicatesTests
+public class PredicateExtensionsTests
 {
     [Theory]
     [InlineData(2, false)]

@@ -167,7 +167,7 @@ public class TypeExtTests
         {
             taskC,
             taskB,
-            Task.Run(Actions.Empty())
+            Task.Run(Action.Idle)
         };
 
         var result = source.OfType((GenericType)typeof(Task<>));

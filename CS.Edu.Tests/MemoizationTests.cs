@@ -21,7 +21,7 @@ public class MemoizationTests
     public void OneInvocation()
     {
         var fact = new TestClass();
-        var memoized = Functions.Memoize<int, int, int>((x,y) => fact.Add(x, y));
+        var memoized = FunctionExtensions.Memoize<int, int, int>((x,y) => fact.Add(x, y));
         //var memoized = Functions.Memoize<(int, int), int>(x => Fact.Add(x.Item1, x.Item2));
         //var memoized = Functions.Memoize<(int, int), int>(((int a, int b) x) => Fact.Add(x.a, x.b));
         //var memoized = Functions.Memoize<int, Func<int, int>>(x => y => Fact.Add(x, y));
@@ -35,7 +35,7 @@ public class MemoizationTests
     public void TwoInvocations_SameValue()
     {
         var fact = new TestClass();
-        var memoized = Functions.Memoize<int, int, int>(fact.Add);
+        var memoized = FunctionExtensions.Memoize<int, int, int>(fact.Add);
         var first = memoized(2, 3);
         var second = memoized(2, 3);
 
@@ -48,7 +48,7 @@ public class MemoizationTests
     public void TwoInvocations_DifferentValues()
     {
         var fact = new TestClass();
-        var memoized = Functions.Memoize<int, int, int>(fact.Add);
+        var memoized = FunctionExtensions.Memoize<int, int, int>(fact.Add);
         var first = memoized(3, 2); //тут вопрос как считать, параметры то одинаковые
         var second = memoized(2, 3);
 

@@ -9,11 +9,11 @@ public static partial class EnumerableExtensions
 {
     public static IEnumerable<T> Generate<T>(T state, Func<T, T> iterate)
     {
-        return Generate(state, Predicates.True<T>(), iterate);
+        return Generate(state, Func<T>.True, iterate);
     }
 
-    public static IEnumerable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
+    public static IEnumerable<T> Generate<T>(T state, Func<T, bool> condition, Func<T, T> iterate)
     {
-        return EnumerableEx.Generate(state, x => condition(x), iterate, Functions.Identity<T>());
+        return EnumerableEx.Generate(state, condition, iterate, Func<T, T>.Identity);
     }
 }

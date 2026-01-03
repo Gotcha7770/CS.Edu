@@ -23,6 +23,6 @@ public class CallerArgumentExpressionTests
         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         Invoking(() => Check(item is { Key: 3 }))
             .Should().Throw<Exception>()
-            .WithMessage("Condition failed: identity is { Key: 3 }");
+            .WithMessage("Condition failed: item is { Key: 3 }");
     }
 }

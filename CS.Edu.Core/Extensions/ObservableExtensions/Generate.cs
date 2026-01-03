@@ -8,11 +8,11 @@ public static partial class Observables
 {
     public static IObservable<T> Generate<T>(T state, Func<T, T> iterate)
     {
-        return Generate(state, Predicates.True<T>(), iterate);
+        return Generate(state, Func<T>.True, iterate);
     }
 
-    public static IObservable<T> Generate<T>(T state, Predicate<T> condition, Func<T, T> iterate)
+    public static IObservable<T> Generate<T>(T state, Func<T, bool> condition, Func<T, T> iterate)
     {
-        return Observable.Generate(state, x => condition(x), iterate, Functions.Identity<T>());
+        return Observable.Generate(state, condition, iterate, Func<T, T>.Identity);
     }
 }

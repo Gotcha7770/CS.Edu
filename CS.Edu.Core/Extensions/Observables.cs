@@ -95,12 +95,6 @@ public static partial class Observables
         }, keySelector);
     }
 
-    public static IObservable<IChangeSet<TObject, TKey>> Filter<TObject, TKey>(this IObservable<IChangeSet<TObject, TKey>> source,
-        IObservable<Predicate<TObject>> predicateChanged)
-    {
-        return source.Filter(predicateChanged.Select(x => x.ToFunc()));
-    }
-
     public static IObservable<IChangeSet<T>> Tail<T>(this IObservable<IChangeSet<T>> source,
         int numberOfItems)
     {

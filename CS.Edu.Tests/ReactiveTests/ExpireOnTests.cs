@@ -14,27 +14,22 @@ namespace CS.Edu.Tests.ReactiveTests;
 
 public class ExpireOnTests
 {
-    private readonly Subject<Unit> _subject = new Subject<Unit>();
+    private readonly Subject<Unit> _subject = new();
 
     [Fact]
     public void RemoveAllWithFilter()
     {
-        var source = Source.From(new[]
-        {
-            new Valuable<int>(0),
-            new Valuable<int>(1)
-        }, x => x.Key);
+        var source = Source.From([new Valuable<int>(0), new Valuable<int>(1)], x => x.Key);
 
-        using (var aggregate = source.Connect()
-                   .Filter(_subject.Select(_ => Predicates.False<Valuable<int>>())
-                       .StartWith(Predicates.True<Valuable<int>>()))
-                   .SkipInitial()
-                   .AsAggregator())
-        {
-            _subject.OnNext(Unit.Default);
-            aggregate.Messages.Should().ContainSingle();
-            aggregate.Messages.Should().OnlyContain(x => x.Removes == 2);
-        }
+        using var aggregate = source.Connect()
+            .Filter(_subject.Select(_ => Func<Valuable<int>>.False)
+                .StartWith(Func<Valuable<int>>.True))
+            .SkipInitial()
+            .AsAggregator();
+
+        _subject.OnNext(Unit.Default);
+        aggregate.Messages.Should().ContainSingle();
+        aggregate.Messages.Should().OnlyContain(x => x.Removes == 2);
     }
 
     [Fact]
@@ -56,11 +51,7 @@ public class ExpireOnTests
     [Fact]
     public void ExpireOn_ClearsOnEvaluation()
     {
-        var source = Source.From(new[]
-        {
-            new Valuable<int>(0),
-            new Valuable<int>(1)
-        }, x => x.Key);
+        var source = Source.From(new[] { new Valuable<int>(0), new Valuable<int>(1) }, x => x.Key);
 
         using (var aggregate = source.Connect()
                    .ExpireOn(_subject)

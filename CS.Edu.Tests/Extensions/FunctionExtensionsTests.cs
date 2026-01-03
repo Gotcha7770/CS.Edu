@@ -5,7 +5,7 @@ using Xunit;
 
 namespace CS.Edu.Tests.Extensions;
 
-public class FunctionsTests
+public class FunctionExtensionsTests
 {
     [Fact]
     public void ApplyPartial()
