@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using CS.Edu.Tests.Utils;
 using CS.Edu.Tests.Utils.Models;
 using FluentAssertions;
 using Xunit;

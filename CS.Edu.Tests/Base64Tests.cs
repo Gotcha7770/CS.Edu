@@ -2,9 +2,6 @@
 using System.Buffers.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Unicode;
 using CS.Edu.Core;
 using FluentAssertions;
 using Xunit;

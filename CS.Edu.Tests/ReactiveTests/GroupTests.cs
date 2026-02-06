@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
-using CS.Edu.Tests.Utils;
 using CS.Edu.Tests.Utils.Models;
 using DynamicData;
 using DynamicData.Tests;

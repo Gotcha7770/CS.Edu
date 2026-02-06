@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CS.Edu.Core.Extensions;
-using CS.Edu.Tests.Utils;
 using CS.Edu.Tests.Utils.Models;
 using DynamicData;
 using DynamicData.Tests;

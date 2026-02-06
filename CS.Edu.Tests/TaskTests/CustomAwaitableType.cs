@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using CS.Edu.Core;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace CS.Edu.Tests.TaskTests;
 public class CustomAwaitableType
 {
     [Fact]
-    public async void Test()
+    public async Task Test()
     {
         await FooAsync();
         RangeParameters rangeParameters = RangeParameters.IncludeBoth;

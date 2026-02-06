@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CS.Edu.Tests.Utils;
 using CS.Edu.Tests.Utils.Models;
 using Xunit;
 

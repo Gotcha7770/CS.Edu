@@ -1,10 +1,9 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 using Segment = CS.Edu.Tests.IO.PathTests.Segment;
 
 namespace CS.Edu.Tests.TestCases;
 
-public class PathParsingCases :TheoryData<string, bool, Segment[]>
+public class PathParsingCases : TheoryData<string, bool, Segment[]>
 {
     public PathParsingCases()
     {

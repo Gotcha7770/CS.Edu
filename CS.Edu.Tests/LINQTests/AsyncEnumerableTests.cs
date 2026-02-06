@@ -70,7 +70,7 @@ public class AsyncEnumerableTests
     }
 
     [Fact]
-    public async void PagingWithEnumerableOfTasks()
+    public async Task PagingWithEnumerableOfTasks()
     {
         IEnumerable<Task<Order>> ofOrders = Enumerable.Empty<Task<Order>>()
             .Take(15..30);
