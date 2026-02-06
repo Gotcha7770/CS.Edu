@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="CS.Edu.Benchmarks/CS.Edu.Benchmarks.csproj" />
+  <Project Path="CS.Edu.Core/CS.Edu.Core.csproj" />
+  <Project Path="CS.Edu.Tests/CS.Edu.Tests.csproj" />
+</Solution>
